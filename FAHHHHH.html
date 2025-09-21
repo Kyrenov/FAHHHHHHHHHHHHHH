@@ -1,0 +1,777 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cooked Menu</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+    
+    <style>
+        :root {
+            --bg-color: rgba(10, 10, 10, 0.92);
+            --primary-text: #ffffff;
+            --secondary-text: #b0b0b0;
+            --accent-color: #8A2BE2;
+            --highlight-bg: #8A2BE2;
+            --border-color: rgba(255, 255, 255, 0.15);
+            --font: 'Inter', sans-serif;
+            --border-radius: 8px;
+            --transition-speed: 0.1s;
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font);
+            background-color: transparent;
+            color: var(--primary-text);
+            overflow: hidden;
+            user-select: none;
+        }
+
+        .hidden { display: none !important; }
+
+        .menu-container {
+            position: absolute;
+            top: 15vh;
+            left: 5vw;
+            width: 420px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            display: flex;
+            flex-direction: column;
+            border: 1px solid var(--border-color);
+            visibility: hidden;
+        }
+
+        .header-image {
+            width: 100%;
+            height: 100px;
+            background-image: url('https://raw.githubusercontent.com/uhfdsauifgyuasfbhasgdghu/LUIOS8BV8/main/JiggyLogo.png');
+            background-size: cover;
+            background-position: center;
+            border-bottom: 1px solid var(--border-color);
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+        }
+
+        .breadcrumb-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background: rgba(0,0,0,0.3);
+            font-size: 14px;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-color);
+        }
+        #breadcrumb { color: var(--secondary-text); text-transform: uppercase; }
+        #option-counter { color: var(--primary-text); }
+
+        .menu-items {
+            list-style: none;
+            position: relative;
+            height: 410px;
+            overflow: hidden;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .menu-items::-webkit-scrollbar {
+            display: none;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 11px 15px;
+            font-size: 15px;
+            position: relative;
+            height: 41px;
+        }
+        
+        .selection-highlight {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 41px;
+            background: var(--highlight-bg);
+            z-index: 1;
+            transition: top var(--transition-speed) ease-out;
+        }
+
+        .item-content {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            z-index: 2;
+        }
+        
+        .item-label { flex-grow: 1; }
+        .item-value { color: var(--primary-text); font-weight: 500; }
+        
+        .toggle-indicator { font-weight: 600; }
+        .toggle-indicator.on { color: #2ecc71; }
+        .toggle-indicator.off { color: #ff4757; }
+
+        .slider-bar {
+            width: 120px;
+            height: 8px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 4px;
+            position: relative;
+        }
+        .slider-fill {
+            height: 100%;
+            background: var(--primary-text);
+            border-radius: 4px;
+        }
+        .slider-container { display: flex; align-items: center; gap: 10px; }
+
+        .footer {
+            padding: 10px 15px;
+            background: rgba(0,0,0,0.3);
+            border-top: 1px solid var(--border-color);
+            min-height: 20px;
+            font-size: 13px;
+            color: var(--secondary-text);
+            border-bottom-left-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
+        }
+
+        #notification-container { position: fixed; bottom: 20px; right: 20px; z-index: 9999; display: flex; flex-direction: column; gap: 10px; }
+        .notification { background: var(--bg-color); border: 1px solid var(--border-color); color: var(--primary-text); padding: 10px 20px; border-radius: 8px; border-left: 4px solid var(--accent-color); box-shadow: 0 5px 15px rgba(0,0,0,0.3); opacity: 0; animation: slideIn 0.3s forwards, slideOut 0.3s 2.7s forwards; }
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        
+        .input-overlay {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.6); backdrop-filter: blur(5px);
+            display: flex; align-items: center; justify-content: center; z-index: 10000;
+        }
+        .input-box {
+            background: var(--bg-color); padding: 25px; border-radius: var(--border-radius);
+            border: 1px solid var(--border-color); width: 400px; text-align: center;
+        }
+        .input-box h3 { margin-bottom: 15px; font-size: 18px; }
+        .input-box input {
+            width: 100%; padding: 12px; background: rgba(0,0,0,0.3);
+            border: 1px solid var(--border-color); color: var(--primary-text);
+            border-radius: 6px; font-size: 16px; text-align: center;
+            transition: border-color 0.2s ease, box-shadow 0.2s ease;
+        }
+        .input-box input:focus { 
+            outline: none; 
+            border-color: var(--accent-color);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
+        }
+        .input-box input:hover {
+            border-color: rgba(138, 43, 226, 0.6);
+        }
+        .input-box small { color: var(--secondary-text); margin-top: 10px; display: block; }
+
+        /* Status panel styles */
+        .status-panel {
+            position: absolute;
+            right: 50px;
+            top: 15vh;
+            width: 350px;
+            height: 500px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            visibility: hidden;
+            overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+        }
+
+        .status-panel::-webkit-scrollbar {
+            display: none;
+        }
+
+        .status-header {
+            padding: 15px;
+            background: rgba(0,0,0,0.3);
+            border-bottom: 1px solid var(--border-color);
+            font-size: 16px;
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .status-content {
+            padding: 15px;
+            position: relative;
+        }
+
+        /* Status panel highlight */
+        .status-selection-highlight {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            background: var(--highlight-bg);
+            z-index: 1;
+            transition: top var(--transition-speed) ease-out;
+            opacity: 0;
+        }
+
+        .status-item-external {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            font-size: 14px;
+            position: relative;
+            z-index: 2;
+            transition: background-color 0.2s ease;
+        }
+
+        .status-item-external:last-child {
+            border-bottom: none;
+        }
+
+        .status-item-external.selected {
+            background: rgba(138, 43, 226, 0.3);
+            margin: 0 -15px;
+            padding: 8px 15px;
+        }
+
+        .status-item-external:hover {
+            background: rgba(138, 43, 226, 0.2) !important;
+            cursor: pointer;
+        }
+
+        /* Add hover effect to main menu items */
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 11px 15px;
+            font-size: 15px;
+            position: relative;
+            height: 41px;
+            transition: background-color 0.2s ease;
+        }
+
+        .menu-item:hover {
+            background: rgba(138, 43, 226, 0.3) !important;
+            cursor: pointer;
+        }
+
+        /* Input hover styling in status panel */
+        .status-item-input {
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            position: relative;
+            z-index: 2;
+            transition: background-color 0.2s ease;
+        }
+
+        .status-item-input:hover {
+            background: rgba(138, 43, 226, 0.2) !important;
+            cursor: pointer;
+        }
+
+        .status-item-input:hover input {
+            border-color: var(--accent-color) !important;
+            background: rgba(0,0,0,0.6) !important;
+            box-shadow: 0 0 0 1px rgba(138, 43, 226, 0.4) !important;
+        }
+
+        /* Make sure input boxes are easily distinguishable when hovered */
+        .status-item-input {
+            transition: all 0.2s ease;
+        }
+
+        .status-item-input input {
+            transition: all 0.2s ease;
+        }
+
+        .status-on { color: #2ecc71; font-weight: 600; }
+        .status-off { color: #ff4757; font-weight: 600; }
+        .status-unknown { color: #f39c12; font-weight: 600; }
+
+        .jiggy-status-banner {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            padding: 15px 20px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            border: 1px solid var(--border-color);
+            font-size: 24px;
+            font-weight: 700;
+            color: var(--accent-color);
+            opacity: 1;
+            transform: translateY(0);
+        }
+        
+        .jiggy-status-banner.loading {
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); opacity: 1; }
+            50% { transform: scale(1.05); opacity: 0.8; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="notification-container"></div>
+<div class="input-overlay hidden" id="input-overlay"></div>
+
+<div class="menu-container" id="menu-container">
+    <div class="header-image"></div>
+    <div class="breadcrumb-bar">
+        <span id="breadcrumb"></span>
+        <span id="option-counter"></span>
+    </div>
+    <ul class="menu-items" id="menu-items">
+        <div class="selection-highlight" id="selection-highlight"></div>
+    </ul>
+    <div class="footer" id="footer">
+    </div>
+</div>
+
+<div class="status-panel" id="status-panel">
+    <div class="status-header" id="status-header">STATUS</div>
+    <div class="status-content" id="status-content">
+        <div class="status-selection-highlight" id="status-selection-highlight"></div>
+    </div>
+</div>
+
+<div class="jiggy-status-banner" id="jiggy-status-banner">
+    UNDETECTED
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuItemsEl = document.getElementById('menu-items');
+        const breadcrumbEl = document.getElementById('breadcrumb');
+        const counterEl = document.getElementById('option-counter');
+        const footerEl = document.getElementById('footer');
+        let highlightEl = document.getElementById('selection-highlight');
+        const notificationContainer = document.getElementById('notification-container');
+        const inputOverlay = document.getElementById('input-overlay');
+        const menuContainer = document.getElementById('menu-container');
+        const statusPanel = document.getElementById('status-panel');
+        const statusHeader = document.getElementById('status-header');
+        const statusContent = document.getElementById('status-content');
+        const statusHighlight = document.getElementById('status-selection-highlight');
+        const banner = document.getElementById('jiggy-status-banner');
+
+        let currentMenuId = 'main';
+        let navigationStack = [];
+        let selectedIndex = 0;
+        let statusSelectedIndex = 0;
+        let optionStates = {};
+        let currentState = null;
+        let isContentPanelOpen = false;
+        let welcomeMessageShown = false;
+        const MAX_VISIBLE_ITEMS = 10;
+        const ITEM_HEIGHT = 41;
+
+        const defaultMenuData = {
+            main: {
+                title: 'Loading Jiggy...',
+                items: [
+                    { label: 'Loading Menu', target: 'self', description: 'Please Wait While The Menu Loads.' },
+                ]
+            }
+        };
+
+        function safeEncode(text) {
+            if (!text || typeof text !== 'string') return '';
+            return text.replace(/&/g, '&amp;')
+                        .replace(/</g, '&lt;')
+                        .replace(/>/g, '&gt;')
+                        .replace(/"/g, '&quot;')
+                        .replace(/'/g, '&#39;');
+        }
+
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notificationContainer.appendChild(notification);
+            setTimeout(() => { notification.remove(); }, 3000);
+        }
+
+        function showInputPrompt(title, placeholder, callback) {
+            inputOverlay.innerHTML = `
+                <div class="input-box">
+                    <h3>${title}</h3>
+                    <input type="text" id="prompt-input" placeholder="${placeholder}">
+                    <small>Press Enter to submit, Escape to cancel.</small>
+                </div>
+            `;
+            inputOverlay.classList.remove('hidden');
+            const inputField = document.getElementById('prompt-input');
+            inputField.focus();
+
+            const close = () => {
+                inputOverlay.classList.add('hidden');
+                document.onkeydown = handleMenuInput;
+            };
+
+            const keyHandler = (e) => {
+                if (e.key === 'Enter') {
+                    callback(inputField.value);
+                    close();
+                } else if (e.key === 'Escape') {
+                    close();
+                }
+            };
+            document.onkeydown = keyHandler;
+        }
+
+        function updateStatusSelection(items) {
+            if (!items || items.length === 0) return;
+            
+            const itemElements = statusContent.querySelectorAll('.status-item-external, .status-item-input');
+            if (!itemElements[statusSelectedIndex]) return;
+
+            // Calculate the position and height of the selected item
+            let itemTop = 0;
+            let itemHeight = 0;
+            
+            for (let i = 0; i < statusSelectedIndex; i++) {
+                if (itemElements[i]) {
+                    itemTop += itemElements[i].offsetHeight;
+                }
+            }
+            
+            if (itemElements[statusSelectedIndex]) {
+                itemHeight = itemElements[statusSelectedIndex].offsetHeight;
+            }
+
+            // Update highlight position and make it visible
+            statusHighlight.style.top = `${itemTop}px`;
+            statusHighlight.style.height = `${itemHeight}px`;
+            statusHighlight.style.opacity = '1';
+
+            // Handle scrolling to keep the highlight in view
+            const statusContentEl = statusContent.parentElement; // status-panel
+            const scrollTop = statusContentEl.scrollTop;
+            const containerHeight = statusContentEl.clientHeight - statusHeader.offsetHeight; // Account for header
+            const itemBottom = itemTop + itemHeight;
+            
+            // Adjust for the status content padding (15px)
+            const contentPadding = 15;
+            const adjustedItemTop = itemTop + statusHeader.offsetHeight + contentPadding;
+            const adjustedItemBottom = adjustedItemTop + itemHeight;
+            
+            if (adjustedItemTop < scrollTop + statusHeader.offsetHeight) {
+                statusContentEl.scrollTop = adjustedItemTop - statusHeader.offsetHeight;
+            } else if (adjustedItemBottom > scrollTop + statusContentEl.clientHeight) {
+                statusContentEl.scrollTop = adjustedItemBottom - statusContentEl.clientHeight;
+            }
+
+            // Update classes for visual feedback
+            itemElements.forEach((el, i) => {
+                el.classList.toggle('selected', i === statusSelectedIndex);
+            });
+        }
+
+        function populateStatusContent(tabData, state) {
+            statusContent.innerHTML = '<div class="status-selection-highlight" id="status-selection-highlight"></div>';
+            const statusHighlightEl = document.getElementById('status-selection-highlight');
+            
+            if (!tabData || !tabData.items || !Array.isArray(tabData.items)) return;
+
+            tabData.items.forEach((item, index) => {
+                const element = document.createElement('div');
+                
+                const isToggleOrState = (item.type === 'toggle' || (item.label && (item.label.toLowerCase().includes('toggle') || item.label.toLowerCase().includes('enabled') || item.label.toLowerCase().includes('boost') || item.label.toLowerCase().includes('crasher'))));
+                const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
+
+                if (item.type === 'input') {
+                    element.className = 'status-item-input';
+                    element.innerHTML = `
+                        <div style="width: 100%;">
+                            <label style="display: block; margin-bottom: 5px; font-size: 12px; color: var(--secondary-text);">${safeEncode(item.label)}</label>
+                            <input type="text" style="width: 100%; padding: 5px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: var(--primary-text); border-radius: 3px; transition: border-color 0.2s ease, background-color 0.2s ease;" value="${safeEncode(item.value || '')}" readonly>
+                        </div>`;
+                } else {
+                    element.className = 'status-item-external';
+                    
+                    if (isToggleOrState || isResourceState) {
+                        const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === '' ? 'status-off' : 'status-unknown') : 'status-off';
+                        const statusText = item.state ? item.state : '';
+                        element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
+                    } else {
+                        element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
+                    }
+                }
+
+                element.addEventListener('click', () => {
+                    statusSelectedIndex = index;
+                    updateStatusSelection(tabData.items);
+                    if (window.parent) {
+                        window.parent.postMessage({ action: 'select', itemIndex: index, isContentPanel: true }, '*');
+                    }
+                });
+
+                statusContent.appendChild(element);
+            });
+
+            // Set initial selection if specified in state
+            if (state.selection && state.selection.index !== undefined) {
+                statusSelectedIndex = state.selection.index;
+            } else {
+                statusSelectedIndex = 0;
+            }
+            
+            // Update the highlight reference and position
+            window.statusHighlight = statusHighlightEl;
+            updateStatusSelection(tabData.items);
+        }
+        
+        function updateMenuFromState(state) {
+            if (!state || !state.tabs) return;
+
+            currentState = state;
+            
+            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
+            highlightEl = document.getElementById('selection-highlight');
+            
+            const menuItems = state.tabs.map((tabData, index) => ({
+                label: tabData.title || `Tab ${index + 1}`,
+                tabIndex: index,
+                type: 'tab',
+                description: `Open ${tabData.title || `Tab ${index + 1}`}`
+            }));
+
+            menuItems.forEach((item, index) => {
+                const menuItemEl = document.createElement('li');
+                menuItemEl.className = 'menu-item';
+                
+                let content = `<div class="item-content">`;
+                content += `<span class="item-label">${item.label}</span>`;
+                content += `<i class="chevron fa-solid fa-angle-right"></i>`;
+                content += `</div>`;
+                
+                menuItemEl.innerHTML = content;
+                menuItemsEl.appendChild(menuItemEl);
+
+                menuItemEl.addEventListener('click', () => {
+                    if (window.parent) {
+                        window.parent.postMessage({ action: 'select', tabIndex: item.tabIndex, isContentPanel: false }, '*');
+                    }
+                });
+            });
+
+            breadcrumbEl.textContent = 'Made By Anonymous';
+            counterEl.textContent = `${state.activeTab + 1} / ${state.tabs.length}`;
+            
+            selectedIndex = state.activeTab;
+            updateSelection(menuItems);
+
+            isContentPanelOpen = state.isContentPanelOpen;
+            if (isContentPanelOpen) {
+                statusPanel.style.visibility = 'visible';
+                const activeTab = state.tabs[state.activeTab];
+                if (activeTab) {
+                    statusHeader.textContent = activeTab.header || activeTab.title;
+                    populateStatusContent(activeTab, state);
+                }
+            } else {
+                statusPanel.style.visibility = 'hidden';
+            }
+
+            const activeTab = state.tabs[state.activeTab];
+            footerEl.textContent = activeTab ? (activeTab.description || `Current Tab: ${activeTab.title}`) : '';
+        }
+
+        function renderMenu(menuId) {
+            const menu = defaultMenuData[menuId];
+            if (!menu) return;
+
+            currentMenuId = menuId;
+            breadcrumbEl.textContent = menu.title;
+            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
+            highlightEl = document.getElementById('selection-highlight');
+            
+            const itemsToRender = menu.items.map(item => {
+                if (item.target) return { ...item, type: 'submenu' };
+                return item;
+            });
+
+            if (menu.parent) {
+                itemsToRender.unshift({ type: 'back', label: 'Back', icon: 'fa-solid fa-arrow-left', description: 'Return to the previous menu.' });
+            }
+
+            itemsToRender.forEach((item, index) => {
+                const menuItemEl = document.createElement('li');
+                menuItemEl.className = 'menu-item';
+                
+                let content = `<div class="item-content">`;
+                if (item.icon) content += `<i class="icon ${item.icon}"></i>`;
+                content += `<span class="item-label">${item.label}</span>`;
+
+                if (item.type === 'submenu' || item.type === 'player') {
+                    content += `<i class="chevron fa-solid fa-angle-right"></i>`;
+                } else if (item.type === 'toggle') {
+                    const isChecked = optionStates[item.stateId] || false;
+                    content += `<div class="item-value"></div>`;
+                } else if (item.type === 'slider') {
+                    const value = optionStates[item.stateId] || item.min;
+                    const percent = ((value - item.min) / (item.max - item.min)) * 100;
+                    content += `<div class="item-value slider-container"><div class="slider-bar"><div class="slider-fill" style="width: ${percent}%"></div></div></div>`;
+                }
+                content += `</div>`;
+                menuItemEl.innerHTML = content;
+                menuItemsEl.appendChild(menuItemEl);
+            });
+            
+            selectedIndex = 0;
+            updateSelection(itemsToRender);
+        }
+        
+        function updateSelection(itemsToRender) {
+            const items = menuItemsEl.querySelectorAll('.menu-item');
+            if (!items[selectedIndex]) return;
+
+            items.forEach((item, i) => item.classList.toggle('selected', i === selectedIndex));
+            
+            const itemTop = selectedIndex * ITEM_HEIGHT;
+            const itemBottom = itemTop + ITEM_HEIGHT;
+            const scrollTop = menuItemsEl.scrollTop;
+            const containerHeight = menuItemsEl.clientHeight;
+            
+            if (itemTop < scrollTop) {
+                menuItemsEl.scrollTop = itemTop;
+            } else if (itemBottom > scrollTop + containerHeight) {
+                menuItemsEl.scrollTop = itemBottom - containerHeight;
+            }
+
+            highlightEl.style.top = `${itemTop - menuItemsEl.scrollTop}px`;
+            
+            counterEl.textContent = `${selectedIndex + 1} / ${items.length}`;
+            const currentItemData = itemsToRender[selectedIndex];
+            footerEl.textContent = currentItemData?.description || '';
+        }
+
+        function handleMenuInput(e) {
+            if (currentState) return;
+
+            e.preventDefault();
+            const menu = defaultMenuData[currentMenuId];
+            const itemsToRender = menu.items.map(item => item.target ? { ...item, type: 'submenu' } : item);
+            if (menu.parent) {
+                itemsToRender.unshift({ type: 'back', label: 'Back', icon: 'fa-solid fa-arrow-left', description: 'Return to the previous menu.' });
+            }
+            const currentItemData = itemsToRender[selectedIndex];
+            
+            switch (e.key) {
+                case 'ArrowUp':
+                    selectedIndex = (selectedIndex - 1 + itemsToRender.length) % itemsToRender.length;
+                    break;
+                case 'ArrowDown':
+                    selectedIndex = (selectedIndex + 1) % itemsToRender.length;
+                    break;
+                case 'Enter':
+                    if (currentItemData.target) {
+                        navigationStack.push(currentMenuId);
+                        renderMenu(currentItemData.target);
+                    } else if (currentItemData.type === 'button') {
+                        showNotification(`Action: ${currentItemData.label}`);
+                    } else if (currentItemData.type === 'toggle') {
+                        optionStates[currentItemData.stateId] = !optionStates[currentItemData.stateId];
+                        showNotification(`${currentItemData.label}: ${optionStates[currentItemData.stateId] ? 'Enabled' : 'Disabled'}`);
+                        renderMenu(currentMenuId);
+                    } else if (currentItemData.type === 'input') {
+                        showInputPrompt(`Enter value for ${currentItemData.label}:`, currentItemData.placeholder, (result) => {
+                            if (result) showNotification(`Set ${currentItemData.label} to: ${result}`);
+                        });
+                    } else if (currentItemData.type === 'back') {
+                        const parentMenu = navigationStack.pop();
+                        renderMenu(parentMenu || 'main');
+                    }
+                    break;
+                case 'Backspace':
+                    if (navigationStack.length > 0) {
+                        const parentMenu = navigationStack.pop();
+                        renderMenu(parentMenu);
+                    }
+                    break;
+            }
+            updateSelection(itemsToRender);
+        }
+        
+        window.addEventListener("message", (event) => {
+            const { action, data } = event.data;
+            
+            if (action === "update" || action === "show") {
+                if (data) {
+                    updateMenuFromState(data);
+                    menuContainer.style.visibility = 'visible';
+                    if (action === "show" && !welcomeMessageShown) {
+                        welcomeMessageShown = true;
+                        showNotification("Jiggy Menu loaded successfully");
+                    }
+                }
+            }
+            
+            if (action === 'hide') {
+                menuContainer.style.visibility = 'hidden';
+                statusPanel.style.visibility = 'hidden';
+            }
+        });
+        
+        document.onkeydown = handleMenuInput;
+        renderMenu('main');
+        menuContainer.style.visibility = 'visible';
+        
+        const headerImage = document.querySelector('.header-image');
+        const bannerEl = document.getElementById('jiggy-status-banner');
+        
+        bannerEl.classList.add('loading');
+
+        const img = new Image();
+        img.onload = () => {
+            bannerEl.classList.remove('loading');
+        };
+        img.onerror = () => {
+            bannerEl.classList.remove('loading');
+        };
+        img.src = 'https://raw.githubusercontent.com/uhfdsauifgyuasfbhasgdghu/LUIOS8BV8/main/JiggyLogo.png';
+    });
+
+    window.addEventListener("message", (event) => {
+        const data = event.data;
+
+        if (data.action === "getClipboard") {
+            navigator.clipboard.readText().then(text => {
+                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text })
+                });
+            }).catch(() => {
+                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: "" })
+                });
+            });
+        }
+
+        if (data.action === "setClipboard") {
+            navigator.clipboard.writeText(data.text || "").catch(err => {
+                console.error("Clipboard write failed:", err);
+            });
+        }
+    });
+</script>
+
+</body>
+</html>
