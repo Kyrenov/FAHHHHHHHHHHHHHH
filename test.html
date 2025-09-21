@@ -16,7 +16,7 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 300px;
+            width: 500px;
             background: rgba(30, 30, 30, 0.9);
             border-radius: 10px;
             box-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
@@ -56,7 +56,7 @@
         }
         .tab-content {
             padding: 10px;
-            max-height: 400px;
+            max-height: 500px;
             overflow-y: auto;
             scrollbar-width: thin;
             scrollbar-color: #bb86fc rgba(0, 0, 0, 0.3);
@@ -157,6 +157,8 @@
                             window.sendMessageToLua({ action: 'updateInput', tabIndex: state.activeTab, itemIndex: index, value: e.target.value });
                         };
                         itemEl.appendChild(input);
+                    } else if (item.type === 'text') {
+                        itemEl.textContent = item.label;
                     } else {
                         itemEl.textContent = item.label;
                         if (item.state) {
@@ -202,10 +204,8 @@
         });
 
         window.sendMessageToLua = function(message) {
-            // Simulate sending message to Lua (replace with actual implementation)
             console.log('Sending to Lua:', message);
-            // Example: Send message to game environment
-            // window.parent.postMessage(message, '*');
+            // Integrate with game NUI callbacks if needed
         };
     </script>
 </body>
