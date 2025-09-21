@@ -11,15 +11,16 @@
   
     <style>
         :root {
-            --bg-color: rgba(10, 10, 10, 0.92);
+            --primary-color: rgb(139, 139, 255);
+            --secondary-color: rgb(100, 100, 200);
+            --bg-color: rgb(20, 20, 30);
             --primary-text: #ffffff;
-            --secondary-text: #b0b0b0;
-            --accent-color: rgb(15, 54, 173);
-            --highlight-bg: rgb(15, 54, 173);
-            --border-color: rgba(255, 255, 255, 0.15);
+            --secondary-text: #d0d0d0;
+            --border-color: rgba(255, 255, 255, 0.2);
+            --highlight-bg: var(--primary-color);
             --font: 'Inter', sans-serif;
-            --border-radius: 8px;
-            --transition-speed: 0.15s;
+            --border-radius: 10px;
+            --transition-speed: 0.2s;
             --easing: cubic-bezier(0.4, 0, 0.2, 1);
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -33,85 +34,86 @@
         .hidden { display: none !important; }
         .menu-container {
             position: absolute;
-            top: 15vh;
-            left: 5vw;
-            width: 420px;
+            top: 10vh;
+            left: 3vw;
+            width: 450px;
             background: var(--bg-color);
             border-radius: var(--border-radius);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
             display: flex;
             flex-direction: column;
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--primary-color);
             visibility: hidden;
             transition: transform 0.3s var(--easing), opacity 0.3s var(--easing);
-            transform: translateY(10px);
+            transform: translateY(20px);
             opacity: 0;
         }
         .menu-container.visible {
             transform: translateY(0);
             opacity: 1;
         }
-        .header-image {
-            width: 100%;
-            height: 100px;
-            background-image: url('https://raw.githubusercontent.com/Kyrenov/FAHHHHHHHHHHHHHH/main/image.png');
-            background-size: cover;
-            background-position: center;
-            border-bottom: 1px solid var(--border-color);
+        .header {
+            padding: 15px 20px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: var(--primary-text);
+            font-size: 18px;
+            font-weight: 600;
+            text-align: center;
             border-top-left-radius: var(--border-radius);
             border-top-right-radius: var(--border-radius);
+            border-bottom: 1px solid var(--border-color);
         }
         .breadcrumb-bar {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 15px;
-            background: rgba(0,0,0,0.3);
+            padding: 10px 20px;
+            background: rgba(0, 0, 0, 0.4);
             font-size: 14px;
             font-weight: 500;
             border-bottom: 1px solid var(--border-color);
         }
         #breadcrumb { color: var(--secondary-text); text-transform: uppercase; }
-        #option-counter { color: var(--primary-text); }
+        #option-counter { color: var(--primary-text); font-weight: 600; }
         .menu-items {
             list-style: none;
             position: relative;
-            height: 410px;
+            height: 450px;
             overflow-y: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
             scroll-behavior: smooth;
         }
-        .menu-items::-webkit-scrollbar {
-            display: none;
-        }
+        .menu-items::-webkit-scrollbar { display: none; }
         .menu-item {
             display: flex;
             align-items: center;
-            padding: 11px 15px;
-            font-size: 15px;
+            padding: 12px 20px;
+            font-size: 16px;
             position: relative;
-            height: 41px;
-            transition: background-color 0.2s var(--easing), transform 0.2s var(--easing);
+            height: 45px;
+            transition: background-color var(--transition-speed) var(--easing), transform var(--transition-speed) var(--easing);
             transform: translateX(0);
         }
         .menu-item:hover {
-            background: rgba(153, 130, 255, 0.3);
+            background: rgba(139, 139, 255, 0.3);
+            transform: translateX(8px);
             cursor: pointer;
-            transform: translateX(5px);
         }
         .menu-item.selected {
-            transform: translateX(5px);
+            background: rgba(139, 139, 255, 0.4);
+            transform: translateX(8px);
         }
         .selection-highlight {
             position: absolute;
             left: 0;
             width: 100%;
-            height: 41px;
+            height: 45px;
             background: var(--highlight-bg);
             z-index: 1;
-            transition: top 0.2s var(--easing), opacity 0.2s var(--easing);
-            opacity: 0.7;
+            transition: top var(--transition-speed) var(--easing), opacity var(--transition-speed) var(--easing);
+            opacity: 0.8;
+            border-left: 4px solid var(--secondary-color);
         }
         .item-content {
             display: flex;
@@ -119,146 +121,148 @@
             align-items: center;
             z-index: 2;
         }
-        .item-label { flex-grow: 1; }
-        .item-value { color: var(--primary-text); font-weight: 500; }
+        .item-label { flex-grow: 1; font-weight: 500; }
+        .item-value { color: var(--primary-text); font-weight: 600; }
         .toggle-indicator { font-weight: 600; }
         .toggle-indicator.on { color: #2ecc71; }
         .toggle-indicator.off { color: #ff4757; }
         .slider-bar {
-            width: 120px;
-            height: 8px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 4px;
+            width: 130px;
+            height: 10px;
+            background: rgba(255, 255, 255, 0.15);
+            border-radius: 5px;
             position: relative;
         }
         .slider-fill {
             height: 100%;
-            background: var(--primary-text);
-            border-radius: 4px;
-            transition: width 0.2s var(--easing);
+            background: var(--secondary-color);
+            border-radius: 5px;
+            transition: width var(--transition-speed) var(--easing);
         }
-        .slider-container { display: flex; align-items: center; gap: 10px; }
+        .slider-container { display: flex; align-items: center; gap: 12px; }
         .footer {
-            padding: 10px 15px;
-            background: rgba(0,0,0,0.3);
+            padding: 12px 20px;
+            background: rgba(0, 0, 0, 0.4);
             border-top: 1px solid var(--border-color);
-            min-height: 20px;
-            font-size: 13px;
+            min-height: 25px;
+            font-size: 14px;
             color: var(--secondary-text);
             border-bottom-left-radius: var(--border-radius);
             border-bottom-right-radius: var(--border-radius);
+            text-align: center;
         }
         #notification-container {
             position: fixed;
-            bottom: 20px;
-            right: 20px;
+            bottom: 30px;
+            right: 30px;
             z-index: 9999;
             display: flex;
             flex-direction: column;
-            gap: 10px;
+            gap: 12px;
         }
         .notification {
             background: var(--bg-color);
-            border: 1px solid var(--border-color);
+            border: 2px solid var(--primary-color);
             color: var(--primary-text);
-            padding: 10px 20px;
+            padding: 12px 25px;
             border-radius: 8px;
-            border-left: 4px solid var(--accent-color);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-left: 5px solid var(--secondary-color);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
             opacity: 0;
-            animation: slideIn 0.3s var(--easing) forwards, slideOut 0.3s 2.7s var(--easing) forwards;
+            animation: slideIn 0.4s var(--easing) forwards, slideOut 0.4s 2.5s var(--easing) forwards;
         }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
         .input-overlay {
             position: fixed;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(6px);
             display: flex;
             align-items: center;
             justify-content: center;
             z-index: 10000;
-            transition: opacity 0.3s var(--easing);
+            transition: opacity 0.4s var(--easing);
         }
         .input-box {
             background: var(--bg-color);
-            padding: 25px;
+            padding: 30px;
             border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
-            width: 400px;
+            border: 2px solid var(--primary-color);
+            width: 420px;
             text-align: center;
-            transform: scale(0.95);
-            transition: transform 0.3s var(--easing);
+            transform: scale(0.9);
+            transition: transform 0.4s var(--easing);
         }
         .input-overlay.visible .input-box {
             transform: scale(1);
         }
         .input-box h3 {
-            margin-bottom: 15px;
-            font-size: 18px;
+            margin-bottom: 20px;
+            font-size: 20px;
+            color: var(--primary-text);
         }
         .input-box input {
             width: 100%;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
+            padding: 14px;
+            background: rgba(0, 0, 0, 0.5);
             border: 1px solid var(--border-color);
             color: var(--primary-text);
             border-radius: 6px;
             font-size: 16px;
             text-align: center;
-            transition: border-color 0.2s var(--easing), box-shadow 0.2s var(--easing);
+            transition: border-color var(--transition-speed) var(--easing), box-shadow var(--transition-speed) var(--easing);
         }
         .input-box input:focus {
             outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(153, 130, 255, 0.2);
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 3px rgba(100, 100, 200, 0.3);
         }
         .input-box input:hover {
-            border-color: rgba(153, 130, 255, 0.6);
+            border-color: var(--primary-color);
         }
         .input-box small {
             color: var(--secondary-text);
-            margin-top: 10px;
+            margin-top: 12px;
             display: block;
+            font-size: 13px;
         }
         .status-panel {
             position: absolute;
-            right: 50px;
-            top: 15vh;
-            width: 350px;
-            height: 500px;
+            right: 3vw;
+            top: 10vh;
+            width: 400px;
+            height: 540px;
             background: var(--bg-color);
             border-radius: var(--border-radius);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color);
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
+            border: 2px solid var(--primary-color);
             visibility: hidden;
             overflow-y: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
             scroll-behavior: smooth;
-            transition: transform 0.3s var(--easing), opacity 0.3s var(--easing);
+            transition: transform 0.4s var(--easing), opacity 0.4s var(--easing);
         }
         .status-panel.visible {
             transform: translateY(0);
             opacity: 1;
         }
-        .status-panel::-webkit-scrollbar {
-            display: none;
-        }
+        .status-panel::-webkit-scrollbar { display: none; }
         .status-header {
             padding: 15px;
-            background: rgba(0,0,0,0.3);
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
             border-bottom: 1px solid var(--border-color);
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             text-align: center;
+            color: var(--primary-text);
         }
         .status-content {
-            padding: 15px;
+            padding: 20px;
             position: relative;
         }
         .status-selection-highlight {
@@ -267,50 +271,49 @@
             width: 100%;
             background: var(--highlight-bg);
             z-index: 1;
-            transition: top 0.2s var(--easing), height 0.2s var(--easing), opacity 0.2s var(--easing);
-            opacity: 0.7;
+            transition: top var(--transition-speed) var(--easing), height var(--transition-speed) var(--easing), opacity var(--transition-speed) var(--easing);
+            opacity: 0.8;
+            border-left: 4px solid var(--secondary-color);
         }
         .status-item-external {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 8px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
-            font-size: 14px;
+            padding: 10px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
+            font-size: 15px;
             position: relative;
             z-index: 2;
-            transition: background-color 0.2s var(--easing), transform 0.2s var(--easing);
+            transition: background-color var(--transition-speed) var(--easing), transform var(--transition-speed) var(--easing);
         }
-        .status-item-external:last-child {
-            border-bottom: none;
-        }
+        .status-item-external:last-child { border-bottom: none; }
         .status-item-external.selected {
-            background: rgba(153, 130, 255, 0.3);
+            background: rgba(139, 139, 255, 0.4);
             margin: 0 -15px;
-            padding: 8px 15px;
-            transform: translateX(5px);
+            padding: 10px 15px;
+            transform: translateX(8px);
         }
         .status-item-external:hover {
-            background: rgba(153, 130, 255, 0.2);
+            background: rgba(139, 139, 255, 0.3);
             cursor: pointer;
-            transform: translateX(5px);
+            transform: translateX(8px);
         }
         .status-item-input {
-            padding: 10px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 12px 15px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
             position: relative;
             z-index: 2;
-            transition: background-color 0.2s var(--easing), transform 0.2s var(--easing);
+            transition: background-color var(--transition-speed) var(--easing), transform var(--transition-speed) var(--easing);
         }
         .status-item-input:hover {
-            background: rgba(153, 130, 255, 0.2);
+            background: rgba(139, 139, 255, 0.3);
             cursor: pointer;
-            transform: translateX(5px);
+            transform: translateX(8px);
         }
         .status-item-input:hover input {
-            border-color: var(--accent-color);
-            background: rgba(0,0,0,0.6);
-            box-shadow: 0 0 0 1px rgba(153, 130, 255, 0.4);
+            border-color: var(--secondary-color);
+            background: rgba(0, 0, 0, 0.6);
+            box-shadow: 0 0 0 2px rgba(100, 100, 200, 0.3);
         }
         .status-on { color: #2ecc71; font-weight: 600; }
         .status-off { color: #ff4757; font-weight: 600; }
@@ -321,9 +324,9 @@
 <div id="notification-container"></div>
 <div class="input-overlay hidden" id="input-overlay"></div>
 <div class="menu-container" id="menu-container">
-    <div class="header-image"></div>
+    <div class="header">Avaris Menu</div>
     <div class="breadcrumb-bar">
-        <span id="breadcrumb">Avaris Menu</span>
+        <span id="breadcrumb">Main Menu</span>
         <span id="option-counter"></span>
     </div>
     <ul class="menu-items" id="menu-items">
@@ -360,13 +363,75 @@
         let isContentPanelOpen = false;
         let welcomeMessageShown = false;
         const MAX_VISIBLE_ITEMS = 10;
-        const ITEM_HEIGHT = 41;
+        const ITEM_HEIGHT = 45;
 
         const defaultMenuData = {
             main: {
-                title: 'Avaris Menu',
+                title: 'Main Menu',
                 items: [
-                    { label: 'Loading Menu', target: 'self', description: 'Please Wait While The Menu Loads.' },
+                    { label: 'Self', target: 'self', description: 'Manage your character settings.' },
+                    { label: 'Vehicle', target: 'vehicle', description: 'Access vehicle controls.' },
+                    { label: 'World', target: 'world', description: 'Modify world settings.' },
+                    { label: 'Network', target: 'network', description: 'Manage network options.' },
+                ]
+            },
+            self: {
+                title: 'Self Options',
+                parent: 'main',
+                items: [
+                    { label: 'Appearance', target: 'appearance', description: 'Customize your character.' },
+                    { label: 'Inventory', target: 'inventory', description: 'Manage your items.' },
+                    { label: 'Settings', target: 'settings', description: 'Adjust personal settings.' },
+                    { label: 'Health Boost', type: 'toggle', stateId: 'healthBoost', description: 'Toggle health boost.' },
+                    { label: 'Speed Multiplier', type: 'slider', stateId: 'speed', min: 1, max: 10, description: 'Adjust movement speed.' },
+                ]
+            },
+            appearance: {
+                title: 'Appearance',
+                parent: 'self',
+                items: [
+                    { label: 'Change Outfit', type: 'button', description: 'Select a new outfit.' },
+                    { label: 'Set Name', type: 'input', placeholder: 'Enter name', description: 'Set character name.' },
+                ]
+            },
+            inventory: {
+                title: 'Inventory',
+                parent: 'self',
+                items: [
+                    { label: 'Add Item', type: 'input', placeholder: 'Item name', description: 'Add an item to inventory.' },
+                    { label: 'Clear Inventory', type: 'button', description: 'Remove all items.' },
+                ]
+            },
+            settings: {
+                title: 'Settings',
+                parent: 'self',
+                items: [
+                    { label: 'God Mode', type: 'toggle', stateId: 'godMode', description: 'Toggle invincibility.' },
+                    { label: 'Visibility', type: 'toggle', stateId: 'visibility', description: 'Toggle visibility.' },
+                ]
+            },
+            vehicle: {
+                title: 'Vehicle Options',
+                parent: 'main',
+                items: [
+                    { label: 'Spawn Vehicle', type: 'input', placeholder: 'Vehicle model', description: 'Spawn a vehicle.' },
+                    { label: 'Repair Vehicle', type: 'button', description: 'Repair current vehicle.' },
+                ]
+            },
+            world: {
+                title: 'World Options',
+                parent: 'main',
+                items: [
+                    { label: 'Change Weather', type: 'button', description: 'Modify weather conditions.' },
+                    { label: 'Set Time', type: 'input', placeholder: 'HH:MM', description: 'Set world time.' },
+                ]
+            },
+            network: {
+                title: 'Network Options',
+                parent: 'main',
+                items: [
+                    { label: 'Kick Player', type: 'input', placeholder: 'Player ID', description: 'Kick a player.' },
+                    { label: 'Ban Player', type: 'input', placeholder: 'Player ID', description: 'Ban a player.' },
                 ]
             }
         };
@@ -430,13 +495,13 @@
 
             statusHighlight.style.top = `${itemTop}px`;
             statusHighlight.style.height = `${itemHeight}px`;
-            statusHighlight.style.opacity = '0.7';
+            statusHighlight.style.opacity = '0.8';
 
             const statusContentEl = statusContent.parentElement;
             const scrollTop = statusContentEl.scrollTop;
             const containerHeight = statusContentEl.clientHeight - statusHeader.offsetHeight;
             const itemBottom = itemTop + itemHeight;
-            const contentPadding = 15;
+            const contentPadding = 20;
             const adjustedItemTop = itemTop + statusHeader.offsetHeight + contentPadding;
             const adjustedItemBottom = adjustedItemTop + itemHeight;
 
@@ -466,8 +531,8 @@
                     element.className = 'status-item-input';
                     element.innerHTML = `
                         <div style="width: 100%;">
-                            <label style="display: block; margin-bottom: 5px; font-size: 12px; color: var(--secondary-text);">${safeEncode(item.label)}</label>
-                            <input type="text" style="width: 100%; padding: 5px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: var(--primary-text); border-radius: 3px;" value="${safeEncode(item.value || '')}" readonly>
+                            <label style="display: block; margin-bottom: 6px; font-size: 13px; color: var(--secondary-text);">${safeEncode(item.label)}</label>
+                            <input type="text" style="width: 100%; padding: 6px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: var(--primary-text); border-radius: 4px;" value="${safeEncode(item.value || '')}" readonly>
                         </div>`;
                 } else {
                     element.className = 'status-item-external';
@@ -522,7 +587,7 @@
                 });
             });
 
-            breadcrumbEl.textContent = 'Avaris Menu';
+            breadcrumbEl.textContent = 'Main Menu';
             counterEl.textContent = `${state.activeTab + 1} / ${state.tabs.length}`;
             selectedIndex = state.activeTab;
             updateSelection(menuItems);
