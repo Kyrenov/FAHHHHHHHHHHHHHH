@@ -4,13 +4,13 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avaris Menu</title>
-    <link href="tailwind.min.css" rel="stylesheet"> <!-- Assumes tailwind.min.css is in html/ -->
-    <script src="gsap.min.js"></script> <!-- Assumes gsap.min.js is in html/ -->
+    <link href="tailwind.min.css" rel="stylesheet"> <!-- Assumes tailwind.min.css in html/ -->
+    <script src="gsap.min.js"></script> <!-- Assumes gsap.min.js in html/ -->
     <style>
         body {
-            background: rgba(0, 0, 0, 0.8);
+            background: rgba(0, 0, 0, 0.85);
             color: #ffffff;
-            font-family: 'Arial', sans-serif;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
             user-select: none;
             overflow: hidden;
             margin: 0;
@@ -20,76 +20,108 @@
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            width: 800px;
-            max-height: 600px;
-            background: rgba(20, 20, 20, 0.9);
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            width: 850px;
+            max-height: 650px;
+            background: linear-gradient(145deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 20, 0.95));
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
             overflow: hidden;
+            transition: opacity 0.3s ease, transform 0.3s ease;
         }
         .tabs {
             display: flex;
             background: #1a1a1a;
-            border-bottom: 1px solid #444;
+            border-bottom: 2px solid #2a2a2a;
+            padding: 8px;
         }
         .tab {
             flex: 1;
             padding: 12px;
             text-align: center;
             cursor: pointer;
-            transition: background 0.2s ease;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #d1d5db;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+            margin: 0 4px;
         }
         .tab:hover {
-            background: #333;
+            background: #2d2d2d;
+            color: #ffffff;
+            transform: translateY(-1px);
         }
         .tab.active {
-            background: #6200ea;
+            background: #7c3aed;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+            transform: translateY(-1px);
         }
         .content {
-            padding: 16px;
-            max-height: 500px;
+            padding: 20px;
+            max-height: 550px;
             overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #7c3aed #1a1a1a;
         }
         .header {
-            font-size: 1.25rem;
-            margin-bottom: 12px;
-            color: #6200ea;
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #7c3aed;
+            letter-spacing: 0.5px;
         }
         .item {
-            padding: 8px;
-            background: #2a2a2a;
-            border-radius: 4px;
-            transition: background 0.2s ease;
+            padding: 10px;
+            background: #252525;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
         }
         .item:hover {
-            background: #3a3a3a;
+            background: #333333;
+            transform: translateX(4px);
+        }
+        .item.selected {
+            background: #6d28d9;
+            box-shadow: 0 2px 8px rgba(109, 40, 217, 0.3);
         }
         .item input {
             width: 100%;
-            padding: 8px;
+            padding: 10px;
             background: #1a1a1a;
-            border: 1px solid #444;
-            border-radius: 4px;
-            color: #fff;
-            transition: border-color 0.2s ease;
+            border: 1px solid #3f3f3f;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
         }
         .item input:focus {
             outline: none;
-            border-color: #6200ea;
+            border-color: #7c3aed;
+            box-shadow: 0 0 8px rgba(124, 58, 237, 0.3);
         }
         .error {
             color: #ef4444;
-            padding: 8px;
+            padding: 10px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 6px;
+            font-size: 0.9rem;
         }
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
         ::-webkit-scrollbar-track {
             background: #1a1a1a;
         }
         ::-webkit-scrollbar-thumb {
-            background: #6200ea;
-            border-radius: 3px;
+            background: #7c3aed;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9f67fa;
         }
     </style>
 </head>
@@ -98,7 +130,6 @@
         <div class="tabs" id="tabs"></div>
         <div class="content" id="content"></div>
     </div>
-
     <script>
         let state = {
             position: { x: 960, y: 540 },
@@ -109,23 +140,49 @@
             tabs: []
         };
 
-        // Fallback for animations if GSAP is not loaded
+        // GSAP fallback
         const animate = window.gsap || {
-            from: (el, props) => el,
-            to: (el, props) => el,
-            set: (el, props) => el
+            from: (el, props) => {
+                el.style.opacity = props.opacity || 1;
+                el.style.transform = props.scale ? `scale(${props.scale})` : 'none';
+                return el;
+            },
+            to: (el, props) => {
+                el.style.transition = 'all 0.2s ease';
+                el.style.opacity = props.opacity || 1;
+                el.style.transform = props.transform || props.scale ? `scale(${props.scale})` : 'none';
+                if (props.onComplete) setTimeout(props.onComplete, 200);
+                return el;
+            },
+            set: (el, props) => {
+                el.style.opacity = props.opacity || 1;
+                el.style.transform = props.transform || 'none';
+                return el;
+            }
         };
 
         function renderMenu(newState) {
             try {
-                console.log('Rendering menu with state:', newState); // Debug log
+                console.log('Rendering menu with state:', newState);
                 state = newState || state;
                 const menu = document.getElementById('menu');
                 const tabsContainer = document.getElementById('tabs');
                 const contentContainer = document.getElementById('content');
 
-                // Show/hide menu
-                menu.classList.toggle('hidden', !state.isContentPanelOpen && state.activeTab === -1);
+                // Show/hide menu with animation
+                if (state.isContentPanelOpen && state.activeTab !== -1) {
+                    menu.classList.remove('hidden');
+                    animate.from(menu, { opacity: 0, scale: 0.98, duration: 0.3, ease: 'power2.out' });
+                } else {
+                    animate.to(menu, {
+                        opacity: 0,
+                        scale: 0.98,
+                        duration: 0.3,
+                        ease: 'power2.in',
+                        onComplete: () => menu.classList.add('hidden')
+                    });
+                    return;
+                }
 
                 // Render tabs
                 tabsContainer.innerHTML = '';
@@ -134,14 +191,18 @@
                     console.error('No valid tabs in state');
                     return;
                 }
+
                 state.tabs.forEach((tab, index) => {
                     const tabEl = document.createElement('div');
-                    tabEl.className = `tab flex-1 p-3 text-center cursor-pointer ${index === state.activeTab ? 'active' : ''}`;
+                    tabEl.className = `tab ${index === state.activeTab ? 'active' : ''}`;
                     tabEl.textContent = tab.title || 'Unnamed Tab';
                     tabEl.onclick = () => {
-                        if (window.gsap) {
-                            animate.to(tabEl, { opacity: 0.7, duration: 0.15, onComplete: () => animate.to(tabEl, { opacity: 1, duration: 0.15 }) });
-                        }
+                        animate.to(tabEl, {
+                            scale: 0.95,
+                            duration: 0.15,
+                            ease: 'power1.out',
+                            onComplete: () => animate.to(tabEl, { scale: 1, duration: 0.15, ease: 'power1.in' })
+                        });
                         window.sendNuiMessage(JSON.stringify({ action: 'changeTab', index }));
                     };
                     tabsContainer.appendChild(tabEl);
@@ -162,8 +223,8 @@
                 contentContainer.appendChild(header);
 
                 const contentDiv = document.createElement('div');
-                contentDiv.className = activeTab.type === 'grid' ? 'grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2' :
-                                    (activeTab.type === 'list' || activeTab.type === 'form' ? 'flex flex-col gap-2' : 'flex flex-col gap-2');
+                contentDiv.className = activeTab.type === 'grid' ? 'grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3' :
+                                    (activeTab.type === 'list' || activeTab.type === 'form' ? 'flex flex-col gap-3' : 'flex flex-col gap-3');
 
                 if (!activeTab.items || !Array.isArray(activeTab.items)) {
                     contentDiv.innerHTML = '<div class="error">No items available</div>';
@@ -173,15 +234,18 @@
 
                 activeTab.items.forEach((item, index) => {
                     const itemEl = document.createElement('div');
-                    itemEl.className = `item p-2 rounded-md ${index === state.selection.index ? 'bg-purple-700' : 'bg-gray-800'}`;
+                    itemEl.className = `item ${index === state.selection.index ? 'selected' : ''}`;
                     itemEl.style.cursor = item.type === 'label' ? 'default' : 'pointer';
 
                     if (item.type === 'button') {
                         itemEl.textContent = item.label + (item.state ? ` (${item.state})` : '');
                         itemEl.onclick = () => {
-                            if (window.gsap) {
-                                animate.to(itemEl, { opacity: 0.7, duration: 0.15, onComplete: () => animate.to(itemEl, { opacity: 1, duration: 0.15 }) });
-                            }
+                            animate.to(itemEl, {
+                                scale: 0.97,
+                                duration: 0.1,
+                                ease: 'power1.out',
+                                onComplete: () => animate.to(itemEl, { scale: 1, duration: 0.1, ease: 'power1.in' })
+                            });
                             window.sendNuiMessage(JSON.stringify({ action: 'execute', tabIndex: state.activeTab, itemIndex: index }));
                         };
                     } else if (item.type === 'input') {
@@ -191,15 +255,11 @@
                         input.value = item.value || '';
                         input.placeholder = item.placeholder || '';
                         input.onfocus = () => {
-                            if (window.gsap) {
-                                animate.to(input, { borderColor: '#6200ea', duration: 0.2 });
-                            }
+                            animate.to(input, { borderColor: '#7c3aed', scale: 1.02, duration: 0.2, ease: 'power1.out' });
                             window.sendNuiMessage(JSON.stringify({ action: 'startTyping', tabIndex: state.activeTab, itemIndex: index }));
                         };
                         input.onblur = () => {
-                            if (window.gsap) {
-                                animate.to(input, { borderColor: '#4b5563', duration: 0.2 });
-                            }
+                            animate.to(input, { borderColor: '#3f3f3f', scale: 1, duration: 0.2, ease: 'power1.in' });
                             window.sendNuiMessage(JSON.stringify({ action: 'stopTyping' }));
                         };
                         input.oninput = (e) => {
@@ -212,37 +272,33 @@
 
                     contentDiv.appendChild(itemEl);
                 });
-                contentContainer.appendChild(contentDiv);
 
-                // Simplified animation for content
-                if (window.gsap) {
-                    animate.from(contentDiv, { opacity: 0, duration: 0.15, ease: 'power1.out' });
-                }
+                contentContainer.appendChild(contentDiv);
+                animate.from(contentDiv, { opacity: 0, y: 10, duration: 0.3, ease: 'power2.out' });
             } catch (error) {
                 console.error('Render error:', error);
                 contentContainer.innerHTML = '<div class="error">Error rendering menu: ' + error.message + '</div>';
             }
         }
 
-        // Handle NUI messages from Lua
+        // Handle NUI messages
         window.addEventListener('message', (event) => {
             try {
-                console.log('Received NUI message:', event.data); // Debug log
+                console.log('Received NUI message:', event.data);
                 const data = event.data;
                 if (data.action === 'update') {
                     renderMenu(data.data);
                 } else if (data.action === 'show') {
-                    document.getElementById('menu').classList.remove('hidden');
-                    if (window.gsap) {
-                        animate.from('.menu-container', { opacity: 0, duration: 0.15, ease: 'power1.out' });
-                    }
+                    renderMenu(state); // Ensure state is rendered on show
                 } else if (data.action === 'hide') {
-                    const onComplete = () => document.getElementById('menu').classList.add('hidden');
-                    if (window.gsap) {
-                        animate.to('.menu-container', { opacity: 0, duration: 0.15, ease: 'power1.in', onComplete });
-                    } else {
-                        onComplete();
-                    }
+                    const menu = document.getElementById('menu');
+                    animate.to(menu, {
+                        opacity: 0,
+                        scale: 0.98,
+                        duration: 0.3,
+                        ease: 'power2.in',
+                        onComplete: () => menu.classList.add('hidden')
+                    });
                 }
             } catch (error) {
                 console.error('NUI message error:', error);
