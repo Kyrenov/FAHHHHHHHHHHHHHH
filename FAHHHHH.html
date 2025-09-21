@@ -14,8 +14,8 @@
             --bg-color: rgba(10, 10, 10, 0.92);
             --primary-text: #ffffff;
             --secondary-text: #b0b0b0;
-            --accent-color: rgb(153, 130, 255);
-            --highlight-bg: rgb(153, 130, 255);
+            --accent-color: rgb(74, 172, 236);
+            --highlight-bg: rgb(74, 172, 236);
             --border-color: rgba(255, 255, 255, 0.15);
             --font: 'Inter', sans-serif;
             --border-radius: 8px;
@@ -46,7 +46,7 @@
         .header-image {
             width: 100%;
             height: 100px;
-            background-image: url('https://raw.githubusercontent.com/uhfdsauifgyuasfbhasgdghu/LUIOS8BV8/main/JiggyLogo.png');
+            background-image: url('https://raw.githubusercontent.com/Kyrenov/FAHHHHHHHHHHHHHH/main/image.png');
             background-size: cover;
             background-position: center;
             border-bottom: 1px solid var(--border-color);
@@ -265,30 +265,6 @@
         .status-on { color: #2ecc71; font-weight: 600; }
         .status-off { color: #ff4757; font-weight: 600; }
         .status-unknown { color: #f39c12; font-weight: 600; }
-        .avaris-status-banner {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            padding: 15px 20px;
-            background: var(--bg-color);
-            border-radius: var(--border-radius);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color);
-            font-size: 24px;
-            font-weight: 700;
-            color: var(--accent-color);
-            opacity: 1;
-            transform: translateY(0);
-        }
-       
-        .avaris-status-banner.loading {
-            animation: pulse 1.5s infinite;
-        }
-        @keyframes pulse {
-            0% { transform: scale(1); opacity: 1; }
-            50% { transform: scale(1.05); opacity: 0.8; }
-            100% { transform: scale(1); opacity: 1; }
-        }
     </style>
 </head>
 <body>
@@ -312,9 +288,6 @@
         <div class="status-selection-highlight" id="status-selection-highlight"></div>
     </div>
 </div>
-<div class="avaris-status-banner" id="avaris-status-banner">
-    UNDETECTED
-</div>
 <script>
     document.addEventListener('DOMContentLoaded', () => {
         const menuItemsEl = document.getElementById('menu-items');
@@ -329,7 +302,6 @@
         const statusHeader = document.getElementById('status-header');
         const statusContent = document.getElementById('status-content');
         const statusHighlight = document.getElementById('status-selection-highlight');
-        const banner = document.getElementById('avaris-status-banner');
         let currentMenuId = 'main';
         let navigationStack = [];
         let selectedIndex = 0;
@@ -393,7 +365,6 @@
            
             const itemElements = statusContent.querySelectorAll('.status-item-external, .status-item-input');
             if (!itemElements[statusSelectedIndex]) return;
-            // Calculate the position and height of the selected item
             let itemTop = 0;
             let itemHeight = 0;
            
@@ -406,17 +377,14 @@
             if (itemElements[statusSelectedIndex]) {
                 itemHeight = itemElements[statusSelectedIndex].offsetHeight;
             }
-            // Update highlight position and make it visible
             statusHighlight.style.top = `${itemTop}px`;
             statusHighlight.style.height = `${itemHeight}px`;
             statusHighlight.style.opacity = '1';
-            // Handle scrolling to keep the highlight in view
-            const statusContentEl = statusContent.parentElement; // status-panel
+            const statusContentEl = statusContent.parentElement;
             const scrollTop = statusContentEl.scrollTop;
-            const containerHeight = statusContentEl.clientHeight - statusHeader.offsetHeight; // Account for header
+            const containerHeight = statusContentEl.clientHeight - statusHeader.offsetHeight;
             const itemBottom = itemTop + itemHeight;
            
-            // Adjust for the status content padding (15px)
             const contentPadding = 15;
             const adjustedItemTop = itemTop + statusHeader.offsetHeight + contentPadding;
             const adjustedItemBottom = adjustedItemTop + itemHeight;
@@ -426,7 +394,6 @@
             } else if (adjustedItemBottom > scrollTop + statusContentEl.clientHeight) {
                 statusContentEl.scrollTop = adjustedItemBottom - statusContentEl.clientHeight;
             }
-            // Update classes for visual feedback
             itemElements.forEach((el, i) => {
                 el.classList.toggle('selected', i === statusSelectedIndex);
             });
@@ -468,14 +435,12 @@
                 });
                 statusContent.appendChild(element);
             });
-            // Set initial selection if specified in state
             if (state.selection && state.selection.index !== undefined) {
                 statusSelectedIndex = state.selection.index;
             } else {
                 statusSelectedIndex = 0;
             }
            
-            // Update the highlight reference and position
             window.statusHighlight = statusHighlightEl;
             updateStatusSelection(tabData.items);
         }
@@ -660,19 +625,6 @@
         document.onkeydown = handleMenuInput;
         renderMenu('main');
         menuContainer.style.visibility = 'visible';
-       
-        const headerImage = document.querySelector('.header-image');
-        const bannerEl = document.getElementById('avaris-status-banner');
-       
-        bannerEl.classList.add('loading');
-        const img = new Image();
-        img.onload = () => {
-            bannerEl.classList.remove('loading');
-        };
-        img.onerror = () => {
-            bannerEl.classList.remove('loading');
-        };
-        img.src = 'https://raw.githubusercontent.com/uhfdsauifgyuasfbhasgdghu/LUIOS8BV8/main/JiggyLogo.png';
     });
     window.addEventListener("message", (event) => {
         const data = event.data;
