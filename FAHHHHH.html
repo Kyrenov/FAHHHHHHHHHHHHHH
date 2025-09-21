@@ -4,764 +4,253 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avaris Menu</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-  
+    <link href="tailwind.min.css" rel="stylesheet"> <!-- Assumes tailwind.min.css is in html/ -->
+    <script src="gsap.min.js"></script> <!-- Assumes gsap.min.js is in html/ -->
     <style>
-        :root {
-            --primary-color: rgb(139, 139, 255);
-            --secondary-color: rgb(100, 100, 200);
-            --bg-color: rgb(20, 20, 30);
-            --primary-text: #ffffff;
-            --secondary-text: #d0d0d0;
-            --border-color: rgba(255, 255, 255, 0.2);
-            --highlight-bg: var(--primary-color);
-            --font: 'Inter', sans-serif;
-            --border-radius: 10px;
-            --transition-speed: 0.2s;
-            --easing: cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: var(--font);
-            background-color: transparent;
-            color: var(--primary-text);
-            overflow: hidden;
+            background: rgba(0, 0, 0, 0.8);
+            color: #ffffff;
+            font-family: 'Arial', sans-serif;
             user-select: none;
+            overflow: hidden;
+            margin: 0;
         }
-        .hidden { display: none !important; }
         .menu-container {
             position: absolute;
-            top: 10vh;
-            left: 3vw;
-            width: 450px;
-            background: var(--bg-color);
-            border-radius: var(--border-radius);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-            display: flex;
-            flex-direction: column;
-            border: 2px solid var(--primary-color);
-            visibility: hidden;
-            transition: transform 0.3s var(--easing), opacity 0.3s var(--easing);
-            transform: translateY(20px);
-            opacity: 0;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            max-height: 600px;
+            background: rgba(20, 20, 20, 0.9);
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            overflow: hidden;
         }
-        .menu-container.visible {
-            transform: translateY(0);
-            opacity: 1;
+        .tabs {
+            display: flex;
+            background: #1a1a1a;
+            border-bottom: 1px solid #444;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            transition: background 0.2s ease;
+        }
+        .tab:hover {
+            background: #333;
+        }
+        .tab.active {
+            background: #6200ea;
+        }
+        .content {
+            padding: 16px;
+            max-height: 500px;
+            overflow-y: auto;
         }
         .header {
-            padding: 15px 20px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            color: var(--primary-text);
-            font-size: 18px;
-            font-weight: 600;
-            text-align: center;
-            border-top-left-radius: var(--border-radius);
-            border-top-right-radius: var(--border-radius);
-            border-bottom: 1px solid var(--border-color);
+            font-size: 1.25rem;
+            margin-bottom: 12px;
+            color: #6200ea;
         }
-        .breadcrumb-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 20px;
-            background: rgba(0, 0, 0, 0.4);
-            font-size: 14px;
-            font-weight: 500;
-            border-bottom: 1px solid var(--border-color);
+        .item {
+            padding: 8px;
+            background: #2a2a2a;
+            border-radius: 4px;
+            transition: background 0.2s ease;
         }
-        #breadcrumb { color: var(--secondary-text); text-transform: uppercase; }
-        #option-counter { color: var(--primary-text); font-weight: 600; }
-        .menu-items {
-            list-style: none;
-            position: relative;
-            height: 450px;
-            overflow-y: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            scroll-behavior: smooth;
+        .item:hover {
+            background: #3a3a3a;
         }
-        .menu-items::-webkit-scrollbar { display: none; }
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 12px 20px;
-            font-size: 16px;
-            position: relative;
-            height: 45px;
-            transition: background-color var(--transition-speed) var(--easing), transform var(--transition-speed) var(--easing);
-            transform: translateX(0);
-        }
-        .menu-item:hover {
-            background: rgba(139, 139, 255, 0.3);
-            transform: translateX(8px);
-            cursor: pointer;
-        }
-        .menu-item.selected {
-            background: rgba(139, 139, 255, 0.4);
-            transform: translateX(8px);
-        }
-        .selection-highlight {
-            position: absolute;
-            left: 0;
+        .item input {
             width: 100%;
-            height: 45px;
-            background: var(--highlight-bg);
-            z-index: 1;
-            transition: top var(--transition-speed) var(--easing), opacity var(--transition-speed) var(--easing);
-            opacity: 0.8;
-            border-left: 4px solid var(--secondary-color);
+            padding: 8px;
+            background: #1a1a1a;
+            border: 1px solid #444;
+            border-radius: 4px;
+            color: #fff;
+            transition: border-color 0.2s ease;
         }
-        .item-content {
-            display: flex;
-            width: 100%;
-            align-items: center;
-            z-index: 2;
-        }
-        .item-label { flex-grow: 1; font-weight: 500; }
-        .item-value { color: var(--primary-text); font-weight: 600; }
-        .toggle-indicator { font-weight: 600; }
-        .toggle-indicator.on { color: #2ecc71; }
-        .toggle-indicator.off { color: #ff4757; }
-        .slider-bar {
-            width: 130px;
-            height: 10px;
-            background: rgba(255, 255, 255, 0.15);
-            border-radius: 5px;
-            position: relative;
-        }
-        .slider-fill {
-            height: 100%;
-            background: var(--secondary-color);
-            border-radius: 5px;
-            transition: width var(--transition-speed) var(--easing);
-        }
-        .slider-container { display: flex; align-items: center; gap: 12px; }
-        .footer {
-            padding: 12px 20px;
-            background: rgba(0, 0, 0, 0.4);
-            border-top: 1px solid var(--border-color);
-            min-height: 25px;
-            font-size: 14px;
-            color: var(--secondary-text);
-            border-bottom-left-radius: var(--border-radius);
-            border-bottom-right-radius: var(--border-radius);
-            text-align: center;
-        }
-        #notification-container {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-        }
-        .notification {
-            background: var(--bg-color);
-            border: 2px solid var(--primary-color);
-            color: var(--primary-text);
-            padding: 12px 25px;
-            border-radius: 8px;
-            border-left: 5px solid var(--secondary-color);
-            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.5);
-            opacity: 0;
-            animation: slideIn 0.4s var(--easing) forwards, slideOut 0.4s 2.5s var(--easing) forwards;
-        }
-        @keyframes slideIn { from { transform: translateX(120%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(120%); opacity: 0; } }
-        .input-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.7);
-            backdrop-filter: blur(6px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            transition: opacity 0.4s var(--easing);
-        }
-        .input-box {
-            background: var(--bg-color);
-            padding: 30px;
-            border-radius: var(--border-radius);
-            border: 2px solid var(--primary-color);
-            width: 420px;
-            text-align: center;
-            transform: scale(0.9);
-            transition: transform 0.4s var(--easing);
-        }
-        .input-overlay.visible .input-box {
-            transform: scale(1);
-        }
-        .input-box h3 {
-            margin-bottom: 20px;
-            font-size: 20px;
-            color: var(--primary-text);
-        }
-        .input-box input {
-            width: 100%;
-            padding: 14px;
-            background: rgba(0, 0, 0, 0.5);
-            border: 1px solid var(--border-color);
-            color: var(--primary-text);
-            border-radius: 6px;
-            font-size: 16px;
-            text-align: center;
-            transition: border-color var(--transition-speed) var(--easing), box-shadow var(--transition-speed) var(--easing);
-        }
-        .input-box input:focus {
+        .item input:focus {
             outline: none;
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 3px rgba(100, 100, 200, 0.3);
+            border-color: #6200ea;
         }
-        .input-box input:hover {
-            border-color: var(--primary-color);
+        .error {
+            color: #ef4444;
+            padding: 8px;
         }
-        .input-box small {
-            color: var(--secondary-text);
-            margin-top: 12px;
-            display: block;
-            font-size: 13px;
+        ::-webkit-scrollbar {
+            width: 6px;
         }
-        .status-panel {
-            position: absolute;
-            right: 3vw;
-            top: 10vh;
-            width: 400px;
-            height: 540px;
-            background: var(--bg-color);
-            border-radius: var(--border-radius);
-            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.6);
-            border: 2px solid var(--primary-color);
-            visibility: hidden;
-            overflow-y: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            scroll-behavior: smooth;
-            transition: transform 0.4s var(--easing), opacity 0.4s var(--easing);
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
         }
-        .status-panel.visible {
-            transform: translateY(0);
-            opacity: 1;
+        ::-webkit-scrollbar-thumb {
+            background: #6200ea;
+            border-radius: 3px;
         }
-        .status-panel::-webkit-scrollbar { display: none; }
-        .status-header {
-            padding: 15px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            border-bottom: 1px solid var(--border-color);
-            font-size: 18px;
-            font-weight: 600;
-            text-align: center;
-            color: var(--primary-text);
-        }
-        .status-content {
-            padding: 20px;
-            position: relative;
-        }
-        .status-selection-highlight {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            background: var(--highlight-bg);
-            z-index: 1;
-            transition: top var(--transition-speed) var(--easing), height var(--transition-speed) var(--easing), opacity var(--transition-speed) var(--easing);
-            opacity: 0.8;
-            border-left: 4px solid var(--secondary-color);
-        }
-        .status-item-external {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            font-size: 15px;
-            position: relative;
-            z-index: 2;
-            transition: background-color var(--transition-speed) var(--easing), transform var(--transition-speed) var(--easing);
-        }
-        .status-item-external:last-child { border-bottom: none; }
-        .status-item-external.selected {
-            background: rgba(139, 139, 255, 0.4);
-            margin: 0 -15px;
-            padding: 10px 15px;
-            transform: translateX(8px);
-        }
-        .status-item-external:hover {
-            background: rgba(139, 139, 255, 0.3);
-            cursor: pointer;
-            transform: translateX(8px);
-        }
-        .status-item-input {
-            padding: 12px 15px;
-            border-bottom: 1px solid rgba(255, 255, 255, 0.15);
-            position: relative;
-            z-index: 2;
-            transition: background-color var(--transition-speed) var(--easing), transform var(--transition-speed) var(--easing);
-        }
-        .status-item-input:hover {
-            background: rgba(139, 139, 255, 0.3);
-            cursor: pointer;
-            transform: translateX(8px);
-        }
-        .status-item-input:hover input {
-            border-color: var(--secondary-color);
-            background: rgba(0, 0, 0, 0.6);
-            box-shadow: 0 0 0 2px rgba(100, 100, 200, 0.3);
-        }
-        .status-on { color: #2ecc71; font-weight: 600; }
-        .status-off { color: #ff4757; font-weight: 600; }
-        .status-unknown { color: #f39c12; font-weight: 600; }
     </style>
 </head>
 <body>
-<div id="notification-container"></div>
-<div class="input-overlay hidden" id="input-overlay"></div>
-<div class="menu-container" id="menu-container">
-    <div class="header">Avaris Menu</div>
-    <div class="breadcrumb-bar">
-        <span id="breadcrumb">Main Menu</span>
-        <span id="option-counter"></span>
+    <div id="menu" class="menu-container hidden">
+        <div class="tabs" id="tabs"></div>
+        <div class="content" id="content"></div>
     </div>
-    <ul class="menu-items" id="menu-items">
-        <div class="selection-highlight" id="selection-highlight"></div>
-    </ul>
-    <div class="footer" id="footer"></div>
-</div>
-<div class="status-panel" id="status-panel">
-    <div class="status-header" id="status-header">STATUS</div>
-    <div class="status-content" id="status-content">
-        <div class="status-selection-highlight" id="status-selection-highlight"></div>
-    </div>
-</div>
-<script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const menuItemsEl = document.getElementById('menu-items');
-        const breadcrumbEl = document.getElementById('breadcrumb');
-        const counterEl = document.getElementById('option-counter');
-        const footerEl = document.getElementById('footer');
-        let highlightEl = document.getElementById('selection-highlight');
-        const notificationContainer = document.getElementById('notification-container');
-        const inputOverlay = document.getElementById('input-overlay');
-        const menuContainer = document.getElementById('menu-container');
-        const statusPanel = document.getElementById('status-panel');
-        const statusHeader = document.getElementById('status-header');
-        const statusContent = document.getElementById('status-content');
-        const statusHighlight = document.getElementById('status-selection-highlight');
-        let currentMenuId = 'main';
-        let navigationStack = [];
-        let selectedIndex = 0;
-        let statusSelectedIndex = 0;
-        let optionStates = {};
-        let currentState = null;
-        let isContentPanelOpen = false;
-        let welcomeMessageShown = false;
-        const MAX_VISIBLE_ITEMS = 10;
-        const ITEM_HEIGHT = 45;
 
-        const defaultMenuData = {
-            main: {
-                title: 'Main Menu',
-                items: [
-                    { label: 'Self', target: 'self', description: 'Manage your character settings.' },
-                    { label: 'Vehicle', target: 'vehicle', description: 'Access vehicle controls.' },
-                    { label: 'World', target: 'world', description: 'Modify world settings.' },
-                    { label: 'Network', target: 'network', description: 'Manage network options.' },
-                ]
-            },
-            self: {
-                title: 'Self Options',
-                parent: 'main',
-                items: [
-                    { label: 'Appearance', target: 'appearance', description: 'Customize your character.' },
-                    { label: 'Inventory', target: 'inventory', description: 'Manage your items.' },
-                    { label: 'Settings', target: 'settings', description: 'Adjust personal settings.' },
-                    { label: 'Health Boost', type: 'toggle', stateId: 'healthBoost', description: 'Toggle health boost.' },
-                    { label: 'Speed Multiplier', type: 'slider', stateId: 'speed', min: 1, max: 10, description: 'Adjust movement speed.' },
-                ]
-            },
-            appearance: {
-                title: 'Appearance',
-                parent: 'self',
-                items: [
-                    { label: 'Change Outfit', type: 'button', description: 'Select a new outfit.' },
-                    { label: 'Set Name', type: 'input', placeholder: 'Enter name', description: 'Set character name.' },
-                ]
-            },
-            inventory: {
-                title: 'Inventory',
-                parent: 'self',
-                items: [
-                    { label: 'Add Item', type: 'input', placeholder: 'Item name', description: 'Add an item to inventory.' },
-                    { label: 'Clear Inventory', type: 'button', description: 'Remove all items.' },
-                ]
-            },
-            settings: {
-                title: 'Settings',
-                parent: 'self',
-                items: [
-                    { label: 'God Mode', type: 'toggle', stateId: 'godMode', description: 'Toggle invincibility.' },
-                    { label: 'Visibility', type: 'toggle', stateId: 'visibility', description: 'Toggle visibility.' },
-                ]
-            },
-            vehicle: {
-                title: 'Vehicle Options',
-                parent: 'main',
-                items: [
-                    { label: 'Spawn Vehicle', type: 'input', placeholder: 'Vehicle model', description: 'Spawn a vehicle.' },
-                    { label: 'Repair Vehicle', type: 'button', description: 'Repair current vehicle.' },
-                ]
-            },
-            world: {
-                title: 'World Options',
-                parent: 'main',
-                items: [
-                    { label: 'Change Weather', type: 'button', description: 'Modify weather conditions.' },
-                    { label: 'Set Time', type: 'input', placeholder: 'HH:MM', description: 'Set world time.' },
-                ]
-            },
-            network: {
-                title: 'Network Options',
-                parent: 'main',
-                items: [
-                    { label: 'Kick Player', type: 'input', placeholder: 'Player ID', description: 'Kick a player.' },
-                    { label: 'Ban Player', type: 'input', placeholder: 'Player ID', description: 'Ban a player.' },
-                ]
-            }
+    <script>
+        let state = {
+            position: { x: 960, y: 540 },
+            activeTab: 0,
+            selection: { index: 0 },
+            isTyping: false,
+            isContentPanelOpen: false,
+            tabs: []
         };
 
-        function safeEncode(text) {
-            return text && typeof text === 'string'
-                ? text.replace(/&/g, '&amp;')
-                      .replace(/</g, '&lt;')
-                      .replace(/>/g, '&gt;')
-                      .replace(/"/g, '&quot;')
-                      .replace(/'/g, '&#39;')
-                : '';
-        }
+        // Fallback for animations if GSAP is not loaded
+        const animate = window.gsap || {
+            from: (el, props) => el,
+            to: (el, props) => el,
+            set: (el, props) => el
+        };
 
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
-            notificationContainer.appendChild(notification);
-            setTimeout(() => notification.remove(), 3000);
-        }
+        function renderMenu(newState) {
+            try {
+                console.log('Rendering menu with state:', newState); // Debug log
+                state = newState || state;
+                const menu = document.getElementById('menu');
+                const tabsContainer = document.getElementById('tabs');
+                const contentContainer = document.getElementById('content');
 
-        function showInputPrompt(title, placeholder, callback) {
-            inputOverlay.innerHTML = `
-                <div class="input-box">
-                    <h3>${title}</h3>
-                    <input type="text" id="prompt-input" placeholder="${placeholder}">
-                    <small>Press Enter to submit, Escape to cancel.</small>
-                </div>
-            `;
-            inputOverlay.classList.remove('hidden');
-            inputOverlay.classList.add('visible');
-            const inputField = document.getElementById('prompt-input');
-            inputField.focus();
-            const close = () => {
-                inputOverlay.classList.remove('visible');
-                inputOverlay.classList.add('hidden');
-                document.onkeydown = handleMenuInput;
-            };
-            document.onkeydown = (e) => {
-                if (e.key === 'Enter') {
-                    callback(inputField.value);
-                    close();
-                } else if (e.key === 'Escape') {
-                    close();
+                // Show/hide menu
+                menu.classList.toggle('hidden', !state.isContentPanelOpen && state.activeTab === -1);
+
+                // Render tabs
+                tabsContainer.innerHTML = '';
+                if (!state.tabs || !Array.isArray(state.tabs)) {
+                    contentContainer.innerHTML = '<div class="error">Error: No tabs available</div>';
+                    console.error('No valid tabs in state');
+                    return;
                 }
-            };
-        }
-
-        function updateStatusSelection(items) {
-            if (!items?.length) return;
-            const itemElements = statusContent.querySelectorAll('.status-item-external, .status-item-input');
-            if (!itemElements[statusSelectedIndex]) return;
-
-            let itemTop = 0;
-            let itemHeight = itemElements[statusSelectedIndex]?.offsetHeight || 0;
-
-            for (let i = 0; i < statusSelectedIndex; i++) {
-                itemTop += itemElements[i]?.offsetHeight || 0;
-            }
-
-            statusHighlight.style.top = `${itemTop}px`;
-            statusHighlight.style.height = `${itemHeight}px`;
-            statusHighlight.style.opacity = '0.8';
-
-            const statusContentEl = statusContent.parentElement;
-            const scrollTop = statusContentEl.scrollTop;
-            const containerHeight = statusContentEl.clientHeight - statusHeader.offsetHeight;
-            const itemBottom = itemTop + itemHeight;
-            const contentPadding = 20;
-            const adjustedItemTop = itemTop + statusHeader.offsetHeight + contentPadding;
-            const adjustedItemBottom = adjustedItemTop + itemHeight;
-
-            if (adjustedItemTop < scrollTop + statusHeader.offsetHeight) {
-                statusContentEl.scrollTo({ top: adjustedItemTop - statusHeader.offsetHeight, behavior: 'smooth' });
-            } else if (adjustedItemBottom > scrollTop + statusContentEl.clientHeight) {
-                statusContentEl.scrollTo({ top: adjustedItemBottom - statusContentEl.clientHeight, behavior: 'smooth' });
-            }
-
-            itemElements.forEach((el, i) => el.classList.toggle('selected', i === statusSelectedIndex));
-        }
-
-        function populateStatusContent(tabData, state) {
-            statusContent.innerHTML = '<div class="status-selection-highlight" id="status-selection-highlight"></div>';
-            const statusHighlightEl = document.getElementById('status-selection-highlight');
-
-            if (!tabData?.items?.length) return;
-
-            tabData.items.forEach((item, index) => {
-                const element = document.createElement('div');
-                const isToggleOrState = item.type === 'toggle' || item.label?.toLowerCase().includes('toggle') || 
-                    item.label?.toLowerCase().includes('enabled') || item.label?.toLowerCase().includes('boost') || 
-                    item.label?.toLowerCase().includes('crasher');
-                const isResourceState = tabData.key === 'resources' && item.state !== undefined;
-
-                if (item.type === 'input') {
-                    element.className = 'status-item-input';
-                    element.innerHTML = `
-                        <div style="width: 100%;">
-                            <label style="display: block; margin-bottom: 6px; font-size: 13px; color: var(--secondary-text);">${safeEncode(item.label)}</label>
-                            <input type="text" style="width: 100%; padding: 6px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: var(--primary-text); border-radius: 4px;" value="${safeEncode(item.value || '')}" readonly>
-                        </div>`;
-                } else {
-                    element.className = 'status-item-external';
-                    if (isToggleOrState || isResourceState) {
-                        const statusClass = item.state ? (item.state === 'ON' ? 'status-on' : item.state === '' ? 'status-off' : 'status-unknown') : 'status-off';
-                        const statusText = item.state || '';
-                        element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(statusText)}</span>`;
-                    } else {
-                        element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
-                    }
-                }
-
-                element.addEventListener('click', () => {
-                    statusSelectedIndex = index;
-                    updateStatusSelection(tabData.items);
-                    window.parent?.postMessage({ action: 'select', itemIndex: index, isContentPanel: true }, '*');
+                state.tabs.forEach((tab, index) => {
+                    const tabEl = document.createElement('div');
+                    tabEl.className = `tab flex-1 p-3 text-center cursor-pointer ${index === state.activeTab ? 'active' : ''}`;
+                    tabEl.textContent = tab.title || 'Unnamed Tab';
+                    tabEl.onclick = () => {
+                        if (window.gsap) {
+                            animate.to(tabEl, { opacity: 0.7, duration: 0.15, onComplete: () => animate.to(tabEl, { opacity: 1, duration: 0.15 }) });
+                        }
+                        window.sendNuiMessage(JSON.stringify({ action: 'changeTab', index }));
+                    };
+                    tabsContainer.appendChild(tabEl);
                 });
 
-                statusContent.appendChild(element);
-            });
-
-            statusSelectedIndex = state.selection?.index ?? 0;
-            window.statusHighlight = statusHighlightEl;
-            updateStatusSelection(tabData.items);
-        }
-
-        function updateMenuFromState(state) {
-            if (!state?.tabs) return;
-            currentState = state;
-
-            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
-            highlightEl = document.getElementById('selection-highlight');
-
-            const menuItems = state.tabs.map((tabData, index) => ({
-                label: tabData.title || `Tab ${index + 1}`,
-                tabIndex: index,
-                type: 'tab',
-                description: `Open ${tabData.title || `Tab ${index + 1}`}`
-            }));
-
-            menuItems.forEach((item, index) => {
-                const menuItemEl = document.createElement('li');
-                menuItemEl.className = 'menu-item';
-                menuItemEl.innerHTML = `
-                    <div class="item-content">
-                        <span class="item-label">${item.label}</span>
-                        <i class="chevron fa-solid fa-angle-right"></i>
-                    </div>`;
-                menuItemsEl.appendChild(menuItemEl);
-                menuItemEl.addEventListener('click', () => {
-                    window.parent?.postMessage({ action: 'select', tabIndex: item.tabIndex, isContentPanel: false }, '*');
-                });
-            });
-
-            breadcrumbEl.textContent = 'Main Menu';
-            counterEl.textContent = `${state.activeTab + 1} / ${state.tabs.length}`;
-            selectedIndex = state.activeTab;
-            updateSelection(menuItems);
-
-            isContentPanelOpen = state.isContentPanelOpen;
-            statusPanel.style.visibility = isContentPanelOpen ? 'visible' : 'hidden';
-            statusPanel.classList.toggle('visible', isContentPanelOpen);
-            if (isContentPanelOpen) {
+                // Render content
+                contentContainer.innerHTML = '';
                 const activeTab = state.tabs[state.activeTab];
-                if (activeTab) {
-                    statusHeader.textContent = activeTab.header || activeTab.title;
-                    populateStatusContent(activeTab, state);
+                if (!activeTab) {
+                    contentContainer.innerHTML = '<div class="error">Error: No active tab selected</div>';
+                    console.error('No active tab');
+                    return;
                 }
-            }
 
-            const activeTab = state.tabs[state.activeTab];
-            footerEl.textContent = activeTab?.description || `Current Tab: ${activeTab?.title || ''}`;
-        }
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = activeTab.header || activeTab.title || 'Menu';
+                contentContainer.appendChild(header);
 
-        function renderMenu(menuId) {
-            const menu = defaultMenuData[menuId];
-            if (!menu) return;
-            currentMenuId = menuId;
-            breadcrumbEl.textContent = menu.title;
-            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
-            highlightEl = document.getElementById('selection-highlight');
+                const contentDiv = document.createElement('div');
+                contentDiv.className = activeTab.type === 'grid' ? 'grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2' :
+                                    (activeTab.type === 'list' || activeTab.type === 'form' ? 'flex flex-col gap-2' : 'flex flex-col gap-2');
 
-            const itemsToRender = menu.items.map(item => item.target ? { ...item, type: 'submenu' } : item);
-            if (menu.parent) {
-                itemsToRender.unshift({ type: 'back', label: 'Back', icon: 'fa-solid fa-arrow-left', description: 'Return to the previous menu.' });
-            }
-
-            itemsToRender.forEach((item, index) => {
-                const menuItemEl = document.createElement('li');
-                menuItemEl.className = 'menu-item';
-                let content = `<div class="item-content">`;
-                if (item.icon) content += `<i class="icon ${item.icon}"></i>`;
-                content += `<span class="item-label">${item.label}</span>`;
-                if (item.type === 'submenu' || item.type === 'player') {
-                    content += `<i class="chevron fa-solid fa-angle-right"></i>`;
-                } else if (item.type === 'toggle') {
-                    const isChecked = optionStates[item.stateId] || false;
-                    content += `<div class="item-value"><span class="toggle-indicator ${isChecked ? 'on' : 'off'}">${isChecked ? 'ON' : 'OFF'}</span></div>`;
-                } else if (item.type === 'slider') {
-                    const value = optionStates[item.stateId] || item.min;
-                    const percent = ((value - item.min) / (item.max - item.min)) * 100;
-                    content += `<div class="item-value slider-container"><div class="slider-bar"><div class="slider-fill" style="width: ${percent}%"></div></div></div>`;
+                if (!activeTab.items || !Array.isArray(activeTab.items)) {
+                    contentDiv.innerHTML = '<div class="error">No items available</div>';
+                    console.error('No valid items in activeTab');
+                    return;
                 }
-                content += `</div>`;
-                menuItemEl.innerHTML = content;
-                menuItemsEl.appendChild(menuItemEl);
-            });
 
-            selectedIndex = 0;
-            updateSelection(itemsToRender);
-        }
+                activeTab.items.forEach((item, index) => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = `item p-2 rounded-md ${index === state.selection.index ? 'bg-purple-700' : 'bg-gray-800'}`;
+                    itemEl.style.cursor = item.type === 'label' ? 'default' : 'pointer';
 
-        function updateSelection(itemsToRender) {
-            const items = menuItemsEl.querySelectorAll('.menu-item');
-            if (!items[selectedIndex]) return;
-
-            items.forEach((item, i) => item.classList.toggle('selected', i === selectedIndex));
-            const itemTop = selectedIndex * ITEM_HEIGHT;
-            const itemBottom = itemTop + ITEM_HEIGHT;
-            const scrollTop = menuItemsEl.scrollTop;
-            const containerHeight = menuItemsEl.clientHeight;
-
-            if (itemTop < scrollTop) {
-                menuItemsEl.scrollTo({ top: itemTop, behavior: 'smooth' });
-            } else if (itemBottom > scrollTop + containerHeight) {
-                menuItemsEl.scrollTo({ top: itemBottom - containerHeight, behavior: 'smooth' });
-            }
-
-            highlightEl.style.top = `${itemTop - menuItemsEl.scrollTop}px`;
-            counterEl.textContent = `${selectedIndex + 1} / ${items.length}`;
-            footerEl.textContent = itemsToRender[selectedIndex]?.description || '';
-        }
-
-        function handleMenuInput(e) {
-            if (currentState) return;
-            e.preventDefault();
-            const menu = defaultMenuData[currentMenuId];
-            const itemsToRender = menu.items.map(item => item.target ? { ...item, type: 'submenu' } : item);
-            if (menu.parent) {
-                itemsToRender.unshift({ type: 'back', label: 'Back', icon: 'fa-solid fa-arrow-left', description: 'Return to the previous menu.' });
-            }
-            const currentItemData = itemsToRender[selectedIndex];
-
-            switch (e.key) {
-                case 'ArrowUp':
-                    selectedIndex = (selectedIndex - 1 + itemsToRender.length) % itemsToRender.length;
-                    break;
-                case 'ArrowDown':
-                    selectedIndex = (selectedIndex + 1) % itemsToRender.length;
-                    break;
-                case 'Enter':
-                    if (currentItemData.target) {
-                        navigationStack.push(currentMenuId);
-                        renderMenu(currentItemData.target);
-                    } else if (currentItemData.type === 'button') {
-                        showNotification(`Action: ${currentItemData.label}`);
-                    } else if (currentItemData.type === 'toggle') {
-                        optionStates[currentItemData.stateId] = !optionStates[currentItemData.stateId];
-                        showNotification(`${currentItemData.label}: ${optionStates[currentItemData.stateId] ? 'Enabled' : 'Disabled'}`);
-                        renderMenu(currentMenuId);
-                    } else if (currentItemData.type === 'input') {
-                        showInputPrompt(`Enter value for ${currentItemData.label}:`, currentItemData.placeholder, (result) => {
-                            if (result) showNotification(`Set ${currentItemData.label} to: ${result}`);
-                        });
-                    } else if (currentItemData.type === 'back') {
-                        const parentMenu = navigationStack.pop();
-                        renderMenu(parentMenu || 'main');
+                    if (item.type === 'button') {
+                        itemEl.textContent = item.label + (item.state ? ` (${item.state})` : '');
+                        itemEl.onclick = () => {
+                            if (window.gsap) {
+                                animate.to(itemEl, { opacity: 0.7, duration: 0.15, onComplete: () => animate.to(itemEl, { opacity: 1, duration: 0.15 }) });
+                            }
+                            window.sendNuiMessage(JSON.stringify({ action: 'execute', tabIndex: state.activeTab, itemIndex: index }));
+                        };
+                    } else if (item.type === 'input') {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.className = 'w-full p-2 bg-gray-900 border border-gray-600 rounded-md text-white focus:outline-none focus:border-purple-500';
+                        input.value = item.value || '';
+                        input.placeholder = item.placeholder || '';
+                        input.onfocus = () => {
+                            if (window.gsap) {
+                                animate.to(input, { borderColor: '#6200ea', duration: 0.2 });
+                            }
+                            window.sendNuiMessage(JSON.stringify({ action: 'startTyping', tabIndex: state.activeTab, itemIndex: index }));
+                        };
+                        input.onblur = () => {
+                            if (window.gsap) {
+                                animate.to(input, { borderColor: '#4b5563', duration: 0.2 });
+                            }
+                            window.sendNuiMessage(JSON.stringify({ action: 'stopTyping' }));
+                        };
+                        input.oninput = (e) => {
+                            window.sendNuiMessage(JSON.stringify({ action: 'updateInput', tabIndex: state.activeTab, itemIndex: index, value: e.target.value }));
+                        };
+                        itemEl.appendChild(input);
+                    } else if (item.type === 'label') {
+                        itemEl.textContent = item.label || 'Unnamed Item';
                     }
-                    break;
-                case 'Backspace':
-                    if (navigationStack.length > 0) {
-                        const parentMenu = navigationStack.pop();
-                        renderMenu(parentMenu);
-                    }
-                    break;
+
+                    contentDiv.appendChild(itemEl);
+                });
+                contentContainer.appendChild(contentDiv);
+
+                // Simplified animation for content
+                if (window.gsap) {
+                    animate.from(contentDiv, { opacity: 0, duration: 0.15, ease: 'power1.out' });
+                }
+            } catch (error) {
+                console.error('Render error:', error);
+                contentContainer.innerHTML = '<div class="error">Error rendering menu: ' + error.message + '</div>';
             }
-            updateSelection(itemsToRender);
         }
 
-        window.addEventListener("message", (event) => {
-            const { action, data } = event.data;
-            if (action === "update" || action === "show") {
-                if (data) {
-                    updateMenuFromState(data);
-                    menuContainer.style.visibility = 'visible';
-                    menuContainer.classList.add('visible');
-                    if (action === "show" && !welcomeMessageShown) {
-                        welcomeMessageShown = true;
-                        showNotification("Avaris Menu loaded successfully");
+        // Handle NUI messages from Lua
+        window.addEventListener('message', (event) => {
+            try {
+                console.log('Received NUI message:', event.data); // Debug log
+                const data = event.data;
+                if (data.action === 'update') {
+                    renderMenu(data.data);
+                } else if (data.action === 'show') {
+                    document.getElementById('menu').classList.remove('hidden');
+                    if (window.gsap) {
+                        animate.from('.menu-container', { opacity: 0, duration: 0.15, ease: 'power1.out' });
+                    }
+                } else if (data.action === 'hide') {
+                    const onComplete = () => document.getElementById('menu').classList.add('hidden');
+                    if (window.gsap) {
+                        animate.to('.menu-container', { opacity: 0, duration: 0.15, ease: 'power1.in', onComplete });
+                    } else {
+                        onComplete();
                     }
                 }
-            }
-            if (action === 'hide') {
-                menuContainer.style.visibility = 'hidden';
-                menuContainer.classList.remove('visible');
-                statusPanel.style.visibility = 'hidden';
-                statusPanel.classList.remove('visible');
+            } catch (error) {
+                console.error('NUI message error:', error);
             }
         });
 
-        document.onkeydown = handleMenuInput;
-        renderMenu('main');
-        menuContainer.style.visibility = 'visible';
-        menuContainer.classList.add('visible');
-    });
-
-    window.addEventListener("message", (event) => {
-        const data = event.data;
-        if (data.action === "getClipboard") {
-            navigator.clipboard.readText().then(text => {
-                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text })
-                });
-            }).catch(() => {
-                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text: "" })
-                });
-            });
-        }
-        if (data.action === "setClipboard") {
-            navigator.clipboard.writeText(data.text || "").catch(err => {
-                console.error("Clipboard write failed:", err);
-            });
-        }
-    });
-</script>
+        // Initialize menu
+        renderMenu(state);
+    </script>
 </body>
 </html>
