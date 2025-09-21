@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Avaris Unified Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+<style>
+:root {
+    --primary-color: rgb(139, 139, 255);
+    --secondary-color: rgb(100, 100, 200);
+    --bg-color: rgb(20, 20, 30);
+    --primary-text: #ffffff;
+    --secondary-text: #d0d0d0;
+    --border-color: rgba(255, 255, 255, 0.2);
+    --highlight-bg: var(--primary-color);
+    --font: 'Inter', sans-serif;
+    --border-radius: 10px;
+    --transition-speed: 0.2s;
+    --easing: cubic-bezier(0.4, 0, 0.2, 1);
+}
+* { margin:0; padding:0; box-sizing:border-box; }
+body { font-family:var(--font); background:transparent; color:var(--primary-text); overflow:hidden; user-select:none; }
+.menu-container { position:absolute; top:10vh; left:3vw; width:400px; background:var(--bg-color); border-radius:var(--border-radius); box-shadow:0 8px 30px rgba(0,0,0,0.6); display:flex; flex-direction:column; border:2px solid var(--primary-color); visibility:hidden; transition:transform 0.3s var(--easing), opacity 0.3s var(--easing); transform:translateY(20px); opacity:0; }
+.menu-container.visible { transform:translateY(0); opacity:1; }
+.header { padding:12px 16px; background:linear-gradient(90deg,var(--primary-color),var(--secondary-color)); font-weight:500; font-size:16px; text-align:center; border-top-left-radius:var(--border-radius); border-top-right-radius:var(--border-radius); border-bottom:1px solid var(--border-color); }
+.breadcrumb-bar { display:flex; justify-content:space-between; align-items:center; padding:8px 16px; font-size:13px; font-weight:400; border-bottom:1px solid var(--border-color); background:rgba(0,0,0,0.4); }
+#breadcrumb { color: var(--secondary-text); text-transform:uppercase; }
+#option-counter { color: var(--primary-text); font-weight:500; }
+.menu-items { list-style:none; position:relative; height:300px; overflow-y:auto; scrollbar-width:none; -ms-overflow-style:none; scroll-behavior:smooth; }
+.menu-items::-webkit-scrollbar { display:none; }
+.menu-item { display:flex; align-items:center; padding:8px 16px; font-size:14px; position:relative; height:40px; transition:background-color var(--transition-speed) var(--easing), transform var(--transition-speed) var(--easing); }
+.menu-item:hover { background:rgba(139,139,255,0.2); transform:translateX(6px); cursor:pointer; }
+.menu-item.selected { background:rgba(139,139,255,0.3); transform:translateX(6px); }
+.selection-highlight { position:absolute; left:0; width:100%; height:40px; background:var(--highlight-bg); z-index:1; transition:top var(--transition-speed) var(--easing), opacity var(--transition-speed) var(--easing); opacity:0.7; border-left:4px solid var(--secondary-color); }
+.item-content { display:flex; width:100%; align-items:center; z-index:2; }
+.item-label { flex-grow:1; font-weight:400; }
+.item-value { color:var(--primary-text); font-weight:500; font-size:13px; margin-left:6px; }
+.toggle-indicator { font-weight:500; font-size:13px; }
+.toggle-indicator.on { color:#2ecc71; }
+.toggle-indicator.off { color:#ff4757; }
+.slider-bar { width:100px; height:8px; background:rgba(255,255,255,0.15); border-radius:4px; position:relative; }
+.slider-fill { height:100%; background:var(--secondary-color); border-radius:4px; transition:width var(--transition-speed) var(--easing); }
+.slider-container { display:flex; align-items:center; gap:6px; margin-left:6px; }
+.footer { padding:8px 16px; background:rgba(0,0,0,0.4); border-top:1px solid var(--border-color); min-height:22px; font-size:12px; color:var(--secondary-text); border-bottom-left-radius:var(--border-radius); border-bottom-right-radius:var(--border-radius); text-align:center; }
+.content-panel { padding:10px 16px; font-size:13px; min-height:80px; background:rgba(0,0,0,0.5); transition:opacity 0.3s var(--easing), transform 0.3s var(--easing); opacity:0; transform:translateY(8px); }
+.content-panel.visible { opacity:1; transform:translateY(0); }
+.input-box { display:flex; flex-direction:column; gap:8px; margin-top:6px; }
+.input-box input { padding:6px; background:rgba(0,0,0,0.5); border:1px solid var(--border-color); color:var(--primary-text); border-radius:4px; font-size:13px; }
+</style>
+</head>
+<body>
+
+<div class="menu-container" id="menu-container">
+    <div class="header">Avaris Menu</div>
+    <div class="breadcrumb-bar">
+        <span id="breadcrumb">Main Menu</span>
+        <span id="option-counter"></span>
+    </div>
+    <ul class="menu-items" id="menu-items">
+        <div class="selection-highlight" id="selection-highlight"></div>
+    </ul>
+    <div class="content-panel" id="content-panel"></div>
+    <div class="footer" id="footer"></div>
+</div>
+
+<script>
+const menuData = {
+    main: { title:'Main Menu', items:[{label:'Self', target:'self', description:'Manage your character settings.'},{label:'Vehicle', target:'vehicle', description:'Access vehicle controls.'},{label:'World', target:'world', description:'Modify world settings.'},{label:'Network', target:'network', description:'Manage network options.'}] },
+    self: { title:'Self Options', parent:'main', items:[{label:'Appearance', target:'appearance', description:'Customize your character.'},{label:'Inventory', target:'inventory', description:'Manage your items.'},{label:'Health Boost', type:'toggle', stateId:'healthBoost', description:'Toggle health boost.'},{label:'Speed Multiplier', type:'slider', stateId:'speed', min:1, max:10, description:'Adjust movement speed.'}] },
+    appearance: { title:'Appearance', parent:'self', items:[{label:'Change Outfit', type:'button', description:'Select a new outfit.'},{label:'Set Name', type:'input', placeholder:'Enter name', description:'Set character name.'}] },
+    inventory: { title:'Inventory', parent:'self', items:[{label:'Add Item', type:'input', placeholder:'Item name', description:'Add an item to inventory.'},{label:'Clear Inventory', type:'button', description:'Remove all items.'}] },
+    vehicle: { title:'Vehicle Options', parent:'main', items:[{label:'Spawn Vehicle', type:'input', placeholder:'Vehicle model', description:'Spawn a vehicle.'},{label:'Repair Vehicle', type:'button', description:'Repair current vehicle.'}] },
+    world: { title:'World Options', parent:'main', items:[{label:'Change Weather', type:'button', description:'Modify weather conditions.'},{label:'Set Time', type:'input', placeholder:'HH:MM', description:'Set world time.'}] },
+    network: { title:'Network Options', parent:'main', items:[{label:'Kick Player', type:'input', placeholder:'Player ID', description:'Kick a player.'},{label:'Ban Player', type:'input', placeholder:'Player ID', description:'Ban a player.'}] }
+};
+
+let currentMenu = 'main', navStack=[], selectedIndex=0, states={};
+
+const menuEl = document.getElementById('menu-items');
+const highlightEl = document.getElementById('selection-highlight');
+const breadcrumbEl = document.getElementById('breadcrumb');
+const footerEl = document.getElementById('footer');
+const contentPanel = document.getElementById('content-panel');
+
+function renderMenu(menuId){
+    const menu = menuData[menuId]; currentMenu=menuId; breadcrumbEl.textContent=menu.title;
+    menuEl.innerHTML='<div class="selection-highlight" id="selection-highlight"></div>'; 
+    menu.items.forEach((item,i)=>{
+        const li=document.createElement('li'); li.className='menu-item';
+        let inner=`<div class="item-content"><span class="item-label">${item.label}</span>`;
+        if(item.type==='toggle'){ 
+            inner+=`<span class="item-value toggle-indicator ${states[item.stateId]?'on':'off'}">${states[item.stateId]?'ON':'OFF'}</span>`; 
+        } else if(item.type==='slider'){ 
+            const val=states[item.stateId]||item.min; 
+            const pct=((val-item.min)/(item.max-item.min))*100; 
+            inner+=`<div class="item-value slider-container"><div class="slider-bar"><div class="slider-fill" style="width:${pct}%"></div></div><span>${val}</span></div>`;
+        }
+        inner+='</div>'; li.innerHTML=inner;
+        menuEl.appendChild(li);
+    });
+    updateSelection();
+}
+
+function updateSelection(){
+    const items=menuEl.querySelectorAll('.menu-item');
+    items.forEach((item,i)=>item.classList.toggle('selected',i===selectedIndex));
+    const itemTop=selectedIndex*40;
+    highlightEl.style.top=`${itemTop}px`;
+    const menu=menuData[currentMenu];
+    footerEl.textContent=menu.items[selectedIndex].description||'';
+    contentPanel.textContent=menu.items[selectedIndex].type==='input'?`Input: ${menu.items[selectedIndex].placeholder||''}`:'';
+    contentPanel.classList.add('visible');
+}
+
+function handleKey(e){
+    const menu=menuData[currentMenu]; 
+    if(e.key==='ArrowDown'){ selectedIndex=(selectedIndex+1)%menu.items.length; updateSelection(); }
+    else if(e.key==='ArrowUp'){ selectedIndex=(selectedIndex-1+menu.items.length)%menu.items.length; updateSelection(); }
+    else if(e.key==='ArrowLeft'){ const item=menu.items[selectedIndex]; if(item.type==='slider'){ states[item.stateId]=Math.max(item.min,(states[item.stateId]||item.min)-1); renderMenu(currentMenu); } }
+    else if(e.key==='ArrowRight'){ const item=menu.items[selectedIndex]; if(item.type==='slider'){ states[item.stateId]=Math.min(item.max,(states[item.stateId]||item.min)+1); renderMenu(currentMenu); } }
+    else if(e.key==='Enter'){ const item=menu.items[selectedIndex]; if(item.target){ navStack.push(currentMenu); selectedIndex=0; renderMenu(item.target); } 
+    else if(item.type==='toggle'){ states[item.stateId]=!states[item.stateId]; renderMenu(currentMenu); } 
+    else if(item.type==='button'){ alert(`Action: ${item.label}`); } 
+    else if(item.type==='input'){ const val=prompt(`Enter value for ${item.label}:`,''); if(val) alert(`Set ${item.label} to ${val}`); } }
+    else if(e.key==='Backspace'){ if(navStack.length>0){ currentMenu=navStack.pop(); selectedIndex=0; renderMenu(currentMenu); } }
+}
+
+document.addEventListener('keydown',handleKey);
+renderMenu('main');
+document.getElementById('menu-container').classList.add('visible');
+</script>
+</body>
+</html>
