@@ -13,8 +13,8 @@
             --bg-color: rgba(10, 10, 10, 0.95);
             --primary-text: #ffffff;
             --secondary-text: #b0b0b0;
-            --accent-color: rgb(153, 130, 255);
-            --highlight-bg: rgb(153, 130, 255);
+            --accent-color: rgb(138, 43, 226); /* Updated to vibrant purple */
+            --highlight-bg: rgba(138, 43, 226, 0.3);
             --border-color: rgba(255, 255, 255, 0.15);
             --font: 'Inter', sans-serif;
             --border-radius: 8px;
@@ -46,7 +46,7 @@
         .header-image {
             width: 100%;
             height: 100px;
-            background-image: url('https://raw.githubusercontent.com/Kyrenov/FAHHHHHHHHHHHHHH/main/image.png');
+            background-image: linear-gradient(to bottom, rgba(138, 43, 226, 0.7), rgba(10, 10, 10, 0.7)), url('https://raw.githubusercontent.com/Kyrenov/FAHHHHHHHHHHHHHH/main/image.png');
             background-size: cover;
             background-position: center;
             border-bottom: 1px solid var(--border-color);
@@ -86,11 +86,11 @@
             transition: background-color 0.2s ease;
         }
         .menu-item:hover {
-            background: rgba(153, 130, 255, 0.3);
+            background: var(--highlight-bg);
             cursor: pointer;
         }
         .menu-item.selected {
-            background: rgba(153, 130, 255, 0.3);
+            background: var(--highlight-bg);
         }
         .selection-highlight {
             position: absolute;
@@ -110,7 +110,8 @@
         .item-label { flex-grow: 1; }
         .item-value { color: var(--primary-text); font-weight: 500; }
         .dropdown {
-            position: relative;
+            position: absolute;
+            top: 100%; /* Position below the menu-item */
             width: 100%;
             background: rgba(20, 20, 20, 0.95);
             border: 1px solid var(--border-color);
@@ -120,6 +121,10 @@
             overflow-y: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
+            display: none; /* Hidden by default, shown when dropdownOpen */
+        }
+        .dropdown.active {
+            display: block; /* Show when active */
         }
         .dropdown::-webkit-scrollbar {
             display: none;
@@ -134,14 +139,14 @@
             transition: background-color 0.2s ease;
         }
         .dropdown-item:hover {
-            background: rgba(153, 130, 255, 0.3);
+            background: var(--highlight-bg);
             cursor: pointer;
         }
         .dropdown-item.selected {
-            background: rgba(153, 130, 255, 0.3);
+            background: var(--highlight-bg);
         }
         .dropdown-item.button {
-            background: rgba(153, 130, 255, 0.2);
+            background: rgba(138, 43, 226, 0.2);
             border: 1px solid var(--accent-color);
             border-radius: 4px;
             margin: 5px 10px;
@@ -149,7 +154,7 @@
             text-align: center;
         }
         .dropdown-item.button:hover {
-            background: rgba(153, 130, 255, 0.5);
+            background: rgba(138, 43, 226, 0.5);
         }
         .dropdown-item.toggle .item-value::before {
             content: '☐';
@@ -216,10 +221,10 @@
         .input-box input:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(153, 130, 255, 0.2);
+            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
         }
         .input-box input:hover {
-            border-color: rgba(153, 130, 255, 0.6);
+            border-color: rgba(138, 43, 226, 0.6);
         }
         .input-box small {
             color: var(--secondary-text);
@@ -456,9 +461,9 @@
                 menuItemEl.innerHTML = content;
                 if (dropdownOpen && index === state.activeTab) {
                     const dropdownEl = document.createElement('div');
-                    dropdownEl.className = 'dropdown';
+                    dropdownEl.className = 'dropdown active'; // Ensure dropdown is shown when open
                     populateDropdown(state.tabs[index], dropdownEl, state);
-                    menuItemsEl.appendChild(dropdownEl); // Append dropdown to menu-items, not menu-item
+                    menuItemsEl.appendChild(dropdownEl);
                 }
                 menuItemsEl.appendChild(menuItemEl);
                 menuItemEl.addEventListener('click', () => {
