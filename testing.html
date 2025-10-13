@@ -4,97 +4,309 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avaris Menu</title>
+    <link href="tailwind.min.css" rel="stylesheet"> <!-- Assumes tailwind.min.css in html/ -->
+    <script src="gsap.min.js"></script> <!-- Assumes gsap.min.js in html/ -->
     <style>
         body {
+            background: rgba(0, 0, 0, 0.85);
+            color: #ffffff;
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            user-select: none;
+            overflow: hidden;
             margin: 0;
-            font-family: Arial, sans-serif;
-            background-color: #1a1a1a;
-            color: #e0e0e0;
+        }
+        .menu-container {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 850px;
+            max-height: 650px;
+            background: linear-gradient(145deg, rgba(30, 30, 30, 0.95), rgba(20, 20, 20, 0.95));
+            border-radius: 12px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.6);
+            overflow: hidden;
+            transition: opacity 0.3s ease, transform 0.3s ease;
+        }
+        .tabs {
+            display: flex;
+            background: #1a1a1a;
+            border-bottom: 2px solid #2a2a2a;
+            padding: 8px;
+        }
+        .tab {
+            flex: 1;
+            padding: 12px;
+            text-align: center;
+            cursor: pointer;
+            font-size: 0.95rem;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: #d1d5db;
+            transition: all 0.2s ease;
+            border-radius: 6px;
+            margin: 0 4px;
+        }
+        .tab:hover {
+            background: #2d2d2d;
+            color: #ffffff;
+            transform: translateY(-1px);
+        }
+        .tab.active {
+            background: #7c3aed;
+            color: #ffffff;
+            box-shadow: 0 2px 8px rgba(124, 58, 237, 0.4);
+            transform: translateY(-1px);
+        }
+        .content {
+            padding: 20px;
+            max-height: 550px;
+            overflow-y: auto;
+            scrollbar-width: thin;
+            scrollbar-color: #7c3aed #1a1a1a;
         }
         .header {
-            background: linear-gradient(to right, #4a90e2, #9013fe);
+            font-size: 1.5rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            color: #7c3aed;
+            letter-spacing: 0.5px;
+        }
+        .item {
             padding: 10px;
-            text-align: center;
-            font-size: 24px;
-            font-weight: bold;
-            color: white;
+            background: #252525;
+            border-radius: 6px;
+            transition: all 0.2s ease;
+            margin-bottom: 8px;
         }
-        .menu {
-            width: 300px;
-            border: 2px solid #333;
-            border-radius: 5px;
-            overflow: hidden;
+        .item:hover {
+            background: #333333;
+            transform: translateX(4px);
         }
-        .menu-item {
+        .item.selected {
+            background: #6d28d9;
+            box-shadow: 0 2px 8px rgba(109, 40, 217, 0.3);
+        }
+        .item input {
+            width: 100%;
             padding: 10px;
-            background-color: #2a2a2a;
-            cursor: pointer;
-            transition: background-color 0.3s;
+            background: #1a1a1a;
+            border: 1px solid #3f3f3f;
+            border-radius: 6px;
+            color: #ffffff;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
         }
-        .menu-item:hover {
-            background-color: #3a3a3a;
+        .item input:focus {
+            outline: none;
+            border-color: #7c3aed;
+            box-shadow: 0 0 8px rgba(124, 58, 237, 0.3);
         }
-        .submenu {
-            padding-left: 20px;
-            display: none;
+        .error {
+            color: #ef4444;
+            padding: 10px;
+            background: rgba(239, 68, 68, 0.1);
+            border-radius: 6px;
+            font-size: 0.9rem;
         }
-        .active {
-            display: block;
+        ::-webkit-scrollbar {
+            width: 8px;
         }
-        .footer {
-            text-align: center;
-            padding: 5px;
-            background-color: #2a2a2a;
-            font-size: 12px;
-            color: #888;
+        ::-webkit-scrollbar-track {
+            background: #1a1a1a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #7c3aed;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #9f67fa;
         }
     </style>
 </head>
 <body>
-    <div class="header">Avaris</div>
-    <div class="menu" id="menu">
-        <!-- Menu items will be populated dynamically via JS -->
+    <div id="menu" class="menu-container hidden">
+        <div class="tabs" id="tabs"></div>
+        <div class="content" id="content"></div>
     </div>
-    <div class="footer">Beta 1.0 - Avaris Private</div>
-
     <script>
-        window.addEventListener('message', function(event) {
-            const data = event.data;
-            if (data.action === 'update') {
+        let state = {
+            position: { x: 960, y: 540 },
+            activeTab: 0,
+            selection: { index: 0 },
+            isTyping: false,
+            isContentPanelOpen: false,
+            tabs: []
+        };
+
+        // GSAP fallback
+        const animate = window.gsap || {
+            from: (el, props) => {
+                el.style.opacity = props.opacity || 1;
+                el.style.transform = props.scale ? `scale(${props.scale})` : 'none';
+                return el;
+            },
+            to: (el, props) => {
+                el.style.transition = 'all 0.2s ease';
+                el.style.opacity = props.opacity || 1;
+                el.style.transform = props.transform || props.scale ? `scale(${props.scale})` : 'none';
+                if (props.onComplete) setTimeout(props.onComplete, 200);
+                return el;
+            },
+            set: (el, props) => {
+                el.style.opacity = props.opacity || 1;
+                el.style.transform = props.transform || 'none';
+                return el;
+            }
+        };
+
+        function renderMenu(newState) {
+            try {
+                console.log('Rendering menu with state:', newState);
+                state = newState || state;
                 const menu = document.getElementById('menu');
-                menu.innerHTML = '';
-                data.items.forEach((item, index) => {
-                    const div = document.createElement('div');
-                    div.className = 'menu-item';
-                    div.textContent = item.label;
-                    if (item.hasChildren) {
-                        const subMenu = document.createElement('div');
-                        subMenu.className = 'submenu';
-                        div.appendChild(subMenu);
-                        div.addEventListener('click', () => {
-                            subMenu.classList.toggle('active');
-                            SendToDui('select', { itemIndex: index, path: data.path });
+                const tabsContainer = document.getElementById('tabs');
+                const contentContainer = document.getElementById('content');
+
+                // Show/hide menu with animation
+                if (state.isContentPanelOpen && state.activeTab !== -1) {
+                    menu.classList.remove('hidden');
+                    animate.from(menu, { opacity: 0, scale: 0.98, duration: 0.3, ease: 'power2.out' });
+                } else {
+                    animate.to(menu, {
+                        opacity: 0,
+                        scale: 0.98,
+                        duration: 0.3,
+                        ease: 'power2.in',
+                        onComplete: () => menu.classList.add('hidden')
+                    });
+                    return;
+                }
+
+                // Render tabs
+                tabsContainer.innerHTML = '';
+                if (!state.tabs || !Array.isArray(state.tabs)) {
+                    contentContainer.innerHTML = '<div class="error">Error: No tabs available</div>';
+                    console.error('No valid tabs in state');
+                    return;
+                }
+
+                state.tabs.forEach((tab, index) => {
+                    const tabEl = document.createElement('div');
+                    tabEl.className = `tab ${index === state.activeTab ? 'active' : ''}`;
+                    tabEl.textContent = tab.title || 'Unnamed Tab';
+                    tabEl.onclick = () => {
+                        animate.to(tabEl, {
+                            scale: 0.95,
+                            duration: 0.15,
+                            ease: 'power1.out',
+                            onComplete: () => animate.to(tabEl, { scale: 1, duration: 0.15, ease: 'power1.in' })
                         });
-                    } else {
-                        div.addEventListener('click', () => {
-                            SendToDui('select', { itemIndex: index, path: data.path });
-                        });
-                    }
-                    if (index === data.selection) div.style.backgroundColor = '#4a90e2';
-                    menu.appendChild(div);
+                        window.sendNuiMessage(JSON.stringify({ action: 'changeTab', index }));
+                    };
+                    tabsContainer.appendChild(tabEl);
                 });
-            } else if (data.action === 'notify') {
-                alert(`${data.title}: ${data.message}`);
+
+                // Render content
+                contentContainer.innerHTML = '';
+                const activeTab = state.tabs[state.activeTab];
+                if (!activeTab) {
+                    contentContainer.innerHTML = '<div class="error">Error: No active tab selected</div>';
+                    console.error('No active tab');
+                    return;
+                }
+
+                const header = document.createElement('div');
+                header.className = 'header';
+                header.textContent = activeTab.header || activeTab.title || 'Menu';
+                contentContainer.appendChild(header);
+
+                const contentDiv = document.createElement('div');
+                contentDiv.className = activeTab.type === 'grid' ? 'grid grid-cols-[repeat(auto-fill,minmax(200px,1fr))] gap-3' :
+                                    (activeTab.type === 'list' || activeTab.type === 'form' ? 'flex flex-col gap-3' : 'flex flex-col gap-3');
+
+                if (!activeTab.items || !Array.isArray(activeTab.items)) {
+                    contentDiv.innerHTML = '<div class="error">No items available</div>';
+                    console.error('No valid items in activeTab');
+                    return;
+                }
+
+                activeTab.items.forEach((item, index) => {
+                    const itemEl = document.createElement('div');
+                    itemEl.className = `item ${index === state.selection.index ? 'selected' : ''}`;
+                    itemEl.style.cursor = item.type === 'label' ? 'default' : 'pointer';
+
+                    if (item.type === 'button') {
+                        itemEl.textContent = item.label + (item.state ? ` (${item.state})` : '');
+                        itemEl.onclick = () => {
+                            animate.to(itemEl, {
+                                scale: 0.97,
+                                duration: 0.1,
+                                ease: 'power1.out',
+                                onComplete: () => animate.to(itemEl, { scale: 1, duration: 0.1, ease: 'power1.in' })
+                            });
+                            window.sendNuiMessage(JSON.stringify({ action: 'execute', tabIndex: state.activeTab, itemIndex: index }));
+                        };
+                    } else if (item.type === 'input') {
+                        const input = document.createElement('input');
+                        input.type = 'text';
+                        input.className = 'w-full p-2 bg-gray-900 border border-gray-600 rounded-md text-white focus:outline-none focus:border-purple-500';
+                        input.value = item.value || '';
+                        input.placeholder = item.placeholder || '';
+                        input.onfocus = () => {
+                            animate.to(input, { borderColor: '#7c3aed', scale: 1.02, duration: 0.2, ease: 'power1.out' });
+                            window.sendNuiMessage(JSON.stringify({ action: 'startTyping', tabIndex: state.activeTab, itemIndex: index }));
+                        };
+                        input.onblur = () => {
+                            animate.to(input, { borderColor: '#3f3f3f', scale: 1, duration: 0.2, ease: 'power1.in' });
+                            window.sendNuiMessage(JSON.stringify({ action: 'stopTyping' }));
+                        };
+                        input.oninput = (e) => {
+                            window.sendNuiMessage(JSON.stringify({ action: 'updateInput', tabIndex: state.activeTab, itemIndex: index, value: e.target.value }));
+                        };
+                        itemEl.appendChild(input);
+                    } else if (item.type === 'label') {
+                        itemEl.textContent = item.label || 'Unnamed Item';
+                    }
+
+                    contentDiv.appendChild(itemEl);
+                });
+
+                contentContainer.appendChild(contentDiv);
+                animate.from(contentDiv, { opacity: 0, y: 10, duration: 0.3, ease: 'power2.out' });
+            } catch (error) {
+                console.error('Render error:', error);
+                contentContainer.innerHTML = '<div class="error">Error rendering menu: ' + error.message + '</div>';
+            }
+        }
+
+        // Handle NUI messages
+        window.addEventListener('message', (event) => {
+            try {
+                console.log('Received NUI message:', event.data);
+                const data = event.data;
+                if (data.action === 'update') {
+                    renderMenu(data.data);
+                } else if (data.action === 'show') {
+                    renderMenu(state); // Ensure state is rendered on show
+                } else if (data.action === 'hide') {
+                    const menu = document.getElementById('menu');
+                    animate.to(menu, {
+                        opacity: 0,
+                        scale: 0.98,
+                        duration: 0.3,
+                        ease: 'power2.in',
+                        onComplete: () => menu.classList.add('hidden')
+                    });
+                }
+            } catch (error) {
+                console.error('NUI message error:', error);
             }
         });
 
-        function SendToDui(action, data) {
-            fetch(`http://${GetParentResourceName()}/callback`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action: action, data: data })
-            });
-        }
+        // Initialize menu
+        renderMenu(state);
     </script>
 </body>
 </html>
