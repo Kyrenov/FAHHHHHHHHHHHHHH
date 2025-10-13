@@ -10,7 +10,7 @@
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
     <style>
         :root {
-            --bg-color: rgba(10, 10, 10, 0.92);
+            --bg-color: rgba(10, 10, 10, 0.95);
             --primary-text: #ffffff;
             --secondary-text: #b0b0b0;
             --accent-color: rgb(153, 130, 255);
@@ -18,7 +18,7 @@
             --border-color: rgba(255, 255, 255, 0.15);
             --font: 'Inter', sans-serif;
             --border-radius: 8px;
-            --transition-speed: 0.1s;
+            --transition-speed: 0.2s;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
@@ -41,6 +41,7 @@
             flex-direction: column;
             border: 1px solid var(--border-color);
             visibility: hidden;
+            z-index: 1000;
         }
         .header-image {
             width: 100%;
@@ -85,7 +86,7 @@
             transition: background-color 0.2s ease;
         }
         .menu-item:hover {
-            background: rgba(153, 130, 255, 0.3) !important;
+            background: rgba(153, 130, 255, 0.3);
             cursor: pointer;
         }
         .menu-item.selected {
@@ -111,7 +112,7 @@
         .dropdown {
             position: relative;
             width: 100%;
-            background: var(--bg-color);
+            background: rgba(20, 20, 20, 0.95);
             border: 1px solid var(--border-color);
             border-radius: 0 0 var(--border-radius) var(--border-radius);
             z-index: 3;
@@ -133,11 +134,36 @@
             transition: background-color 0.2s ease;
         }
         .dropdown-item:hover {
-            background: rgba(153, 130, 255, 0.3) !important;
+            background: rgba(153, 130, 255, 0.3);
             cursor: pointer;
         }
         .dropdown-item.selected {
             background: rgba(153, 130, 255, 0.3);
+        }
+        .dropdown-item.button {
+            background: rgba(153, 130, 255, 0.2);
+            border: 1px solid var(--accent-color);
+            border-radius: 4px;
+            margin: 5px 10px;
+            padding: 8px 15px;
+            text-align: center;
+        }
+        .dropdown-item.button:hover {
+            background: rgba(153, 130, 255, 0.5);
+        }
+        .dropdown-item.toggle .item-value::before {
+            content: '☐';
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            line-height: 20px;
+            text-align: center;
+            margin-right: 10px;
+            font-size: 16px;
+        }
+        .dropdown-item.toggle.on .item-value::before {
+            content: '☑';
+            color: #2ecc71;
         }
         .dropdown-selection-highlight {
             position: absolute;
@@ -223,15 +249,31 @@
             background: var(--bg-color);
             border: 1px solid var(--border-color);
             color: var(--primary-text);
-            padding: 10px 20px;
+            padding: 15px 20px;
             border-radius: 8px;
             border-left: 4px solid var(--accent-color);
             box-shadow: 0 5px 15px rgba(0,0,0,0.3);
             opacity: 0;
-            animation: slideIn 0.3s forwards, slideOut 0.3s 2.7s forwards;
+            animation: slideIn 0.3s ease-out forwards, slideOut 0.3s ease-out forwards;
+            max-width: 300px;
         }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        .notification-title {
+            font-weight: 600;
+            font-size: 14px;
+            margin-bottom: 5px;
+        }
+        .notification-message {
+            font-size: 13px;
+            color: var(--secondary-text);
+        }
+        @keyframes slideIn { 
+            from { transform: translateX(100%); opacity: 0; } 
+            to { transform: translateX(0); opacity: 1; } 
+        }
+        @keyframes slideOut { 
+            from { transform: translateX(0); opacity: 1; } 
+            to { transform: translateX(100%); opacity: 0; } 
+        }
     </style>
 </head>
 <body>
@@ -274,12 +316,16 @@
                       .replace(/'/g, '&#39;');
         }
 
-        function showNotification(message) {
+        function showNotification(title, message, duration) {
             const notification = document.createElement('div');
             notification.className = 'notification';
-            notification.textContent = message;
+            notification.style.animationDelay = `0s, ${duration - 300}ms`;
+            notification.innerHTML = `
+                <div class="notification-title">${safeEncode(title)}</div>
+                <div class="notification-message">${safeEncode(message)}</div>
+            `;
             notificationContainer.appendChild(notification);
-            setTimeout(() => { notification.remove(); }, 3000);
+            setTimeout(() => { notification.remove(); }, duration);
         }
 
         function showInputPrompt(title, placeholder, callback) {
@@ -350,13 +396,19 @@
             if (!tabData || !tabData.items || !Array.isArray(tabData.items)) return;
             tabData.items.forEach((item, index) => {
                 const element = document.createElement('div');
-                element.className = 'dropdown-item';
+                element.className = `dropdown-item ${item.type === 'button' ? 'button' : item.type === 'toggle' ? 'toggle' : ''}`;
                 if (item.type === 'input') {
                     element.innerHTML = `
                         <div style="width: 100%;">
                             <label style="display: block; margin-bottom: 5px; font-size: 12px; color: var(--secondary-text);">${safeEncode(item.label)}</label>
                             <input type="text" style="width: 100%; padding: 5px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: var(--primary-text); border-radius: 3px;" value="${safeEncode(item.value || '')}" readonly>
                         </div>`;
+                } else if (item.type === 'toggle') {
+                    element.className += item.value ? ' on' : '';
+                    element.innerHTML = `
+                        <span>${safeEncode(item.label || 'Unknown')}</span>
+                        <span class="item-value"></span>
+                    `;
                 } else {
                     const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
                     if (isResourceState) {
@@ -406,7 +458,7 @@
                     const dropdownEl = document.createElement('div');
                     dropdownEl.className = 'dropdown';
                     populateDropdown(state.tabs[index], dropdownEl, state);
-                    menuItemEl.appendChild(dropdownEl);
+                    menuItemsEl.appendChild(dropdownEl); // Append dropdown to menu-items, not menu-item
                 }
                 menuItemsEl.appendChild(menuItemEl);
                 menuItemEl.addEventListener('click', () => {
@@ -429,11 +481,12 @@
                     menuContainer.style.visibility = 'visible';
                     if (action === "show" && !welcomeMessageShown) {
                         welcomeMessageShown = true;
-                        showNotification("Avaris Menu loaded successfully");
+                        showNotification("Avaris Menu", "Loaded successfully", 3000);
                     }
                 }
-            }
-            if (action === 'hide') {
+            } else if (action === "notify") {
+                showNotification(data.title, data.message, data.duration);
+            } else if (action === "hide") {
                 menuContainer.style.visibility = 'hidden';
             }
         });
