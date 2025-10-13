@@ -1,285 +1,56 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avaris Menu</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-    <style>
-        :root {
-            --bg-color: rgba(10, 10, 10, 0.95);
-            --primary-text: #ffffff;
-            --secondary-text: #b0b0b0;
-            --accent-color: rgb(138, 43, 226);
-            --highlight-bg: rgba(138, 43, 226, 0.3);
-            --border-color: rgba(255, 255, 255, 0.15);
-            --font: 'Inter', sans-serif;
-            --border-radius: 8px;
-            --transition-speed: 0.2s;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--font);
-            background-color: transparent;
-            color: var(--primary-text);
-            overflow: hidden;
-            user-select: none;
-        }
-        .hidden { display: none !important; }
-        .menu-container {
-            position: absolute;
-            top: 15vh;
-            left: 5vw;
-            width: 420px;
-            background: var(--bg-color);
-            border-radius: var(--border-radius);
-            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--border-color);
-            visibility: hidden;
-            z-index: 1000;
-        }
-        .header-image {
-            width: 100%;
-            height: 100px;
-            background-image: linear-gradient(to bottom, rgba(138, 43, 226, 0.7), rgba(10, 10, 10, 0.7)), url('https://raw.githubusercontent.com/Kyrenov/FAHHHHHHHHHHHHHH/main/image.png');
-            background-size: cover;
-            background-position: center;
-            border-bottom: 1px solid var(--border-color);
-            border-top-left-radius: var(--border-radius);
-            border-top-right-radius: var(--border-radius);
-        }
-        .breadcrumb-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 15px;
-            background: rgba(0,0,0,0.3);
-            font-size: 14px;
-            font-weight: 500;
-            border-bottom: 1px solid var(--border-color);
-        }
-        #breadcrumb { color: var(--secondary-text); text-transform: uppercase; }
-        #option-counter { color: var(--primary-text); }
-        .menu-items {
-            list-style: none;
-            position: relative;
-            height: 410px;
-            overflow-y: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-        }
-        .menu-items::-webkit-scrollbar {
-            display: none;
-        }
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 11px 15px;
-            font-size: 15px;
-            position: relative;
-            height: 41px;
-            transition: background-color 0.2s ease;
-        }
-        .menu-item:hover {
-            background: var(--highlight-bg);
-            cursor: pointer;
-        }
-        .menu-item.selected {
-            background: var(--highlight-bg);
-        }
-        .selection-highlight {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 41px;
-            background: var(--highlight-bg);
-            z-index: 1;
-            transition: top var(--transition-speed) ease-out;
-        }
-        .item-content {
-            display: flex;
-            width: 100%;
-            align-items: center;
-            z-index: 2;
-        }
-        .item-label { flex-grow: 1; }
-        .item-value { color: var(--primary-text); font-weight: 500; }
-        .dropdown {
-            position: absolute;
-            top: 100%;
-            width: 100%;
-            background: rgba(20, 20, 20, 0.95);
-            border: 1px solid var(--border-color);
-            border-radius: 0 0 var(--border-radius) var(--border-radius);
-            z-index: 3;
-            max-height: 205px;
-            overflow-y: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            display: none;
-        }
-        .dropdown.active {
-            display: block;
-        }
-        .dropdown::-webkit-scrollbar {
-            display: none;
-        }
-        .dropdown-item {
-            padding: 11px 15px;
-            font-size: 15px;
-            height: 41px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            transition: background-color 0.2s ease;
-        }
-        .dropdown-item:hover {
-            background: var(--highlight-bg);
-            cursor: pointer;
-        }
-        .dropdown-item.selected {
-            background: var(--highlight-bg);
-        }
-        .dropdown-item.button {
-            background: rgba(138, 43, 226, 0.2);
-            border: 1px solid var(--accent-color);
-            border-radius: 4px;
-            margin: 5px 10px;
-            padding: 8px 15px;
-            text-align: center;
-        }
-        .dropdown-item.button:hover {
-            background: rgba(138, 43, 226, 0.5);
-        }
-        .dropdown-item.toggle .item-value::before {
-            content: '☐';
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            line-height: 20px;
-            text-align: center;
-            margin-right: 10px;
-            font-size: 16px;
-        }
-        .dropdown-item.toggle.on .item-value::before {
-            content: '☑';
-            color: #2ecc71;
-        }
-        .dropdown-selection-highlight {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 41px;
-            background: var(--highlight-bg);
-            z-index: 1;
-            transition: top var(--transition-speed) ease-out;
-        }
-        .status-on { color: #2ecc71; font-weight: 600; }
-        .status-off { color: #ff4757; font-weight: 600; }
-        .status-unknown { color: #f39c12; font-weight: 600; }
-        .input-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0,0,0,0.6);
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-        }
-        .input-box {
-            background: var(--bg-color);
-            padding: 25px;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--border-color);
-            width: 400px;
-            text-align: center;
-        }
-        .input-box h3 {
-            margin-bottom: 15px;
-            font-size: 18px;
-        }
-        .input-box input {
-            width: 100%;
-            padding: 12px;
-            background: rgba(0,0,0,0.3);
-            border: 1px solid var(--border-color);
-            color: var(--primary-text);
-            border-radius: 6px;
-            font-size: 16px;
-            text-align: center;
-            transition: border-color 0.2s ease, box-shadow 0.2s ease;
-        }
-        .input-box input:focus {
-            outline: none;
-            border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(138, 43, 226, 0.2);
-        }
-        .input-box input:hover {
-            border-color: rgba(138, 43, 226, 0.6);
-        }
-        .input-box small {
-            color: var(--secondary-text);
-            margin-top: 10px;
-            display: block;
-        }
-        .footer {
-            padding: 10px 15px;
-            background: rgba(0,0,0,0.3);
-            border-top: 1px solid var(--border-color);
-            min-height: 20px;
-            font-size: 13px;
-            color: var(--secondary-text);
-            border-bottom-left-radius: var(--border-radius);
-            border-bottom-right-radius: var(--border-radius);
-        }
-        #notification-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .notification {
-            background: var(--bg-color);
-            border: 1px solid var(--border-color);
-            color: var(--primary-text);
-            padding: 15px 20px;
-            border-radius: 8px;
-            border-left: 4px solid var(--accent-color);
-            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
-            opacity: 0;
-            animation: slideIn 0.3s ease-out forwards, slideOut 0.3s ease-out forwards;
-            max-width: 300px;
-        }
-        .notification-title {
-            font-weight: 600;
-            font-size: 14px;
-            margin-bottom: 5px;
-        }
-        .notification-message {
-            font-size: 13px;
-            color: var(--secondary-text);
-        }
-        @keyframes slideIn { 
-            from { transform: translateX(100%); opacity: 0; } 
-            to { transform: translateX(0); opacity: 1; } 
-        }
-        @keyframes slideOut { 
-            from { transform: translateX(0); opacity: 1; } 
-            to { transform: translateX(100%); opacity: 0; } 
-        }
-    </style>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Avaris Menu</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css" />
+<style>
+/* (same styles as you provided) */
+:root{--bg-color:rgba(10,10,10,0.95);--primary-text:#fff;--secondary-text:#b0b0b0;--accent-color:rgb(138,43,226);--highlight-bg:rgba(138,43,226,0.3);--border-color:rgba(255,255,255,0.15);--font:'Inter',sans-serif;--border-radius:8px;--transition-speed:0.2s}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:var(--font);background-color:transparent;color:var(--primary-text);overflow:hidden;user-select:none}
+.hidden{display:none!important}
+.menu-container{position:absolute;top:15vh;left:5vw;width:420px;background:var(--bg-color);border-radius:var(--border-radius);box-shadow:0 10px 40px rgba(0,0,0,0.5);display:flex;flex-direction:column;border:1px solid var(--border-color);visibility:hidden;z-index:1000}
+.header-image{width:100%;height:100px;background-image:linear-gradient(to bottom, rgba(138,43,226,0.7), rgba(10,10,10,0.7)), url('https://raw.githubusercontent.com/Kyrenov/FAHHHHHHHHHHHHHH/main/image.png');background-size:cover;background-position:center;border-bottom:1px solid var(--border-color);border-top-left-radius:var(--border-radius);border-top-right-radius:var(--border-radius)}
+.breadcrumb-bar{display:flex;justify-content:space-between;align-items:center;padding:8px 15px;background:rgba(0,0,0,0.3);font-size:14px;font-weight:500;border-bottom:1px solid var(--border-color)}
+#breadcrumb{color:var(--secondary-text);text-transform:uppercase}
+#option-counter{color:var(--primary-text)}
+.menu-items{list-style:none;position:relative;height:410px;overflow-y:auto;scrollbar-width:none;-ms-overflow-style:none}
+.menu-items::-webkit-scrollbar{display:none}
+.menu-item{display:flex;align-items:center;padding:11px 15px;font-size:15px;position:relative;height:41px;transition:background-color 0.2s ease}
+.menu-item:hover{background:var(--highlight-bg);cursor:pointer}
+.menu-item.selected{background:var(--highlight-bg)}
+.selection-highlight{position:absolute;left:0;width:100%;height:41px;background:var(--highlight-bg);z-index:1;transition:top var(--transition-speed) ease-out}
+.item-content{display:flex;width:100%;align-items:center;z-index:2}
+.item-label{flex-grow:1}
+.item-value{color:var(--primary-text);font-weight:500}
+.dropdown{position:absolute;top:100%;width:100%;background:rgba(20,20,20,0.95);border:1px solid var(--border-color);border-radius:0 0 var(--border-radius) var(--border-radius);z-index:3;max-height:205px;overflow-y:auto;display:none}
+.dropdown.active{display:block}
+.dropdown-item{padding:11px 15px;font-size:15px;height:41px;display:flex;align-items:center;justify-content:space-between;transition:background-color 0.2s ease}
+.dropdown-item:hover{background:var(--highlight-bg);cursor:pointer}
+.dropdown-item.selected{background:var(--highlight-bg)}
+.dropdown-item.button{background:rgba(138,43,226,0.2);border:1px solid var(--accent-color);border-radius:4px;margin:5px 10px;padding:8px 15px;text-align:center}
+.dropdown-selection-highlight{position:absolute;left:0;width:100%;height:41px;background:var(--highlight-bg);z-index:1;transition:top var(--transition-speed) ease-out}
+.status-on{color:#2ecc71;font-weight:600}
+.status-off{color:#ff4757;font-weight:600}
+.status-unknown{color:#f39c12;font-weight:600}
+.input-overlay{position:fixed;top:0;left:0;width:100%;height:100%;background:rgba(0,0,0,0.6);backdrop-filter:blur(5px);display:flex;align-items:center;justify-content:center;z-index:10000}
+.input-box{background:var(--bg-color);padding:25px;border-radius:var(--border-radius);border:1px solid var(--border-color);width:400px;text-align:center}
+.input-box h3{margin-bottom:15px;font-size:18px}
+.input-box input{width:100%;padding:12px;background:rgba(0,0,0,0.3);border:1px solid var(--border-color);color:var(--primary-text);border-radius:6px;font-size:16px;text-align:center;transition:border-color 0.2s ease,box-shadow 0.2s ease}
+.input-box input:focus{outline:none;border-color:var(--accent-color);box-shadow:0 0 0 2px rgba(138,43,226,0.2)}
+.footer{padding:10px 15px;background:rgba(0,0,0,0.3);border-top:1px solid var(--border-color);min-height:20px;font-size:13px;color:var(--secondary-text);border-bottom-left-radius:var(--border-radius);border-bottom-right-radius:var(--border-radius)}
+#notification-container{position:fixed;bottom:20px;right:20px;z-index:9999;display:flex;flex-direction:column;gap:10px}
+.notification{background:var(--bg-color);border:1px solid var(--border-color);color:var(--primary-text);padding:15px 20px;border-radius:8px;border-left:4px solid var(--accent-color);box-shadow:0 5px 15px rgba(0,0,0,0.3);opacity:0;animation:slideIn 0.3s ease-out forwards,slideOut 0.3s ease-out forwards;max-width:300px}
+.notification-title{font-weight:600;font-size:14px;margin-bottom:5px}
+.notification-message{font-size:13px;color:var(--secondary-text)}
+@keyframes slideIn{from{transform:translateX(100%);opacity:0}to{transform:translateX(0);opacity:1}}
+@keyframes slideOut{from{transform:translateX(0);opacity:1}to{transform:translateX(100%);opacity:0}}
+</style>
 </head>
 <body>
 <div id="notification-container"></div>
@@ -295,237 +66,221 @@
     </ul>
     <div class="footer" id="footer"></div>
 </div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const menuItemsEl = document.getElementById('menu-items');
-        const breadcrumbEl = document.getElementById('breadcrumb');
-        const counterEl = document.getElementById('option-counter');
-        const footerEl = document.getElementById('footer');
-        const notificationContainer = document.getElementById('notification-container');
-        const inputOverlay = document.getElementById('input-overlay');
-        const menuContainer = document.getElementById('menu-container');
-        let highlightEl = document.getElementById('selection-highlight');
-        let selectedTabIndex = 0;
-        let dropdownSelectedIndex = 0;
-        let dropdownOpen = false;
-        let currentState = null;
-        let welcomeMessageShown = false;
-        const ITEM_HEIGHT = 41;
+document.addEventListener('DOMContentLoaded', () => {
+    const menuItemsEl = document.getElementById('menu-items');
+    const breadcrumbEl = document.getElementById('breadcrumb');
+    const counterEl = document.getElementById('option-counter');
+    const footerEl = document.getElementById('footer');
+    const notificationContainer = document.getElementById('notification-container');
+    const inputOverlay = document.getElementById('input-overlay');
+    const menuContainer = document.getElementById('menu-container');
+    let highlightEl = document.getElementById('selection-highlight');
+    let activeTabIndex = 0;
+    let dropdownSelectedIndex = 0;
+    let dropdownOpen = false;
+    let currentState = null;
+    let welcomeMessageShown = false;
+    const ITEM_HEIGHT = 41;
 
-        function safeEncode(text) {
-            if (!text || typeof text !== 'string') return '';
-            return text.replace(/&/g, '&amp;')
-                      .replace(/</g, '&lt;')
-                      .replace(/>/g, '&gt;')
-                      .replace(/"/g, '&quot;')
-                      .replace(/'/g, '&#39;');
-        }
+    function safeEncode(text) {
+        if (!text || typeof text !== 'string') return '';
+        return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+    }
 
-        function showNotification(title, message, duration) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.style.animationDelay = `0s, ${duration - 300}ms`;
-            notification.innerHTML = `
-                <div class="notification-title">${safeEncode(title)}</div>
-                <div class="notification-message">${safeEncode(message)}</div>
-            `;
-            notificationContainer.appendChild(notification);
-            setTimeout(() => { notification.remove(); }, duration);
-        }
+    function showNotification(title, message, duration) {
+        const notification = document.createElement('div');
+        notification.className = 'notification';
+        notification.style.animationDelay = `0s, ${Math.max(0, (duration || 3000) - 300)}ms`;
+        notification.innerHTML = `<div class="notification-title">${safeEncode(title)}</div><div class="notification-message">${safeEncode(message)}</div>`;
+        notificationContainer.appendChild(notification);
+        setTimeout(() => { notification.remove(); }, duration || 3000);
+    }
 
-        function showInputPrompt(title, placeholder, callback) {
-            inputOverlay.innerHTML = `
-                <div class="input-box">
-                    <h3>${safeEncode(title)}</h3>
-                    <input type="text" id="prompt-input" placeholder="${safeEncode(placeholder)}">
-                    <small>Press Enter to submit, Escape to cancel.</small>
-                </div>
-            `;
-            inputOverlay.classList.remove('hidden');
-            const inputField = document.getElementById('prompt-input');
-            inputField.focus();
-            const close = () => {
-                inputOverlay.classList.add('hidden');
-                if (window.parent) {
-                    window.parent.postMessage({ action: 'inputClosed' }, '*');
-                }
-            };
-            const keyHandler = (e) => {
-                if (e.key === 'Enter') {
-                    callback(inputField.value);
-                    close();
-                } else if (e.key === 'Escape') {
-                    close();
-                }
-            };
-            document.onkeydown = keyHandler;
-        }
-
-        function updateTabSelection() {
-            const items = menuItemsEl.querySelectorAll('.menu-item');
-            if (!items[selectedTabIndex]) return;
-            items.forEach((item, i) => item.classList.toggle('selected', i === selectedTabIndex));
-            const itemTop = selectedTabIndex * ITEM_HEIGHT;
-            highlightEl.style.top = `${itemTop - menuItemsEl.scrollTop}px`;
-            counterEl.textContent = `${selectedTabIndex + 1} / ${items.length}`;
-            const currentTab = currentState.tabs[selectedTabIndex];
-            footerEl.textContent = currentTab ? (currentTab.description || `Current Tab: ${currentTab.title}`) : '';
-        }
-
-        function updateDropdownSelection(dropdownEl, items) {
-            if (!items || items.length === 0) return;
-            const dropdownItems = dropdownEl.querySelectorAll('.dropdown-item');
-            if (!dropdownItems[dropdownSelectedIndex]) return;
-            let itemTop = 0;
-            for (let i = 0; i < dropdownSelectedIndex; i++) {
-                if (dropdownItems[i]) {
-                    itemTop += dropdownItems[i].offsetHeight;
-                }
+    function showInputPrompt(title, placeholder, callback) {
+        inputOverlay.innerHTML = `<div class="input-box"><h3>${safeEncode(title)}</h3><input type="text" id="prompt-input" placeholder="${safeEncode(placeholder)}"><small>Press Enter to submit, Escape to cancel.</small></div>`;
+        inputOverlay.classList.remove('hidden');
+        const inputField = document.getElementById('prompt-input');
+        inputField.focus();
+        const close = () => {
+            inputOverlay.classList.add('hidden');
+            window.fetch(`https://${GetParentResourceName()}/inputClosed`, { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify({}) });
+        };
+        const keyHandler = (e) => {
+            if (e.key === 'Enter') {
+                callback(inputField.value);
+                close();
+            } else if (e.key === 'Escape') {
+                close();
             }
-            const dropdownHighlight = dropdownEl.querySelector('.dropdown-selection-highlight');
+        };
+        document.onkeydown = keyHandler;
+    }
+
+    function updateTabHighlight() {
+        const items = menuItemsEl.querySelectorAll('.menu-item');
+        items.forEach((it, i) => it.classList.toggle('selected', i === activeTabIndex));
+        const itemTop = activeTabIndex * ITEM_HEIGHT;
+        highlightEl.style.top = `${itemTop - menuItemsEl.scrollTop}px`;
+        counterEl.textContent = `${activeTabIndex + 1} / ${items.length}`;
+        const currentTab = currentState && currentState.tabs && currentState.tabs[activeTabIndex];
+        footerEl.textContent = currentTab ? (currentTab.description || `Current Tab: ${currentTab.title}`) : '';
+    }
+
+    function updateDropdownSelection(dropdownEl, items) {
+        if (!items || items.length === 0) return;
+        const dropdownItems = dropdownEl.querySelectorAll('.dropdown-item');
+        if (!dropdownItems[dropdownSelectedIndex]) return;
+        let itemTop = 0;
+        for (let i = 0; i < dropdownSelectedIndex; i++) {
+            if (dropdownItems[i]) itemTop += dropdownItems[i].offsetHeight;
+        }
+        const dropdownHighlight = dropdownEl.querySelector('.dropdown-selection-highlight');
+        if (dropdownHighlight) {
             dropdownHighlight.style.top = `${itemTop}px`;
             dropdownHighlight.style.height = `${ITEM_HEIGHT}px`;
-            dropdownItems.forEach((el, i) => el.classList.toggle('selected', i === dropdownSelectedIndex));
-            const scrollTop = dropdownEl.scrollTop;
-            const containerHeight = dropdownEl.clientHeight;
-            const itemBottom = itemTop + ITEM_HEIGHT;
-            if (itemTop < scrollTop) {
-                dropdownEl.scrollTop = itemTop;
-            } else if (itemBottom > scrollTop + containerHeight) {
-                dropdownEl.scrollTop = itemBottom - containerHeight;
-            }
         }
+        dropdownItems.forEach((el, i) => el.classList.toggle('selected', i === dropdownSelectedIndex));
+        // ensure visible
+        const scrollTop = dropdownEl.scrollTop;
+        const containerHeight = dropdownEl.clientHeight;
+        const itemBottom = itemTop + ITEM_HEIGHT;
+        if (itemTop < scrollTop) {
+            dropdownEl.scrollTop = itemTop;
+        } else if (itemBottom > scrollTop + containerHeight) {
+            dropdownEl.scrollTop = itemBottom - containerHeight;
+        }
+    }
 
-        function populateDropdown(tabData, dropdownEl, state) {
-            dropdownEl.innerHTML = '<div class="dropdown-selection-highlight"></div>';
-            if (!tabData || !tabData.items || !Array.isArray(tabData.items)) return;
-            tabData.items.forEach((item, index) => {
-                const element = document.createElement('div');
-                element.className = `dropdown-item ${item.type === 'button' ? 'button' : item.type === 'toggle' ? 'toggle' : ''}`;
-                if (item.type === 'input') {
-                    element.innerHTML = `
-                        <div style="width: 100%;">
-                            <label style="display: block; margin-bottom: 5px; font-size: 12px; color: var(--secondary-text);">${safeEncode(item.label)}</label>
-                            <input type="text" style="width: 100%; padding: 5px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: var(--primary-text); border-radius: 3px;" value="${safeEncode(item.value || '')}" readonly>
-                        </div>`;
-                } else if (item.type === 'toggle') {
-                    element.className += item.value ? ' on' : '';
-                    element.innerHTML = `
-                        <span>${safeEncode(item.label || 'Unknown')}</span>
-                        <span class="item-value"></span>
-                    `;
+    function populateDropdown(tabData, dropdownEl, state) {
+        dropdownEl.innerHTML = '<div class="dropdown-selection-highlight"></div>';
+        if (!tabData || !tabData.items || !Array.isArray(tabData.items)) return;
+        tabData.items.forEach((item, index) => {
+            const element = document.createElement('div');
+            element.className = `dropdown-item ${item.type === 'button' ? 'button' : item.type === 'toggle' ? 'toggle' : ''}`;
+            if (item.type === 'input') {
+                element.innerHTML = `<div style="width:100%"><label style="display:block;margin-bottom:5px;font-size:12px;color:var(--secondary-text);">${safeEncode(item.label)}</label><input type="text" style="width:100%;padding:5px;background:rgba(0,0,0,0.5);border:1px solid var(--border-color);color:var(--primary-text);border-radius:3px;" value="${safeEncode(item.value || '')}" readonly></div>`;
+            } else if (item.type === 'toggle') {
+                if (item.value) element.className += ' on';
+                element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="item-value"></span>`;
+            } else {
+                const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
+                if (isResourceState) {
+                    const statusClass = item.state ? (item.state.toLowerCase() === 'started' ? 'status-on' : item.state.toLowerCase() === 'stopped' ? 'status-off' : 'status-unknown') : 'status-off';
+                    element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(item.state || '')}</span>`;
                 } else {
-                    const isResourceState = (tabData.key === 'resources' && item.state !== undefined);
-                    if (isResourceState) {
-                        const statusClass = item.state ? (item.state.toLowerCase() === 'started' ? 'status-on' : item.state.toLowerCase() === 'stopped' ? 'status-off' : 'status-unknown') : 'status-off';
-                        element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span><span class="${statusClass}">${safeEncode(item.state || '')}</span>`;
-                    } else {
-                        element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
-                    }
+                    element.innerHTML = `<span>${safeEncode(item.label || 'Unknown')}</span>`;
                 }
-                element.addEventListener('click', () => {
-                    dropdownSelectedIndex = index;
-                    updateDropdownSelection(dropdownEl, tabData.items);
-                    if (window.parent) {
-                        window.parent.postMessage({ action: 'select', tabIndex: selectedTabIndex, itemIndex: index, isDropdown: true }, '*');
-                    }
-                });
-                dropdownEl.appendChild(element);
-            });
-            dropdownSelectedIndex = state.dropdownSelection ? state.dropdownSelection.index : 0;
-            updateDropdownSelection(dropdownEl, tabData.items);
-        }
-
-        function updateMenuFromState(state) {
-            if (!state || !state.tabs) return;
-            currentState = state;
-            dropdownOpen = state.dropdownOpen || false;
-            selectedTabIndex = state.activeTab || 0;
-            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
-            highlightEl = document.getElementById('selection-highlight');
-
-            const menuItems = state.tabs.map((tabData, index) => ({
-                label: tabData.title || `Tab ${index + 1}`,
-                tabIndex: index,
-                type: 'tab',
-                description: `Open ${tabData.title || `Tab ${index + 1}`}`
-            }));
-
-            menuItems.forEach((item, index) => {
-                const menuItemEl = document.createElement('li');
-                menuItemEl.className = 'menu-item';
-                let content = `<div class="item-content">`;
-                content += `<span class="item-label">${safeEncode(item.label)}</span>`;
-                content += `<i class="chevron fa-solid fa-angle-right"></i>`;
-                content += `</div>`;
-                menuItemEl.innerHTML = content;
-                if (dropdownOpen && index === state.activeTab) {
-                    const dropdownEl = document.createElement('div');
-                    dropdownEl.className = 'dropdown active'; // Ensure dropdown is shown for active tab
-                    populateDropdown(state.tabs[index], dropdownEl, state);
-                    menuItemsEl.appendChild(dropdownEl);
-                }
-                menuItemsEl.appendChild(menuItemEl);
-                menuItemEl.addEventListener('click', () => {
-                    if (window.parent) {
-                        window.parent.postMessage({ action: 'openDropdown', tabIndex: item.tabIndex }, '*'); // Trigger dropdown on click
-                    }
+            }
+            element.addEventListener('click', () => {
+                dropdownSelectedIndex = index;
+                updateDropdownSelection(dropdownEl, tabData.items);
+                // send to parent via NUI callback
+                fetch(`https://${GetParentResourceName()}/select`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ tabIndex: activeTabIndex, itemIndex: index })
                 });
             });
+            dropdownEl.appendChild(element);
+        });
+        // set dropdownSelectedIndex from state
+        dropdownSelectedIndex = (state && state.dropdownSelection) ? state.dropdownSelection.index : 0;
+        updateDropdownSelection(dropdownEl, tabData.items);
+    }
 
-            breadcrumbEl.textContent = state.tabs[state.activeTab].header || 'Avaris Menu';
-            counterEl.textContent = `${state.activeTab + 1} / ${state.tabs.length}`;
-            updateTabSelection();
+    function updateMenuFromState(state) {
+        if (!state || !state.tabs) return;
+        currentState = state;
+        dropdownOpen = state.dropdownOpen || false;
+        activeTabIndex = state.activeTab || 0;
+        menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
+        highlightEl = document.getElementById('selection-highlight');
+
+        // render tabs (as vertical list)
+        state.tabs.forEach((tabData, index) => {
+            const menuItemEl = document.createElement('li');
+            menuItemEl.className = 'menu-item';
+            menuItemEl.innerHTML = `<div class="item-content"><span class="item-label">${safeEncode(tabData.title || `Tab ${index+1}`)}</span><i class="chevron fa-solid fa-angle-right"></i></div>`;
+            menuItemsEl.appendChild(menuItemEl);
+
+            // if this is active and dropdownOpen, append dropdown after this tab item
+            if (index === activeTabIndex && dropdownOpen) {
+                const dropdownEl = document.createElement('div');
+                dropdownEl.className = 'dropdown active';
+                populateDropdown(tabData, dropdownEl, state);
+                menuItemsEl.appendChild(dropdownEl);
+            }
+
+            menuItemEl.addEventListener('click', () => {
+                // open dropdown for clicked tab via NUI fetch
+                fetch(`https://${GetParentResourceName()}/openDropdown`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ tabIndex: index })
+                });
+            });
+        });
+
+        // breadcrumb and counter
+        breadcrumbEl.textContent = (state.tabs[state.activeTab] && state.tabs[state.activeTab].header) ? state.tabs[state.activeTab].header : 'Avaris Menu';
+        counterEl.textContent = `${state.activeTab + 1} / ${state.tabs.length}`;
+
+        // selection highlight for tab list
+        updateTabHighlight();
+    }
+
+    // handle incoming messages from Lua (SendToDui)
+    window.addEventListener("message", (event) => {
+        const { action, data } = event.data || {};
+        if (action === "update" || action === "show") {
+            if (data) {
+                updateMenuFromState(data);
+                menuContainer.style.visibility = 'visible';
+                if (action === "show" && !welcomeMessageShown) {
+                    welcomeMessageShown = true;
+                    showNotification("Avaris Menu", "Loaded successfully", 3000);
+                }
+            }
+        } else if (action === "notify") {
+            showNotification(data.title, data.message, data.duration);
+        } else if (action === "hide") {
+            menuContainer.style.visibility = 'hidden';
+        } else if (action === "openDropdown") {
+            // fallback if parent triggers openDropdown via message rather than fetch callback
+            if (currentState) {
+                currentState.dropdownOpen = true;
+                currentState.dropdownSelection.index = 0;
+                updateMenuFromState(currentState);
+            }
         }
-
-        window.addEventListener("message", (event) => {
-            const { action, data } = event.data;
-            if (action === "update" || action === "show") {
-                if (data) {
-                    updateMenuFromState(data);
-                    menuContainer.style.visibility = 'visible';
-                    if (action === "show" && !welcomeMessageShown) {
-                        welcomeMessageShown = true;
-                        showNotification("Avaris Menu", "Loaded successfully", 3000);
-                    }
-                }
-            } else if (action === "notify") {
-                showNotification(data.title, data.message, data.duration);
-            } else if (action === "hide") {
-                menuContainer.style.visibility = 'hidden';
-            } else if (action === "openDropdown") {
-                if (currentState) {
-                    currentState.dropdownOpen = true;
-                    currentState.dropdownSelection.index = 0;
-                    updateMenuFromState(currentState); // Force re-render with dropdown
-                }
-            }
-        });
-
-        window.addEventListener("message", (event) => {
-            const data = event.data;
-            if (data.action === "getClipboard") {
-                navigator.clipboard.readText().then(text => {
-                    fetch(`https://${GetParentResourceName()}/clipboardGet`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ text })
-                    });
-                }).catch(() => {
-                    fetch(`https://${GetParentResourceName()}/clipboardGet`, {
-                        method: "POST",
-                        headers: { "Content-Type": "application/json" },
-                        body: JSON.stringify({ text: "" })
-                    });
-                });
-            }
-            if (data.action === "setClipboard") {
-                navigator.clipboard.writeText(data.text || "").catch(err => {
-                    console.error("Clipboard write failed:", err);
-                });
-            }
-        });
     });
+
+    // messages that use fetch to interact with parent already implemented above (select/openDropdown)
+    // clipboard integration: parent will post message {action: 'getClipboard'} or {action: 'setClipboard'}
+    window.addEventListener("message", (event) => {
+        const data = event.data || {};
+        if (data.action === "getClipboard") {
+            navigator.clipboard.readText().then(text => {
+                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text })
+                });
+            }).catch(() => {
+                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: "" })
+                });
+            });
+        }
+        if (data.action === "setClipboard") {
+            navigator.clipboard.writeText(data.text || "").catch(err => console.error("Clipboard write failed:", err));
+        }
+    });
+});
 </script>
 </body>
 </html>
