@@ -1,599 +1,426 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Avaris Menu</title>
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
-  
-    <style>
-        :root {
-            --primary-color: rgb(139, 139, 255);
-            --secondary-color: rgb(100, 100, 200);
-            --bg-color: rgb(25, 25, 35);
-            --primary-text: #ffffff;
-            --secondary-text: #d0d0d0;
-            --border-color: rgba(255, 255, 255, 0.15);
-            --highlight-bg: var(--primary-color);
-            --font: 'Inter', sans-serif;
-            --border-radius: 8px;
-            --transition-speed: 0.15s;
-            --easing: cubic-bezier(0.4, 0, 0.2, 1);
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--font);
-            background-color: transparent;
-            color: var(--primary-text);
-            overflow: hidden;
-            user-select: none;
-        }
-        .hidden { display: none !important; }
-        .menu-container {
-            position: absolute;
-            top: 12vh;
-            left: 2vw;
-            width: 380px;
-            background: var(--bg-color);
-            border-radius: var(--border-radius);
-            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
-            display: flex;
-            flex-direction: column;
-            border: 1px solid var(--primary-color);
-            visibility: hidden;
-            transition: transform 0.25s var(--easing), opacity 0.25s var(--easing);
-            transform: translateY(15px);
-            opacity: 0;
-        }
-        .menu-container.visible {
-            transform: translateY(0);
-            opacity: 1;
-        }
-        .header {
-            padding: 12px 15px;
-            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
-            color: var(--primary-text);
-            font-size: 16px;
-            font-weight: 600;
-            text-align: center;
-            border-top-left-radius: var(--border-radius);
-            border-top-right-radius: var(--border-radius);
-            border-bottom: 1px solid var(--border-color);
-        }
-        .breadcrumb-bar {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 8px 15px;
-            background: rgba(0, 0, 0, 0.3);
-            font-size: 13px;
-            font-weight: 500;
-            border-bottom: 1px solid var(--border-color);
-        }
-        #breadcrumb { color: var(--secondary-text); text-transform: uppercase; }
-        #option-counter { color: var(--primary-text); font-weight: 600; }
-        .menu-items {
-            list-style: none;
-            position: relative;
-            height: 400px;
-            overflow-y: auto;
-            scrollbar-width: none;
-            -ms-overflow-style: none;
-            scroll-behavior: smooth;
-        }
-        .menu-items::-webkit-scrollbar { display: none; }
-        .menu-item {
-            display: flex;
-            align-items: center;
-            padding: 10px 15px;
-            font-size: 14px;
-            position: relative;
-            height: 40px;
-            transition: background-color var(--transition-speed) var(--easing), transform var(--transition-speed) var(--easing);
-            transform: translateX(0);
-        }
-        .menu-item:hover {
-            background: rgba(139, 139, 255, 0.25);
-            transform: translateX(5px);
-            cursor: pointer;
-        }
-        .menu-item.selected {
-            background: rgba(139, 139, 255, 0.35);
-            transform: translateX(5px);
-        }
-        .selection-highlight {
-            position: absolute;
-            left: 0;
-            width: 100%;
-            height: 40px;
-            background: var(--highlight-bg);
-            z-index: 1;
-            transition: top var(--transition-speed) var(--easing), opacity var(--transition-speed) var(--easing);
-            opacity: 0.75;
-            border-left: 3px solid var(--secondary-color);
-        }
-        .item-content {
-            display: flex;
-            width: 100%;
-            align-items: center;
-            z-index: 2;
-        }
-        .item-label { flex-grow: 1; font-weight: 500; }
-        .item-value { color: var(--primary-text); font-weight: 600; }
-        .toggle-indicator { font-weight: 600; }
-        .toggle-indicator.on { color: #2ecc71; }
-        .toggle-indicator.off { color: #ff4757; }
-        .slider-bar {
-            width: 100px;
-            height: 8px;
-            background: rgba(255, 255, 255, 0.1);
-            border-radius: 4px;
-            position: relative;
-        }
-        .slider-fill {
-            height: 100%;
-            background: var(--secondary-color);
-            border-radius: 4px;
-            transition: width var(--transition-speed) var(--easing);
-        }
-        .slider-container { display: flex; align-items: center; gap: 10px; }
-        .footer {
-            padding: 10px 15px;
-            background: rgba(0, 0, 0, 0.3);
-            border-top: 1px solid var(--border-color);
-            min-height: 20px;
-            font-size: 12px;
-            color: var(--secondary-text);
-            border-bottom-left-radius: var(--border-radius);
-            border-bottom-right-radius: var(--border-radius);
-            text-align: center;
-        }
-        #notification-container {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            z-index: 9999;
-            display: flex;
-            flex-direction: column;
-            gap: 10px;
-        }
-        .notification {
-            background: var(--bg-color);
-            border: 1px solid var(--primary-color);
-            color: var(--primary-text);
-            padding: 10px 20px;
-            border-radius: 6px;
-            border-left: 4px solid var(--secondary-color);
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
-            opacity: 0;
-            animation: slideIn 0.3s var(--easing) forwards, slideOut 0.3s 2.5s var(--easing) forwards;
-        }
-        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
-        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
-        .input-overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            backdrop-filter: blur(5px);
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            z-index: 10000;
-            transition: opacity 0.3s var(--easing);
-        }
-        .input-box {
-            background: var(--bg-color);
-            padding: 20px;
-            border-radius: var(--border-radius);
-            border: 1px solid var(--primary-color);
-            width: 360px;
-            text-align: center;
-            transform: scale(0.95);
-            transition: transform 0.3s var(--easing);
-        }
-        .input-overlay.visible .input-box {
-            transform: scale(1);
-        }
-        .input-box h3 {
-            margin-bottom: 15px;
-            font-size: 18px;
-            color: var(--primary-text);
-        }
-        .input-box input {
-            width: 100%;
-            padding: 10px;
-            background: rgba(0, 0, 0, 0.4);
-            border: 1px solid var(--border-color);
-            color: var(--primary-text);
-            border-radius: 5px;
-            font-size: 14px;
-            text-align: center;
-            transition: border-color var(--transition-speed) var(--easing), box-shadow var(--transition-speed) var(--easing);
-        }
-        .input-box input:focus {
-            outline: none;
-            border-color: var(--secondary-color);
-            box-shadow: 0 0 0 2px rgba(100, 100, 200, 0.2);
-        }
-        .input-box input:hover {
-            border-color: var(--primary-color);
-        }
-        .input-box small {
-            color: var(--secondary-text);
-            margin-top: 10px;
-            display: block;
-            font-size: 12px;
-        }
-    </style>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Avaris Menu</title>
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+
+<style>
+  :root{
+    /* Dark Theme 2 */
+    --bg:#0f1115;           /* page bg (transparent when used in DUI) */
+    --card:#0b0d11;         /* panel */
+    --muted:#98a0b3;
+    --text:#e6eef8;
+    --accent:#8b8bff;       /* purple */
+    --accent-2:#6e7be0;     /* secondary */
+    --glass: rgba(255,255,255,0.03);
+    --radius:10px;
+    --item-h:44px;
+    --trans:200ms;
+    --font: 'Inter', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{
+    margin:0;
+    font-family:var(--font);
+    color:var(--text);
+    background:transparent;
+    -webkit-font-smoothing:antialiased;
+    user-select:none;
+    overflow:hidden;
+  }
+
+  /* Outer container */
+  .menu-container{
+    width:400px;
+    max-width:92vw;
+    position:absolute;
+    left:2.5vw;
+    top:10vh;
+    background:linear-gradient(180deg,var(--card), rgba(11,13,17,0.98));
+    border-radius:var(--radius);
+    box-shadow:0 12px 40px rgba(0,0,0,0.6);
+    border:1px solid rgba(255,255,255,0.04);
+    overflow:hidden;
+    transform:translateY(6px);
+    opacity:0;
+    transition:transform var(--trans) ease, opacity var(--trans) ease;
+  }
+  .menu-container.visible{ transform:none; opacity:1; }
+
+  /* header + banner */
+  .header{
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:10px 12px;
+    background:linear-gradient(90deg, rgba(139,139,255,0.12), rgba(110,123,224,0.06));
+    border-bottom:1px solid rgba(255,255,255,0.03);
+  }
+  .logo {
+    width:72px;
+    height:40px;
+    flex:0 0 72px;
+    border-radius:8px;
+    background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01));
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    overflow:hidden;
+  }
+  .logo img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .title {
+    font-weight:700;
+    letter-spacing:0.2px;
+    font-size:15px;
+    color:var(--text);
+  }
+  .subtitle{ font-size:11px; color:var(--muted); margin-top:2px; }
+
+  /* breadcrumb / meta row */
+  .meta {
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    gap:12px;
+    padding:10px 12px;
+    background:var(--glass);
+    border-bottom:1px solid rgba(255,255,255,0.02);
+  }
+  .meta .crumb{ text-transform:uppercase; color:var(--muted); font-size:12px; font-weight:600; }
+  .meta .counter{ font-weight:700; color:var(--text); font-size:13px; }
+
+  /* list */
+  .menu-items{
+    list-style:none;
+    padding:8px;
+    margin:0;
+    max-height:420px;
+    overflow:auto;
+    scroll-behavior:smooth;
+  }
+  .menu-items::-webkit-scrollbar{ width:8px }
+  .menu-items::-webkit-scrollbar-thumb{ background:rgba(255,255,255,0.04); border-radius:6px }
+
+  .menu-item{
+    height:var(--item-h);
+    display:flex;
+    align-items:center;
+    gap:12px;
+    padding:6px 10px;
+    border-radius:8px;
+    transition:background var(--trans), transform var(--trans);
+    cursor:pointer;
+    position:relative;
+  }
+  .menu-item .label{flex:1; font-weight:600; color:var(--text)}
+  .menu-item .desc{ font-size:12px; color:var(--muted); max-width:40%; text-align:right }
+  .menu-item:hover{ background:rgba(255,255,255,0.02); transform:translateX(4px) }
+  .menu-item.selected{ background:linear-gradient(90deg, rgba(139,139,255,0.06), rgba(110,123,224,0.04)); box-shadow:inset 3px 0 0 var(--accent); transform:translateX(4px) }
+
+  .chev{ width:26px; text-align:center; color:var(--muted) }
+
+  /* small widget types */
+  .toggle-indicator{ font-weight:700; font-size:12px; padding:4px 8px; border-radius:6px; }
+  .on{ background: rgba(46,204,113,0.12); color:#2ecc71; }
+  .off{ background: rgba(255,71,87,0.06); color:#ff4757; }
+
+  .slider-bar{ width:120px; height:8px; background:rgba(255,255,255,0.03); border-radius:999px; overflow:hidden; }
+  .slider-fill{ height:100%; background: linear-gradient(90deg,var(--accent),var(--accent-2)); width:30%; }
+
+  /* footer */
+  .footer{
+    padding:10px 12px;
+    font-size:12px;
+    color:var(--muted);
+    border-top:1px solid rgba(255,255,255,0.02);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+  }
+
+  /* notifications */
+  #notification-container{ position:fixed; right:18px; bottom:18px; display:flex; flex-direction:column; gap:10px; z-index:9999 }
+  .notification{
+    background:rgba(10,12,14,0.9);
+    border:1px solid rgba(139,139,255,0.09);
+    padding:10px 14px;
+    border-radius:8px;
+    box-shadow:0 8px 28px rgba(0,0,0,0.6);
+    color:var(--text);
+    font-size:13px;
+    min-width:180px;
+    opacity:0;
+    transform:translateX(16px);
+    animation:notifyIn .28s forwards;
+  }
+  @keyframes notifyIn{ to{ opacity:1; transform:none } }
+
+  /* input overlay */
+  .input-overlay{
+    position:fixed; inset:0; display:flex; align-items:center; justify-content:center; z-index:10000;
+    background:rgba(3,4,6,0.6); backdrop-filter: blur(6px);
+    display:none;
+  }
+  .input-overlay.visible{ display:flex }
+  .input-box{
+    width:360px; max-width:92vw; padding:16px; border-radius:10px; background:linear-gradient(180deg, rgba(255,255,255,0.02), rgba(255,255,255,0.01)); border:1px solid rgba(255,255,255,0.03);
+  }
+  .input-box input{
+    width:100%; padding:8px 10px; margin-top:8px; border-radius:8px; background:transparent; border:1px solid rgba(255,255,255,0.03); color:var(--text);
+  }
+
+  /* accessibility helpers */
+  .sr-only{ position:absolute; left:-9999px; top:auto; width:1px; height:1px; overflow:hidden; }
+</style>
 </head>
 <body>
-<div id="notification-container"></div>
-<div class="input-overlay hidden" id="input-overlay"></div>
-<div class="menu-container" id="menu-container">
-    <div class="header">Avaris Menu</div>
-    <div class="breadcrumb-bar">
-        <span id="breadcrumb">Main Menu</span>
-        <span id="option-counter"></span>
+  <div id="notification-container"></div>
+
+  <div class="input-overlay" id="input-overlay" role="dialog" aria-modal="true">
+    <div class="input-box" id="input-box">
+      <!-- content filled by JS -->
     </div>
-    <ul class="menu-items" id="menu-items">
-        <div class="selection-highlight" id="selection-highlight"></div>
-    </ul>
-    <div class="footer" id="footer"></div>
-</div>
+  </div>
+
+  <div class="menu-container visible" id="menu-container" role="menu" aria-label="Avaris Menu">
+    <div class="header" aria-hidden="false">
+      <div class="logo"><img src="./banner.png" alt="Avaris banner"></div>
+      <div>
+        <div class="title">Avaris Menu</div>
+        <div class="subtitle">Dark Theme · Compact UI</div>
+      </div>
+    </div>
+
+    <div class="meta">
+      <div class="crumb" id="breadcrumb">Main Menu</div>
+      <div class="counter" id="option-counter"></div>
+    </div>
+
+    <ul class="menu-items" id="menu-items" tabindex="0" aria-label="Menu items" role="listbox"></ul>
+
+    <div class="footer" id="footer">Beta 1.0 — Avaris Private</div>
+  </div>
+
 <script>
-    document.addEventListener('DOMContentLoaded', () => {
-        const menuItemsEl = document.getElementById('menu-items');
-        const breadcrumbEl = document.getElementById('breadcrumb');
-        const counterEl = document.getElementById('option-counter');
-        const footerEl = document.getElementById('footer');
-        let highlightEl = document.getElementById('selection-highlight');
-        const notificationContainer = document.getElementById('notification-container');
-        const inputOverlay = document.getElementById('input-overlay');
-        const menuContainer = document.getElementById('menu-container');
-        let currentMenuId = 'main';
-        let navigationStack = [];
-        let selectedIndex = 0;
-        let optionStates = {};
-        let currentState = null;
-        let welcomeMessageShown = false;
-        const MAX_VISIBLE_ITEMS = 10;
-        const ITEM_HEIGHT = 40;
+/* -------------------------
+   Lightweight, robust UI
+   Accepts two update shapes from Lua:
+     1) state-style: { tabs: [...], activeTab: n }  (existing external state)
+     2) items-style: { items: [ {label, hasChildren} ], selection, footer, path }
+   Also accepts action: "notify" with data { title, message, duration }
+   ------------------------- */
 
-        const defaultMenuData = {
-            main: {
-                title: 'Main Menu',
-                items: [
-                    { label: 'Self', target: 'self', description: 'Manage your character settings.' },
-                    { label: 'Vehicle', target: 'vehicle', description: 'Access vehicle controls.' },
-                    { label: 'World', target: 'world', description: 'Modify world settings.' },
-                    { label: 'Network', target: 'network', description: 'Manage network options.' },
-                    { label: 'Status', target: 'status', description: 'View status information.' },
-                ]
-            },
-            self: {
-                title: 'Self Options',
-                parent: 'main',
-                items: [
-                    { label: 'Appearance', target: 'appearance', description: 'Customize your character.' },
-                    { label: 'Inventory', target: 'inventory', description: 'Manage your items.' },
-                    { label: 'Settings', target: 'settings', description: 'Adjust personal settings.' },
-                    { label: 'Health Boost', type: 'toggle', stateId: 'healthBoost', description: 'Toggle health boost.' },
-                    { label: 'Speed Multiplier', type: 'slider', stateId: 'speed', min: 1, max: 10, description: 'Adjust movement speed.' },
-                ]
-            },
-            appearance: {
-                title: 'Appearance',
-                parent: 'self',
-                items: [
-                    { label: 'Change Outfit', type: 'button', description: 'Select a new outfit.' },
-                    { label: 'Set Name', type: 'input', placeholder: 'Enter name', description: 'Set character name.' },
-                ]
-            },
-            inventory: {
-                title: 'Inventory',
-                parent: 'self',
-                items: [
-                    { label: 'Add Item', type: 'input', placeholder: 'Item name', description: 'Add an item to inventory.' },
-                    { label: 'Clear Inventory', type: 'button', description: 'Remove all items.' },
-                ]
-            },
-            settings: {
-                title: 'Settings',
-                parent: 'self',
-                items: [
-                    { label: 'God Mode', type: 'toggle', stateId: 'godMode', description: 'Toggle invincibility.' },
-                    { label: 'Visibility', type: 'toggle', stateId: 'visibility', description: 'Toggle visibility.' },
-                ]
-            },
-            vehicle: {
-                title: 'Vehicle Options',
-                parent: 'main',
-                items: [
-                    { label: 'Spawn Vehicle', type: 'input', placeholder: 'Vehicle model', description: 'Spawn a vehicle.' },
-                    { label: 'Repair Vehicle', type: 'button', description: 'Repair current vehicle.' },
-                ]
-            },
-            world: {
-                title: 'World Options',
-                parent: 'main',
-                items: [
-                    { label: 'Change Weather', type: 'button', description: 'Modify weather conditions.' },
-                    { label: 'Set Time', type: 'input', placeholder: 'HH:MM', description: 'Set world time.' },
-                ]
-            },
-            network: {
-                title: 'Network Options',
-                parent: 'main',
-                items: [
-                    { label: 'Kick Player', type: 'input', placeholder: 'Player ID', description: 'Kick a player.' },
-                    { label: 'Ban Player', type: 'input', placeholder: 'Player ID', description: 'Ban a player.' },
-                ]
-            },
-            status: {
-                title: 'Status',
-                parent: 'main',
-                items: [
-                    { label: 'Health Status', type: 'toggle', stateId: 'healthStatus', description: 'Current health status.' },
-                    { label: 'Server Uptime', type: 'input', placeholder: 'N/A', description: 'Server uptime duration.' },
-                    { label: 'Player Count', type: 'input', placeholder: 'N/A', description: 'Current player count.' },
-                ]
-            }
-        };
+(function(){
+  const menuItemsEl = document.getElementById('menu-items');
+  const breadcrumbEl = document.getElementById('breadcrumb');
+  const counterEl = document.getElementById('option-counter');
+  const footerEl = document.getElementById('footer');
+  const notifContainer = document.getElementById('notification-container');
+  const inputOverlay = document.getElementById('input-overlay');
+  const inputBox = document.getElementById('input-box');
+  const menuContainer = document.getElementById('menu-container');
 
-        function safeEncode(text) {
-            return text && typeof text === 'string'
-                ? text.replace(/&/g, '&amp;')
-                      .replace(/</g, '&lt;')
-                      .replace(/>/g, '&gt;')
-                      .replace(/"/g, '&quot;')
-                      .replace(/'/g, '&#39;')
-                : '';
-        }
+  let items = [];         // current list of items (from Lua or from local default)
+  let selected = 0;
+  let currentPath = [];   // forwarded back to Lua when selecting
+  let isExternal = true;  // true when items come from Lua
 
-        function showNotification(message) {
-            const notification = document.createElement('div');
-            notification.className = 'notification';
-            notification.textContent = message;
-            notificationContainer.appendChild(notification);
-            setTimeout(() => notification.remove(), 2500);
-        }
+  function safeText(t){ return (t===null||t===undefined)?'':String(t) }
 
-        function showInputPrompt(title, placeholder, callback) {
-            inputOverlay.innerHTML = `
-                <div class="input-box">
-                    <h3>${title}</h3>
-                    <input type="text" id="prompt-input" placeholder="${placeholder}">
-                    <small>Press Enter to submit, Escape to cancel.</small>
-                </div>
-            `;
-            inputOverlay.classList.remove('hidden');
-            inputOverlay.classList.add('visible');
-            const inputField = document.getElementById('prompt-input');
-            inputField.focus();
-            const close = () => {
-                inputOverlay.classList.remove('visible');
-                inputOverlay.classList.add('hidden');
-                document.onkeydown = handleMenuInput;
-            };
-            document.onkeydown = (e) => {
-                if (e.key === 'Enter') {
-                    callback(inputField.value);
-                    close();
-                } else if (e.key === 'Escape') {
-                    close();
-                }
-            };
-        }
+  function showNotification(text, duration=2200){
+    const n = document.createElement('div');
+    n.className = 'notification';
+    n.textContent = safeText(text);
+    notifContainer.appendChild(n);
+    setTimeout(()=> {
+      n.style.transition = 'opacity 180ms, transform 180ms';
+      n.style.opacity = '0'; n.style.transform = 'translateX(8px)';
+      setTimeout(()=> n.remove(), 220);
+    }, duration);
+  }
 
-        function updateSelection(itemsToRender) {
-            const items = menuItemsEl.querySelectorAll('.menu-item');
-            if (!items[selectedIndex]) return;
+  function showInputPrompt(title, placeholder, cb){
+    inputBox.innerHTML = `<h3 style="margin:0;color:var(--text)">${title}</h3>
+      <input id="prompt-input" placeholder="${safeText(placeholder||'')}" />`;
+    inputOverlay.classList.add('visible');
+    const input = document.getElementById('prompt-input');
+    input.focus();
+    function close(){
+      inputOverlay.classList.remove('visible');
+      document.removeEventListener('keydown', onKey);
+    }
+    function onKey(e){
+      if(e.key === 'Enter'){ cb(input.value); close(); }
+      if(e.key === 'Escape'){ close(); }
+    }
+    document.addEventListener('keydown', onKey);
+  }
 
-            items.forEach((item, i) => item.classList.toggle('selected', i === selectedIndex));
-            const itemTop = selectedIndex * ITEM_HEIGHT;
-            const itemBottom = itemTop + ITEM_HEIGHT;
-            const scrollTop = menuItemsEl.scrollTop;
-            const containerHeight = menuItemsEl.clientHeight;
+  function clearAndRender(list){
+    menuItemsEl.innerHTML = '';
+    list.forEach((it, idx) => {
+      const li = document.createElement('li');
+      li.className = 'menu-item' + (idx === selected ? ' selected' : '');
+      li.setAttribute('role','option');
+      li.setAttribute('data-index', idx);
+      let inner = `<div class="label">${safeText(it.label)}</div>`;
+      if(it.type === 'toggle') {
+        inner += `<div class="desc"><span class="toggle-indicator ${it.checked ? 'on' : 'off'}">${it.checked ? 'ON' : 'OFF'}</span></div>`;
+      } else if(it.type === 'slider'){
+        inner += `<div class="desc"><div class="slider-bar"><div class="slider-fill" style="width:${it.percent||0}%"></div></div></div>`;
+      } else {
+        inner += `<div class="desc">${it.hasChildren ? '<i class="chev fa-solid fa-angle-right"></i>' : ''}</div>`;
+      }
+      li.innerHTML = inner;
+      li.addEventListener('click', () => {
+        selected = idx;
+        updateSelection();
+        postSelect();
+      });
+      menuItemsEl.appendChild(li);
+    });
+    updateSelection();
+  }
 
-            if (itemTop < scrollTop) {
-                menuItemsEl.scrollTo({ top: itemTop, behavior: 'smooth' });
-            } else if (itemBottom > scrollTop + containerHeight) {
-                menuItemsEl.scrollTo({ top: itemBottom - containerHeight, behavior: 'smooth' });
-            }
+  function updateSelection(){
+    const children = Array.from(menuItemsEl.children);
+    children.forEach((c,i)=>{
+      c.classList.toggle('selected', i === selected);
+      c.scrollIntoView({ block: 'nearest', inline: 'nearest' });
+    });
+    counterEl.textContent = `${selected+1} / ${Math.max(1, items.length)}`;
+    footerEl.textContent = (items[selected] && items[selected].description) || footerEl.textContent;
+  }
 
-            highlightEl.style.top = `${itemTop - menuItemsEl.scrollTop}px`;
-            counterEl.textContent = `${selectedIndex + 1} / ${items.length}`;
-            footerEl.textContent = itemsToRender[selectedIndex]?.description || '';
-        }
+  function postSelect(){
+    // send selection back to parent (Lua expects select callback)
+    const payload = {
+      action: 'select',
+      itemIndex: selected,
+      path: Array.isArray(currentPath) ? currentPath : []
+    };
+    // parent will be the runtime that listens (Macho / NUI)
+    window.parent?.postMessage(payload, '*');
+  }
 
-        function renderMenu(menuId) {
-            const menu = defaultMenuData[menuId];
-            if (!menu) return;
-            currentMenuId = menuId;
-            breadcrumbEl.textContent = menu.title;
-            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
-            highlightEl = document.getElementById('selection-highlight');
+  // handle keyboard nav locally for items lists
+  function onKey(e){
+    if(!menuContainer.classList.contains('visible')) return;
+    if(e.key === 'ArrowUp'){ selected = (selected - 1 + items.length) % Math.max(1, items.length); updateSelection(); e.preventDefault(); }
+    else if(e.key === 'ArrowDown'){ selected = (selected + 1) % Math.max(1, items.length); updateSelection(); e.preventDefault(); }
+    else if(e.key === 'Enter'){ postSelect(); e.preventDefault(); }
+    else if(e.key === 'Backspace' || e.key === 'Escape'){ window.parent?.postMessage({ action:'back' }, '*'); e.preventDefault(); }
+  }
+  document.addEventListener('keydown', onKey);
 
-            const itemsToRender = menu.items.map(item => item.target ? { ...item, type: 'submenu' } : item);
-            if (menu.parent) {
-                itemsToRender.unshift({ type: 'back', label: 'Back', icon: 'fa-solid fa-arrow-left', description: 'Return to the previous menu.' });
-            }
+  /* --- Incoming message handler (from Lua) --- */
+  window.addEventListener('message', (ev) => {
+    const msg = ev.data || {};
+    if(!msg.action) return;
 
-            itemsToRender.forEach((item, index) => {
-                const menuItemEl = document.createElement('li');
-                menuItemEl.className = 'menu-item';
-                let content = `<div class="item-content">`;
-                if (item.icon) content += `<i class="icon ${item.icon}"></i>`;
-                content += `<span class="item-label">${item.label}</span>`;
-                if (item.type === 'submenu' || item.type === 'player') {
-                    content += `<i class="chevron fa-solid fa-angle-right"></i>`;
-                } else if (item.type === 'toggle') {
-                    const isChecked = optionStates[item.stateId] || false;
-                    content += `<div class="item-value"><span class="toggle-indicator ${isChecked ? 'on' : 'off'}">${isChecked ? 'ON' : 'OFF'}</span></div>`;
-                } else if (item.type === 'slider') {
-                    const value = optionStates[item.stateId] || item.min;
-                    const percent = ((value - item.min) / (item.max - item.min)) * 100;
-                    content += `<div class="item-value slider-container"><div class="slider-bar"><div class="slider-fill" style="width: ${percent}%"></div></div></div>`;
-                } else if (item.type === 'input') {
-                    content += `<div class="item-value">${safeEncode(item.placeholder || 'N/A')}</div>`;
-                }
-                content += `</div>`;
-                menuItemEl.innerHTML = content;
-                menuItemsEl.appendChild(menuItemEl);
-                menuItemEl.addEventListener('click', () => {
-                    selectedIndex = index;
-                    handleItemSelection(itemsToRender[index]);
-                    updateSelection(itemsToRender);
-                });
-            });
+    // simple notify action
+    if(msg.action === 'notify'){
+      const d = msg.data || {};
+      showNotification(d.message || d.title || 'Notification', d.duration || 2200);
+      return;
+    }
 
-            selectedIndex = 0;
-            updateSelection(itemsToRender);
-        }
-
-        function handleItemSelection(item) {
-            if (item.target) {
-                navigationStack.push(currentMenuId);
-                renderMenu(item.target);
-            } else if (item.type === 'button') {
-                showNotification(`Action: ${item.label}`);
-            } else if (item.type === 'toggle') {
-                optionStates[item.stateId] = !optionStates[item.stateId];
-                showNotification(`${item.label}: ${optionStates[item.stateId] ? 'Enabled' : 'Disabled'}`);
-                renderMenu(currentMenuId);
-            } else if (item.type === 'input') {
-                showInputPrompt(`Enter value for ${item.label}:`, item.placeholder, (result) => {
-                    if (result) showNotification(`Set ${item.label} to: ${result}`);
-                });
-            } else if (item.type === 'back') {
-                const parentMenu = navigationStack.pop();
-                renderMenu(parentMenu || 'main');
-            }
-        }
-
-        function updateMenuFromState(state) {
-            if (!state?.tabs) return;
-            currentState = state;
-
-            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
-            highlightEl = document.getElementById('selection-highlight');
-
-            const menuItems = state.tabs.map((tabData, index) => ({
-                label: tabData.title || `Tab ${index + 1}`,
-                target: tabData.key || `tab${index + 1}`,
-                description: `Open ${tabData.title || `Tab ${index + 1}`}`
-            }));
-
-            menuItems.forEach((item, index) => {
-                const menuItemEl = document.createElement('li');
-                menuItemEl.className = 'menu-item';
-                menuItemEl.innerHTML = `
-                    <div class="item-content">
-                        <span class="item-label">${item.label}</span>
-                        <i class="chevron fa-solid fa-angle-right"></i>
-                    </div>`;
-                menuItemsEl.appendChild(menuItemEl);
-                menuItemEl.addEventListener('click', () => {
-                    selectedIndex = index;
-                    handleItemSelection(item);
-                    updateSelection(menuItems);
-                    window.parent?.postMessage({ action: 'select', tabIndex: index, isContentPanel: false }, '*');
-                });
-            });
-
-            breadcrumbEl.textContent = 'Main Menu';
-            counterEl.textContent = `${state.activeTab + 1} / ${state.tabs.length}`;
-            selectedIndex = state.activeTab;
-            updateSelection(menuItems);
-
-            const activeTab = state.tabs[state.activeTab];
-            footerEl.textContent = activeTab?.description || `Current Tab: ${activeTab?.title || ''}`;
-        }
-
-        function handleMenuInput(e) {
-            if (currentState) return;
-            e.preventDefault();
-            const menu = defaultMenuData[currentMenuId];
-            const itemsToRender = menu.items.map(item => item.target ? { ...item, type: 'submenu' } : item);
-            if (menu.parent) {
-                itemsToRender.unshift({ type: 'back', label: 'Back', icon: 'fa-solid fa-arrow-left', description: 'Return to the previous menu.' });
-            }
-            const currentItemData = itemsToRender[selectedIndex];
-
-            switch (e.key) {
-                case 'ArrowUp':
-                    selectedIndex = (selectedIndex - 1 + itemsToRender.length) % itemsToRender.length;
-                    break;
-                case 'ArrowDown':
-                    selectedIndex = (selectedIndex + 1) % itemsToRender.length;
-                    break;
-                case 'Enter':
-                    handleItemSelection(currentItemData);
-                    break;
-                case 'Backspace':
-                    if (navigationStack.length > 0) {
-                        const parentMenu = navigationStack.pop();
-                        renderMenu(parentMenu);
-                    }
-                    break;
-            }
-            updateSelection(itemsToRender);
-        }
-
-        window.addEventListener("message", (event) => {
-            const { action, data } = event.data;
-            if (action === "update" || action === "show") {
-                if (data) {
-                    updateMenuFromState(data);
-                    menuContainer.style.visibility = 'visible';
-                    menuContainer.classList.add('visible');
-                    if (action === "show" && !welcomeMessageShown) {
-                        welcomeMessageShown = true;
-                        showNotification("Avaris Menu loaded successfully");
-                    }
-                }
-            }
-            if (action === 'hide') {
-                menuContainer.style.visibility = 'hidden';
-                menuContainer.classList.remove('visible');
-            }
-        });
-
-        document.onkeydown = handleMenuInput;
-        renderMenu('main');
-        menuContainer.style.visibility = 'visible';
+    // show / hide commands
+    if(msg.action === 'show' || msg.action === 'hide'){
+      if(msg.action === 'show'){
         menuContainer.classList.add('visible');
-    });
+        menuContainer.style.visibility = 'visible';
+        if(msg.data && msg.data.items) { handleUpdateItems(msg.data); }
+      } else {
+        menuContainer.classList.remove('visible');
+        setTimeout(()=> menuContainer.style.visibility = 'hidden', 180);
+      }
+      return;
+    }
 
-    window.addEventListener("message", (event) => {
-        const data = event.data;
-        if (data.action === "getClipboard") {
-            navigator.clipboard.readText().then(text => {
-                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text })
-                });
-            }).catch(() => {
-                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ text: "" })
-                });
-            });
-        }
-        if (data.action === "setClipboard") {
-            navigator.clipboard.writeText(data.text || "").catch(err => {
-                console.error("Clipboard write failed:", err);
-            });
-        }
-    });
+    // update action — support two shapes:
+    // 1) { tabs: [...], activeTab: n, footer: ... }  (external state)
+    // 2) { items: [...], selection, footer, path }   (lua direct items)
+    if(msg.action === 'update'){
+      handleUpdate(msg.data || {});
+    }
+  });
+
+  function handleUpdate(data){
+    // external state shape
+    if(Array.isArray(data.tabs)){
+      // convert tabs -> items (top-level list)
+      items = (data.tabs||[]).map((t, i)=>({
+        label: t.title || `Tab ${i+1}`,
+        hasChildren: !!t.items || !!t.content,
+        description: t.description || t.title || ''
+      }));
+      selected = (typeof data.activeTab === 'number') ? data.activeTab : 0;
+      currentPath = [];
+      isExternal = true;
+      footerEl.textContent = (data.footer || data.description || '');
+      clearAndRender(items);
+      return;
+    }
+
+    // items-provided shape (Lua)
+    if(Array.isArray(data.items)){
+      items = data.items.map(it => ({
+        label: it.label || it.name || 'Item',
+        hasChildren: !!it.hasChildren,
+        description: it.description || ''
+      }));
+      selected = Math.max(0, Math.min((data.selection||0), Math.max(0, items.length-1)));
+      currentPath = Array.isArray(data.path) ? data.path : [];
+      footerEl.textContent = data.footer || footerEl.textContent;
+      isExternal = false;
+      clearAndRender(items);
+      return;
+    }
+
+    // fallback: nothing recognized
+    console.warn('update received but format was unknown', data);
+  }
+
+  // When local menu code wants to send clipboard fetch/write events, the resource will call postMessage with action:getClipboard or setClipboard
+  window.addEventListener('message', (ev) => {
+    const d = ev.data || {};
+    if(d && d.action === 'getClipboard'){
+      navigator.clipboard.readText().then(text => {
+        fetch(`https://${GetParentResourceName()}/clipboardGet`, {
+          method:'POST', headers:{'Content-Type':'application/json'},
+          body: JSON.stringify({ text })
+        }).catch(()=>{/* ignore */});
+      }).catch(()=>{/* ignore */});
+    }
+    if(d && d.action === 'setClipboard'){
+      navigator.clipboard.writeText(d.text || '').catch(()=>{/* ignore */});
+    }
+  });
+
+  // small helper required by some FiveM Dui setups — if not defined, we keep things safe.
+  window.GetParentResourceName = window.GetParentResourceName || function(){ return (window && window.location && window.location.host) || 'parent' };
+
+  /* initial local demo fallback: show nothing until Lua updates */
+  items = [];
+  selected = 0;
+  clearAndRender(items);
+
+})();
 </script>
 </body>
 </html>
