@@ -409,7 +409,6 @@
                             <input type="text" style="width: 100%; padding: 5px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: var(--primary-text); border-radius: 3px;" value="${safeEncode(item.value || '')}" readonly>
                         </div>`;
                 } else if (item.type === 'toggle') {
-                    // Added NoClip toggle UI feature
                     element.className += item.value ? ' on' : '';
                     element.innerHTML = `
                         <span>${safeEncode(item.label || 'Unknown')}</span>
@@ -462,7 +461,7 @@
                 menuItemEl.innerHTML = content;
                 if (dropdownOpen && index === state.activeTab) {
                     const dropdownEl = document.createElement('div');
-                    dropdownEl.className = 'dropdown active';
+                    dropdownEl.className = 'dropdown active'; // Ensure dropdown is shown for active tab
                     populateDropdown(state.tabs[index], dropdownEl, state);
                     menuItemsEl.appendChild(dropdownEl);
                 }
@@ -487,7 +486,6 @@
                     menuContainer.style.visibility = 'visible';
                     if (action === "show" && !welcomeMessageShown) {
                         welcomeMessageShown = true;
-                        // Added custom notification feature
                         showNotification("Avaris Menu", "Loaded successfully", 3000);
                     }
                 }
