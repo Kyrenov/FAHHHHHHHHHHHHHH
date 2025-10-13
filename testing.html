@@ -1,9 +1,9 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Nexus-like Menu (Blue)</title>
+<title>Avaris Menu (Blue)</title>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
 <style>
 :root{
@@ -42,9 +42,9 @@ body{background:transparent;font-family:Inter,system-ui,-apple-system,Segoe UI,R
 <body>
 <div id="container" class="container" style="visibility:hidden">
   <div class="header">
-    <div class="logo">N</div>
+    <div class="logo">A</div>
     <div>
-      <div class="title">Nexus Menu</div>
+      <div class="title">Avaris Menu</div>
       <div style="font-size:12px;color:var(--muted)">Home</div>
     </div>
   </div>
@@ -60,7 +60,7 @@ body{background:transparent;font-family:Inter,system-ui,-apple-system,Segoe UI,R
   </div>
 
   <div class="footer" id="footer">
-    <div class="note" id="status">Beta 1.0</div>
+    <div class="note" id="status">Beta 1.0 - Avaris Private</div>
     <div class="note" id="count">0/0</div>
   </div>
 </div>
@@ -79,9 +79,7 @@ body{background:transparent;font-family:Inter,system-ui,-apple-system,Segoe UI,R
   function safe(s){ return (s==null)?"":String(s); }
 
   function render() {
-    // show container
     container.style.visibility = 'visible';
-    // sidebar tabs
     sidebar.innerHTML = '';
     state.tabs.forEach((t,i)=>{
       const li = document.createElement('li');
@@ -96,7 +94,6 @@ body{background:transparent;font-family:Inter,system-ui,-apple-system,Segoe UI,R
       sidebar.appendChild(li);
     });
 
-    // current items (right pane)
     menuList.innerHTML = '';
     const items = state.items || [];
     items.forEach((it, idx) => {
@@ -105,7 +102,6 @@ body{background:transparent;font-family:Inter,system-ui,-apple-system,Segoe UI,R
       const hasChildren = !!it.hasChildren;
       li.innerHTML = `<div class="label">${safe(it.label)}</div><div class="chev">${hasChildren ? '›' : ''}</div>`;
       li.onclick = ()=> {
-        // when clicking an item, send select with current path
         fetch(`https://${GetParentResourceName()}/select`, {
           method:'POST', headers:{'Content-Type':'application/json'},
           body: JSON.stringify({ tabIndex: state.activeTab, path: state.path || [], itemIndex: idx })
@@ -114,43 +110,33 @@ body{background:transparent;font-family:Inter,system-ui,-apple-system,Segoe UI,R
       menuList.appendChild(li);
     });
 
-    // footer
     statusEl.textContent = safe(state.footer || '');
     countEl.textContent = `${(state.selection || 0) + 1}/${Math.max(1, items.length)}`;
   }
 
-  // handle incoming messages (SendToDui from Lua)
   window.addEventListener("message", (ev) => {
     const data = ev.data || {};
     const action = data.action;
     const payload = data.data;
     if (action === "update" && payload) {
-      // payload: tabs, activeTab, path, items, selection, footer
       state.tabs = payload.tabs || [];
-      state.activeTab = payload.activeTab or payload.activeTab === 0 and payload.activeTab or (payload.activeTab || 0);
+      state.activeTab = payload.activeTab or payload.activeTab === 0 ? payload.activeTab : (payload.activeTab || 0);
       state.path = payload.path || [];
       state.items = payload.items || [];
-      state.selection = payload.selection or payload.selection === 0 and payload.selection or (payload.selection || 0);
-      state.footer = payload.footer or payload.footer === 0 and payload.footer or (payload.footer || "");
+      state.selection = payload.selection or payload.selection === 0 ? payload.selection : (payload.selection || 0);
+      state.footer = payload.footer || payload.footer === 0 ? payload.footer : (payload.footer || "");
       render();
     } else if (action === "notify" && payload) {
-      // quick native notification (could be improved)
       console.log("notify", payload);
     } else if (action === "hide") {
       container.style.visibility = 'hidden';
     }
   });
 
-  // helper to coalesce optional zeros (older JS engines)
   Object.defineProperty(window, 'or', { value: function(a,b){ return a!=null?a:b; } });
 
-  // fallback: if message uses flat structure (older code)
   window.addEventListener("message", (ev) => {
-    // no-op (we already handle update)
   });
-
-  // show container when ready
-  // initial message might come from Lua, so wait
 })();
 </script>
 </body>
