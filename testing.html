@@ -1,143 +1,100 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width,initial-scale=1"/>
-<title>Avaris Menu (Blue)</title>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet"/>
-<style>
-:root{
-  --bg:#0b0f14;
-  --panel:#0f1720;
-  --muted:#9aa7c7;
-  --accent: rgb(138,167,248);
-  --accent-strong: rgba(138,167,248,0.18);
-  --item-bg: #0d1116;
-  --border: rgba(255,255,255,0.06);
-  --radius:6px;
-}
-*{box-sizing:border-box;margin:0;padding:0}
-body{background:transparent;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial;color:#eaf2ff;user-select:none;overflow:hidden}
-.container{position:absolute;left:50%;top:15vh;transform:translateX(-50%);width:480px;background:var(--panel);border-radius:8px;border:1px solid var(--border);box-shadow:0 10px 30px rgba(0,0,0,0.7);overflow:hidden}
-.header{height:84px;background:linear-gradient(180deg,rgba(0,0,0,0.3),rgba(0,0,0,0.6));display:flex;align-items:center;padding:12px 14px;gap:12px}
-.logo{width:64px;height:64px;border-radius:6px;background:linear-gradient(135deg,var(--accent),#5b84d6);display:flex;align-items:center;justify-content:center;font-weight:700;color:#081226}
-.title{font-weight:700;font-size:18px;color:var(--accent)}
-.body{display:flex;border-top:1px solid var(--border)}
-.sidebar{width:180px;background:var(--bg);padding:10px;border-right:1px solid var(--border)}
-.side-list{list-style:none}
-.side-item{padding:10px 8px;border-radius:6px;margin-bottom:6px;cursor:pointer;color:var(--muted);display:flex;align-items:center;justify-content:space-between}
-.side-item.selected{background:var(--accent-strong);color:var(--accent);font-weight:700;border-left:4px solid var(--accent)}
-.content{flex:1;padding:12px;background:linear-gradient(180deg,transparent,rgba(0,0,0,0.03))}
-.menu-list{list-style:none;max-height:300px;overflow:auto;padding-right:6px}
-.menu-item{display:flex;align-items:center;justify-content:space-between;padding:10px;border-radius:6px;margin-bottom:6px;cursor:pointer;background:transparent;color:#dff0ff}
-.menu-item .label{flex:1}
-.menu-item:hover{background:rgba(255,255,255,0.02)}
-.menu-item.selected{background:var(--accent-strong);color:var(--accent);font-weight:700}
-.chev{opacity:0.8;color:var(--muted)}
-.footer{padding:8px 12px;background:rgba(0,0,0,0.12);border-top:1px solid var(--border);font-size:13px;color:var(--muted);display:flex;justify-content:space-between}
-.hidden{display:none!important}
-.note{font-size:12px;color:var(--muted);opacity:0.9}
-</style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Avaris Menu</title>
+    <style>
+        body {
+            margin: 0;
+            font-family: Arial, sans-serif;
+            background-color: #1a1a1a;
+            color: #e0e0e0;
+        }
+        .header {
+            background: linear-gradient(to right, #4a90e2, #9013fe);
+            padding: 10px;
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            color: white;
+        }
+        .menu {
+            width: 300px;
+            border: 2px solid #333;
+            border-radius: 5px;
+            overflow: hidden;
+        }
+        .menu-item {
+            padding: 10px;
+            background-color: #2a2a2a;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+        .menu-item:hover {
+            background-color: #3a3a3a;
+        }
+        .submenu {
+            padding-left: 20px;
+            display: none;
+        }
+        .active {
+            display: block;
+        }
+        .footer {
+            text-align: center;
+            padding: 5px;
+            background-color: #2a2a2a;
+            font-size: 12px;
+            color: #888;
+        }
+    </style>
 </head>
 <body>
-<div id="container" class="container" style="visibility:hidden">
-  <div class="header">
-    <div class="logo">A</div>
-    <div>
-      <div class="title">Avaris Menu</div>
-      <div style="font-size:12px;color:var(--muted)">Home</div>
+    <div class="header">Avaris</div>
+    <div class="menu" id="menu">
+        <!-- Menu items will be populated dynamically via JS -->
     </div>
-  </div>
+    <div class="footer">Beta 1.0 - Avaris Private</div>
 
-  <div class="body">
-    <div class="sidebar">
-      <ul id="sidebar" class="side-list"></ul>
-    </div>
-
-    <div class="content">
-      <ul id="menuList" class="menu-list"></ul>
-    </div>
-  </div>
-
-  <div class="footer" id="footer">
-    <div class="note" id="status">Beta 1.0 - Avaris Private</div>
-    <div class="note" id="count">0/0</div>
-  </div>
-</div>
-
-<script>
-(function(){
-  const container = document.getElementById('container');
-  const sidebar = document.getElementById('sidebar');
-  const menuList = document.getElementById('menuList');
-  const footer = document.getElementById('footer');
-  const statusEl = document.getElementById('status');
-  const countEl = document.getElementById('count');
-
-  let state = { tabs:[], activeTab:0, path:[], items:[], selection:0, footer:"" };
-
-  function safe(s){ return (s==null)?"":String(s); }
-
-  function render() {
-    container.style.visibility = 'visible';
-    sidebar.innerHTML = '';
-    state.tabs.forEach((t,i)=>{
-      const li = document.createElement('li');
-      li.className = 'side-item' + (i===state.activeTab ? ' selected' : '');
-      li.innerHTML = `<span>${safe(t.title)}</span>`;
-      li.onclick = ()=> {
-        fetch(`https://${GetParentResourceName()}/setActiveTab`, {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ tabIndex: i })
+    <script>
+        window.addEventListener('message', function(event) {
+            const data = event.data;
+            if (data.action === 'update') {
+                const menu = document.getElementById('menu');
+                menu.innerHTML = '';
+                data.items.forEach((item, index) => {
+                    const div = document.createElement('div');
+                    div.className = 'menu-item';
+                    div.textContent = item.label;
+                    if (item.hasChildren) {
+                        const subMenu = document.createElement('div');
+                        subMenu.className = 'submenu';
+                        div.appendChild(subMenu);
+                        div.addEventListener('click', () => {
+                            subMenu.classList.toggle('active');
+                            SendToDui('select', { itemIndex: index, path: data.path });
+                        });
+                    } else {
+                        div.addEventListener('click', () => {
+                            SendToDui('select', { itemIndex: index, path: data.path });
+                        });
+                    }
+                    if (index === data.selection) div.style.backgroundColor = '#4a90e2';
+                    menu.appendChild(div);
+                });
+            } else if (data.action === 'notify') {
+                alert(`${data.title}: ${data.message}`);
+            }
         });
-      };
-      sidebar.appendChild(li);
-    });
 
-    menuList.innerHTML = '';
-    const items = state.items || [];
-    items.forEach((it, idx) => {
-      const li = document.createElement('li');
-      li.className = 'menu-item' + (idx===state.selection ? ' selected' : '');
-      const hasChildren = !!it.hasChildren;
-      li.innerHTML = `<div class="label">${safe(it.label)}</div><div class="chev">${hasChildren ? '›' : ''}</div>`;
-      li.onclick = ()=> {
-        fetch(`https://${GetParentResourceName()}/select`, {
-          method:'POST', headers:{'Content-Type':'application/json'},
-          body: JSON.stringify({ tabIndex: state.activeTab, path: state.path || [], itemIndex: idx })
-        });
-      };
-      menuList.appendChild(li);
-    });
-
-    statusEl.textContent = safe(state.footer || '');
-    countEl.textContent = `${(state.selection || 0) + 1}/${Math.max(1, items.length)}`;
-  }
-
-  window.addEventListener("message", (ev) => {
-    const data = ev.data || {};
-    const action = data.action;
-    const payload = data.data;
-    if (action === "update" && payload) {
-      state.tabs = payload.tabs || [];
-      state.activeTab = payload.activeTab or payload.activeTab === 0 ? payload.activeTab : (payload.activeTab || 0);
-      state.path = payload.path || [];
-      state.items = payload.items || [];
-      state.selection = payload.selection or payload.selection === 0 ? payload.selection : (payload.selection || 0);
-      state.footer = payload.footer || payload.footer === 0 ? payload.footer : (payload.footer || "");
-      render();
-    } else if (action === "notify" && payload) {
-      console.log("notify", payload);
-    } else if (action === "hide") {
-      container.style.visibility = 'hidden';
-    }
-  });
-
-  Object.defineProperty(window, 'or', { value: function(a,b){ return a!=null?a:b; } });
-
-  window.addEventListener("message", (ev) => {
-  });
-})();
-</script>
+        function SendToDui(action, data) {
+            fetch(`http://${GetParentResourceName()}/callback`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: action, data: data })
+            });
+        }
+    </script>
 </body>
 </html>
