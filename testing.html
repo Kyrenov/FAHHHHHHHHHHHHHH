@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avaris Menu</title>
-    <link href="tailwind.min.css" rel="stylesheet"> <!-- Assumes tailwind.min.css is in html/ -->
-    <script src="gsap.min.js"></script> <!-- Assumes gsap.min.js is in html/ -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
     <style>
         body {
             background: rgba(0, 0, 0, 0.8);
@@ -13,7 +13,6 @@
             font-family: 'Arial', sans-serif;
             user-select: none;
             overflow: hidden;
-            margin: 0;
         }
         .menu-container {
             position: absolute;
@@ -23,21 +22,21 @@
             width: 800px;
             max-height: 600px;
             background: rgba(20, 20, 20, 0.9);
-            border-radius: 8px;
-            box-shadow: 0 0 10px rgba(0, 0, 0, 0.5);
+            border-radius: 10px;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
             overflow: hidden;
         }
         .tabs {
             display: flex;
             background: #1a1a1a;
-            border-bottom: 1px solid #444;
+            border-bottom: 1px solid #333;
         }
         .tab {
             flex: 1;
-            padding: 12px;
+            padding: 15px;
             text-align: center;
             cursor: pointer;
-            transition: background 0.2s ease;
+            transition: background 0.3s;
         }
         .tab:hover {
             background: #333;
@@ -46,22 +45,29 @@
             background: #6200ea;
         }
         .content {
-            padding: 16px;
+            padding: 20px;
             max-height: 500px;
             overflow-y: auto;
         }
-        .header {
-            font-size: 1.25rem;
-            margin-bottom: 12px;
-            color: #6200ea;
+        .content-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+        }
+        .content-list, .content-form {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
         }
         .item {
-            padding: 8px;
+            padding: 10px;
             background: #2a2a2a;
-            border-radius: 4px;
-            transition: background 0.2s ease;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
         }
         .item:hover {
+            transform: scale(1.02);
             background: #3a3a3a;
         }
         .item input {
@@ -69,27 +75,27 @@
             padding: 8px;
             background: #1a1a1a;
             border: 1px solid #444;
-            border-radius: 4px;
+            border-radius: 5px;
             color: #fff;
-            transition: border-color 0.2s ease;
         }
         .item input:focus {
             outline: none;
             border-color: #6200ea;
         }
-        .error {
-            color: #ef4444;
-            padding: 8px;
+        .header {
+            font-size: 1.5rem;
+            margin-bottom: 15px;
+            color: #6200ea;
         }
         ::-webkit-scrollbar {
-            width: 6px;
+            width: 8px;
         }
         ::-webkit-scrollbar-track {
             background: #1a1a1a;
         }
         ::-webkit-scrollbar-thumb {
             background: #6200ea;
-            border-radius: 3px;
+            border-radius: 4px;
         }
     </style>
 </head>
@@ -98,6 +104,7 @@
         <div class="tabs" id="tabs"></div>
         <div class="content" id="content"></div>
     </div>
+
     <script>
         let state = {
             position: { x: 960, y: 540 },
@@ -107,135 +114,108 @@
             isContentPanelOpen: false,
             tabs: []
         };
-        // Fallback for animations if GSAP is not loaded
-        const animate = window.gsap || {
-            from: (el, props) => el,
-            to: (el, props) => el,
-            set: (el, props) => el
-        };
+
         function renderMenu(newState) {
-            try {
-                console.log('Rendering menu with state:', newState); // Debug log
-                state = newState || state;
-                const menu = document.getElementById('menu');
-                const tabsContainer = document.getElementById('tabs');
-                const contentContainer = document.getElementById('content');
-                // Show/hide menu
-                menu.classList.toggle('hidden', !state.isContentPanelOpen && state.activeTab === -1);
-                // Render tabs
-                tabsContainer.innerHTML = '';
-                if (!state.tabs || !Array.isArray(state.tabs)) {
-                    contentContainer.innerHTML = '<div class="error">Error: No tabs available</div>';
-                    console.error('No valid tabs in state');
-                    return;
-                }
-                state.tabs.forEach((tab, index) => {
-                    const tabEl = document.createElement('div');
-                    tabEl.className = `tab flex-1 p-3 text-center cursor-pointer ${index === state.activeTab ? 'active' : ''}`;
-                    tabEl.textContent = tab.title || 'Unnamed Tab';
-                    tabEl.onclick = () => {
-                        if (window.gsap) {
-                            animate.to(tabEl, { opacity: 0.7, duration: 0.15, onComplete: () => animate.to(tabEl, { opacity: 1, duration: 0.15 }) });
-                        }
-                        window.sendNuiMessage(JSON.stringify({ action: 'changeTab', index }));
+            state = newState;
+            const menu = document.getElementById('menu');
+            const tabsContainer = document.getElementById('tabs');
+            const contentContainer = document.getElementById('content');
+
+            // Show/hide menu
+            menu.classList.toggle('hidden', !state.isContentPanelOpen && state.activeTab === -1);
+
+            // Render tabs
+            tabsContainer.innerHTML = '';
+            state.tabs.forEach((tab, index) => {
+                const tabEl = document.createElement('div');
+                tabEl.className = `tab ${index === state.activeTab ? 'active' : ''}`;
+                tabEl.textContent = tab.title;
+                tabEl.onclick = () => {
+                    gsap.to(tabEl, { scale: 1.1, duration: 0.2, yoyo: true, repeat: 1 });
+                    window.sendNuiMessage(JSON.stringify({ action: 'changeTab', index }));
+                };
+                tabsContainer.appendChild(tabEl);
+            });
+
+            // Render content
+            contentContainer.innerHTML = '';
+            const activeTab = state.tabs[state.activeTab];
+            if (!activeTab) return;
+
+            const header = document.createElement('div');
+            header.className = 'header';
+            header.textContent = activeTab.header || activeTab.title;
+            contentContainer.appendChild(header);
+
+            const contentDiv = document.createElement('div');
+            contentDiv.className = `content-${activeTab.type || 'list'}`;
+            activeTab.items.forEach((item, index) => {
+                const itemEl = document.createElement('div');
+                itemEl.className = `item ${index === state.selection.index ? 'bg-purple-700' : ''}`;
+
+                if (item.type === 'button') {
+                    itemEl.textContent = item.label + (item.state ? ` (${item.state})` : '');
+                    itemEl.onclick = () => {
+                        gsap.to(itemEl, { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1 });
+                        window.sendNuiMessage(JSON.stringify({ action: 'execute', tabIndex: state.activeTab, itemIndex: index }));
                     };
-                    tabsContainer.appendChild(tabEl);
-                });
-                // Render content
-                contentContainer.innerHTML = '';
-                const activeTab = state.tabs[state.activeTab];
-                if (!activeTab) {
-                    contentContainer.innerHTML = '<div class="error">Error: No active tab selected</div>';
-                    console.error('No active tab');
-                    return;
+                } else if (item.type === 'input') {
+                    const input = document.createElement('input');
+                    input.type = 'text';
+                    input.value = item.value || '';
+                    input.placeholder = item.placeholder || '';
+                    input.onfocus = () => {
+                        gsap.to(input, { borderColor: '#6200ea', duration: 0.3 });
+                        window.sendNuiMessage(JSON.stringify({ action: 'startTyping', tabIndex: state.activeTab, itemIndex: index }));
+                    };
+                    input.onblur = () => {
+                        gsap.to(input, { borderColor: '#444', duration: 0.3 });
+                        window.sendNuiMessage(JSON.stringify({ action: 'stopTyping' }));
+                    };
+                    input.oninput = (e) => {
+                        window.sendNuiMessage(JSON.stringify({ action: 'updateInput', tabIndex: state.activeTab, itemIndex: index, value: e.target.value }));
+                    };
+                    itemEl.appendChild(input);
+                } else if (item.type === 'label') {
+                    itemEl.textContent = item.label;
+                    itemEl.style.cursor = 'default';
                 }
-                const header = document.createElement('div');
-                header.className = 'header';
-                header.textContent = activeTab.header || activeTab.title || 'Menu';
-                contentContainer.appendChild(header);
-                const contentDiv = document.createElement('div');
-                contentDiv.className = activeTab.type === 'grid' ? 'grid grid-cols-[repeat(auto-fill,minmax(180px,1fr))] gap-2' :
-                                    (activeTab.type === 'list' || activeTab.type === 'form' ? 'flex flex-col gap-2' : 'flex flex-col gap-2');
-                if (!activeTab.items || !Array.isArray(activeTab.items)) {
-                    contentDiv.innerHTML = '<div class="error">No items available</div>';
-                    console.error('No valid items in activeTab');
-                    return;
-                }
-                activeTab.items.forEach((item, index) => {
-                    const itemEl = document.createElement('div');
-                    itemEl.className = `item p-2 rounded-md ${index === state.selection.index ? 'bg-purple-700' : 'bg-gray-800'}`;
-                    itemEl.style.cursor = item.type === 'label' ? 'default' : 'pointer';
-                    if (item.type === 'button') {
-                        itemEl.textContent = item.label + (item.state ? ` (${item.state})` : '');
-                        itemEl.onclick = () => {
-                            if (window.gsap) {
-                                animate.to(itemEl, { opacity: 0.7, duration: 0.15, onComplete: () => animate.to(itemEl, { opacity: 1, duration: 0.15 }) });
-                            }
-                            window.sendNuiMessage(JSON.stringify({ action: 'execute', tabIndex: state.activeTab, itemIndex: index }));
-                        };
-                    } else if (item.type === 'input') {
-                        const input = document.createElement('input');
-                        input.type = 'text';
-                        input.className = 'w-full p-2 bg-gray-900 border border-gray-600 rounded-md text-white focus:outline-none focus:border-purple-500';
-                        input.value = item.value || '';
-                        input.placeholder = item.placeholder || '';
-                        input.onfocus = () => {
-                            if (window.gsap) {
-                                animate.to(input, { borderColor: '#6200ea', duration: 0.2 });
-                            }
-                            window.sendNuiMessage(JSON.stringify({ action: 'startTyping', tabIndex: state.activeTab, itemIndex: index }));
-                        };
-                        input.onblur = () => {
-                            if (window.gsap) {
-                                animate.to(input, { borderColor: '#4b5563', duration: 0.2 });
-                            }
-                            window.sendNuiMessage(JSON.stringify({ action: 'stopTyping' }));
-                        };
-                        input.oninput = (e) => {
-                            window.sendNuiMessage(JSON.stringify({ action: 'updateInput', tabIndex: state.activeTab, itemIndex: index, value: e.target.value }));
-                        };
-                        itemEl.appendChild(input);
-                    } else if (item.type === 'label') {
-                        itemEl.textContent = item.label || 'Unnamed Item';
-                    }
-                    contentDiv.appendChild(itemEl);
-                });
-                contentContainer.appendChild(contentDiv);
-                // Simplified animation for content
-                if (window.gsap) {
-                    animate.from(contentDiv, { opacity: 0, duration: 0.15, ease: 'power1.out' });
-                }
-            } catch (error) {
-                console.error('Render error:', error);
-                contentContainer.innerHTML = '<div class="error">Error rendering menu: ' + error.message + '</div>';
-            }
+
+                contentDiv.appendChild(itemEl);
+            });
+            contentContainer.appendChild(contentDiv);
+
+            // Animate content entrance
+            gsap.from(contentDiv.children, {
+                opacity: 0,
+                y: 20,
+                stagger: 0.05,
+                duration: 0.3,
+                ease: 'power2.out'
+            });
         }
+
         // Handle NUI messages from Lua
         window.addEventListener('message', (event) => {
-            try {
-                console.log('Received NUI message:', event.data); // Debug log
-                const data = event.data;
-                if (data.action === 'update') {
-                    renderMenu(data.data);
-                } else if (data.action === 'show') {
-                    document.getElementById('menu').classList.remove('hidden');
-                    if (window.gsap) {
-                        animate.from('.menu-container', { opacity: 0, duration: 0.15, ease: 'power1.out' });
-                    }
-                } else if (data.action === 'hide') {
-                    const onComplete = () => document.getElementById('menu').classList.add('hidden');
-                    if (window.gsap) {
-                        animate.to('.menu-container', { opacity: 0, duration: 0.15, ease: 'power1.in', onComplete });
-                    } else {
-                        onComplete();
-                    }
-                }
-            } catch (error) {
-                console.error('NUI message error:', error);
+            const data = event.data;
+            if (data.action === 'update') {
+                renderMenu(data.data);
+            } else if (data.action === 'show') {
+                document.getElementById('menu').classList.remove('hidden');
+                gsap.from('.menu-container', { opacity: 0, scale: 0.95, duration: 0.3, ease: 'back.out(1.7)' });
+            } else if (data.action === 'hide') {
+                gsap.to('.menu-container', {
+                    opacity: 0,
+                    scale: 0.95,
+                    duration: 0.3,
+                    ease: 'back.in(1.7)',
+                    onComplete: () => document.getElementById('menu').classList.add('hidden')
+                });
             }
         });
-        // Initialize menu
-        renderMenu(state);
+
+        // Initialize GSAP
+        gsap.set('.menu-container', { xPercent: -50, yPercent: -50 });
     </script>
 </body>
 </html>
