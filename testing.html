@@ -13,8 +13,8 @@
             --bg-color: rgba(10, 10, 10, 0.92);
             --primary-text: #ffffff;
             --secondary-text: #b0b0b0;
-            --accent-color: rgb(138, 167, 248);
-            --highlight-bg: rgb(138, 167, 248);
+            --accent-color: rgb(153, 130, 255);
+            --highlight-bg: rgb(153, 130, 255);
             --border-color: rgba(255, 255, 255, 0.15);
             --font: 'Inter', sans-serif;
             --border-radius: 8px;
@@ -85,8 +85,11 @@
             transition: background-color 0.2s ease;
         }
         .menu-item:hover {
-            background: rgba(138, 167, 248, 0.3) !important;
+            background: rgba(153, 130, 255, 0.3) !important;
             cursor: pointer;
+        }
+        .menu-item.selected {
+            background: rgba(153, 130, 255, 0.3);
         }
         .selection-highlight {
             position: absolute;
@@ -106,15 +109,13 @@
         .item-label { flex-grow: 1; }
         .item-value { color: var(--primary-text); font-weight: 500; }
         .dropdown {
-            position: absolute;
-            top: 0;
-            left: 0;
+            position: relative;
             width: 100%;
             background: var(--bg-color);
             border: 1px solid var(--border-color);
             border-radius: 0 0 var(--border-radius) var(--border-radius);
             z-index: 3;
-            max-height: 410px;
+            max-height: 205px;
             overflow-y: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
@@ -132,11 +133,11 @@
             transition: background-color 0.2s ease;
         }
         .dropdown-item:hover {
-            background: rgba(138, 167, 248, 0.3) !important;
+            background: rgba(153, 130, 255, 0.3) !important;
             cursor: pointer;
         }
         .dropdown-item.selected {
-            background: rgba(138, 167, 248, 0.3);
+            background: rgba(153, 130, 255, 0.3);
         }
         .dropdown-selection-highlight {
             position: absolute;
@@ -189,10 +190,10 @@
         .input-box input:focus {
             outline: none;
             border-color: var(--accent-color);
-            box-shadow: 0 0 0 2px rgba(138, 167, 248, 0.2);
+            box-shadow: 0 0 0 2px rgba(153, 130, 255, 0.2);
         }
         .input-box input:hover {
-            border-color: rgba(138, 167, 248, 0.6);
+            border-color: rgba(153, 130, 255, 0.6);
         }
         .input-box small {
             color: var(--secondary-text);
@@ -253,14 +254,14 @@
         const breadcrumbEl = document.getElementById('breadcrumb');
         const counterEl = document.getElementById('option-counter');
         const footerEl = document.getElementById('footer');
-        let highlightEl = document.getElementById('selection-highlight');
         const notificationContainer = document.getElementById('notification-container');
         const inputOverlay = document.getElementById('input-overlay');
         const menuContainer = document.getElementById('menu-container');
-        let selectedIndex = 0;
+        let highlightEl = document.getElementById('selection-highlight');
+        let selectedTabIndex = 0;
         let dropdownSelectedIndex = 0;
-        let currentState = null;
         let dropdownOpen = false;
+        let currentState = null;
         let welcomeMessageShown = false;
         const ITEM_HEIGHT = 41;
 
@@ -284,8 +285,8 @@
         function showInputPrompt(title, placeholder, callback) {
             inputOverlay.innerHTML = `
                 <div class="input-box">
-                    <h3>${title}</h3>
-                    <input type="text" id="prompt-input" placeholder="${placeholder}">
+                    <h3>${safeEncode(title)}</h3>
+                    <input type="text" id="prompt-input" placeholder="${safeEncode(placeholder)}">
                     <small>Press Enter to submit, Escape to cancel.</small>
                 </div>
             `;
@@ -294,7 +295,6 @@
             inputField.focus();
             const close = () => {
                 inputOverlay.classList.add('hidden');
-                document.onkeydown = null;
                 if (window.parent) {
                     window.parent.postMessage({ action: 'inputClosed' }, '*');
                 }
@@ -310,14 +310,14 @@
             document.onkeydown = keyHandler;
         }
 
-        function updateSelection() {
+        function updateTabSelection() {
             const items = menuItemsEl.querySelectorAll('.menu-item');
-            if (!items[selectedIndex]) return;
-            items.forEach((item, i) => item.classList.toggle('selected', i === selectedIndex));
-            const itemTop = selectedIndex * ITEM_HEIGHT;
+            if (!items[selectedTabIndex]) return;
+            items.forEach((item, i) => item.classList.toggle('selected', i === selectedTabIndex));
+            const itemTop = selectedTabIndex * ITEM_HEIGHT;
             highlightEl.style.top = `${itemTop - menuItemsEl.scrollTop}px`;
-            counterEl.textContent = `${selectedIndex + 1} / ${items.length}`;
-            const currentTab = currentState.tabs[selectedIndex];
+            counterEl.textContent = `${selectedTabIndex + 1} / ${items.length}`;
+            const currentTab = currentState.tabs[selectedTabIndex];
             footerEl.textContent = currentTab ? (currentTab.description || `Current Tab: ${currentTab.title}`) : '';
         }
 
@@ -370,7 +370,7 @@
                     dropdownSelectedIndex = index;
                     updateDropdownSelection(dropdownEl, tabData.items);
                     if (window.parent) {
-                        window.parent.postMessage({ action: 'select', itemIndex: index, isDropdown: true }, '*');
+                        window.parent.postMessage({ action: 'select', tabIndex: selectedTabIndex, itemIndex: index, isDropdown: true }, '*');
                     }
                 });
                 dropdownEl.appendChild(element);
@@ -383,25 +383,28 @@
             if (!state || !state.tabs) return;
             currentState = state;
             dropdownOpen = state.dropdownOpen || false;
+            selectedTabIndex = state.activeTab || 0;
             menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
             highlightEl = document.getElementById('selection-highlight');
+
             const menuItems = state.tabs.map((tabData, index) => ({
                 label: tabData.title || `Tab ${index + 1}`,
                 tabIndex: index,
                 type: 'tab',
                 description: `Open ${tabData.title || `Tab ${index + 1}`}`
             }));
+
             menuItems.forEach((item, index) => {
                 const menuItemEl = document.createElement('li');
                 menuItemEl.className = 'menu-item';
                 let content = `<div class="item-content">`;
-                content += `<span class="item-label">${item.label}</span>`;
+                content += `<span class="item-label">${safeEncode(item.label)}</span>`;
                 content += `<i class="chevron fa-solid fa-angle-right"></i>`;
                 content += `</div>`;
+                menuItemEl.innerHTML = content;
                 if (dropdownOpen && index === state.activeTab) {
                     const dropdownEl = document.createElement('div');
                     dropdownEl.className = 'dropdown';
-                    dropdownEl.style.top = `${(index + 1) * ITEM_HEIGHT}px`;
                     populateDropdown(state.tabs[index], dropdownEl, state);
                     menuItemEl.appendChild(dropdownEl);
                 }
@@ -412,12 +415,10 @@
                     }
                 });
             });
-            breadcrumbEl.textContent = state.tabs[state.activeTab].header || 'Made By Anonymous';
+
+            breadcrumbEl.textContent = state.tabs[state.activeTab].header || 'Avaris Menu';
             counterEl.textContent = `${state.activeTab + 1} / ${state.tabs.length}`;
-            selectedIndex = state.activeTab;
-            updateSelection();
-            const activeTab = state.tabs[state.activeTab];
-            footerEl.textContent = activeTab ? (activeTab.description || `Current Tab: ${activeTab.title}`) : '';
+            updateTabSelection();
         }
 
         window.addEventListener("message", (event) => {
