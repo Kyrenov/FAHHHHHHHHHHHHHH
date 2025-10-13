@@ -4,218 +4,596 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Avaris Menu</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.1.1/css/all.min.css">
+  
     <style>
-        body {
-            background: rgba(0, 0, 0, 0.8);
-            color: #ffffff;
-            font-family: 'Arial', sans-serif;
-            user-select: none;
-            overflow: hidden;
+        :root {
+            --primary-color: rgb(139, 139, 255);
+            --secondary-color: rgb(100, 100, 200);
+            --bg-color: rgb(25, 25, 35);
+            --primary-text: #ffffff;
+            --secondary-text: #d0d0d0;
+            --border-color: rgba(255, 255, 255, 0.15);
+            --highlight-bg: var(--primary-color);
+            --font: 'Inter', sans-serif;
+            --border-radius: 8px;
+            --transition-speed: 0.15s;
+            --easing: cubic-bezier(0.4, 0, 0.2, 1);
         }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font);
+            background-color: transparent;
+            color: var(--primary-text);
+            overflow: hidden;
+            user-select: none;
+        }
+        .hidden { display: none !important; }
         .menu-container {
             position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 800px;
-            max-height: 600px;
-            background: rgba(20, 20, 20, 0.9);
-            border-radius: 10px;
-            box-shadow: 0 0 20px rgba(0, 0, 0, 0.5);
-            overflow: hidden;
-        }
-        .tabs {
+            top: 12vh;
+            left: 2vw;
+            width: 380px;
+            background: var(--bg-color);
+            border-radius: var(--border-radius);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.5);
             display: flex;
-            background: #1a1a1a;
-            border-bottom: 1px solid #333;
+            flex-direction: column;
+            border: 1px solid var(--primary-color);
+            visibility: hidden;
+            transition: transform 0.25s var(--easing), opacity 0.25s var(--easing);
+            transform: translateY(15px);
+            opacity: 0;
         }
-        .tab {
-            flex: 1;
-            padding: 15px;
+        .menu-container.visible {
+            transform: translateY(0);
+            opacity: 1;
+        }
+        .header {
+            padding: 12px 15px;
+            background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+            color: var(--primary-text);
+            font-size: 16px;
+            font-weight: 600;
             text-align: center;
-            cursor: pointer;
-            transition: background 0.3s;
+            border-top-left-radius: var(--border-radius);
+            border-top-right-radius: var(--border-radius);
+            border-bottom: 1px solid var(--border-color);
         }
-        .tab:hover {
-            background: #333;
+        .breadcrumb-bar {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            font-size: 13px;
+            font-weight: 500;
+            border-bottom: 1px solid var(--border-color);
         }
-        .tab.active {
-            background: #6200ea;
-        }
-        .content {
-            padding: 20px;
-            max-height: 500px;
+        #breadcrumb { color: var(--secondary-text); text-transform: uppercase; }
+        #option-counter { color: var(--primary-text); font-weight: 600; }
+        .menu-items {
+            list-style: none;
+            position: relative;
+            height: 400px;
             overflow-y: auto;
+            scrollbar-width: none;
+            -ms-overflow-style: none;
+            scroll-behavior: smooth;
         }
-        .content-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
+        .menu-items::-webkit-scrollbar { display: none; }
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 10px 15px;
+            font-size: 14px;
+            position: relative;
+            height: 40px;
+            transition: background-color var(--transition-speed) var(--easing), transform var(--transition-speed) var(--easing);
+            transform: translateX(0);
         }
-        .content-list, .content-form {
+        .menu-item:hover {
+            background: rgba(139, 139, 255, 0.25);
+            transform: translateX(5px);
+            cursor: pointer;
+        }
+        .menu-item.selected {
+            background: rgba(139, 139, 255, 0.35);
+            transform: translateX(5px);
+        }
+        .selection-highlight {
+            position: absolute;
+            left: 0;
+            width: 100%;
+            height: 40px;
+            background: var(--highlight-bg);
+            z-index: 1;
+            transition: top var(--transition-speed) var(--easing), opacity var(--transition-speed) var(--easing);
+            opacity: 0.75;
+            border-left: 3px solid var(--secondary-color);
+        }
+        .item-content {
+            display: flex;
+            width: 100%;
+            align-items: center;
+            z-index: 2;
+        }
+        .item-label { flex-grow: 1; font-weight: 500; }
+        .item-value { color: var(--primary-text); font-weight: 600; }
+        .toggle-indicator { font-weight: 600; }
+        .toggle-indicator.on { color: #2ecc71; }
+        .toggle-indicator.off { color: #ff4757; }
+        .slider-bar {
+            width: 100px;
+            height: 8px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            position: relative;
+        }
+        .slider-fill {
+            height: 100%;
+            background: var(--secondary-color);
+            border-radius: 4px;
+            transition: width var(--transition-speed) var(--easing);
+        }
+        .slider-container { display: flex; align-items: center; gap: 10px; }
+        .footer {
+            padding: 10px 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-top: 1px solid var(--border-color);
+            min-height: 20px;
+            font-size: 12px;
+            color: var(--secondary-text);
+            border-bottom-left-radius: var(--border-radius);
+            border-bottom-right-radius: var(--border-radius);
+            text-align: center;
+        }
+        #notification-container {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 9999;
             display: flex;
             flex-direction: column;
             gap: 10px;
         }
-        .item {
-            padding: 10px;
-            background: #2a2a2a;
-            border-radius: 5px;
-            cursor: pointer;
-            transition: transform 0.2s, background 0.2s;
+        .notification {
+            background: var(--bg-color);
+            border: 1px solid var(--primary-color);
+            color: var(--primary-text);
+            padding: 10px 20px;
+            border-radius: 6px;
+            border-left: 4px solid var(--secondary-color);
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.4);
+            opacity: 0;
+            animation: slideIn 0.3s var(--easing) forwards, slideOut 0.3s 2.5s var(--easing) forwards;
         }
-        .item:hover {
-            transform: scale(1.02);
-            background: #3a3a3a;
-        }
-        .item input {
+        @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+        @keyframes slideOut { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
+        .input-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
             width: 100%;
-            padding: 8px;
-            background: #1a1a1a;
-            border: 1px solid #444;
-            border-radius: 5px;
-            color: #fff;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(5px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 10000;
+            transition: opacity 0.3s var(--easing);
         }
-        .item input:focus {
-            outline: none;
-            border-color: #6200ea;
+        .input-box {
+            background: var(--bg-color);
+            padding: 20px;
+            border-radius: var(--border-radius);
+            border: 1px solid var(--primary-color);
+            width: 360px;
+            text-align: center;
+            transform: scale(0.95);
+            transition: transform 0.3s var(--easing);
         }
-        .header {
-            font-size: 1.5rem;
+        .input-overlay.visible .input-box {
+            transform: scale(1);
+        }
+        .input-box h3 {
             margin-bottom: 15px;
-            color: #6200ea;
+            font-size: 18px;
+            color: var(--primary-text);
         }
-        ::-webkit-scrollbar {
-            width: 8px;
+        .input-box input {
+            width: 100%;
+            padding: 10px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--border-color);
+            color: var(--primary-text);
+            border-radius: 5px;
+            font-size: 14px;
+            text-align: center;
+            transition: border-color var(--transition-speed) var(--easing), box-shadow var(--transition-speed) var(--easing);
         }
-        ::-webkit-scrollbar-track {
-            background: #1a1a1a;
+        .input-box input:focus {
+            outline: none;
+            border-color: var(--secondary-color);
+            box-shadow: 0 0 0 2px rgba(100, 100, 200, 0.2);
         }
-        ::-webkit-scrollbar-thumb {
-            background: #6200ea;
-            border-radius: 4px;
+        .input-box input:hover {
+            border-color: var(--primary-color);
+        }
+        .input-box small {
+            color: var(--secondary-text);
+            margin-top: 10px;
+            display: block;
+            font-size: 12px;
         }
     </style>
 </head>
 <body>
-    <div id="menu" class="menu-container hidden">
-        <div class="tabs" id="tabs"></div>
-        <div class="content" id="content"></div>
+<div id="notification-container"></div>
+<div class="input-overlay hidden" id="input-overlay"></div>
+<div class="menu-container" id="menu-container">
+    <div class="header">Avaris Menu</div>
+    <div class="breadcrumb-bar">
+        <span id="breadcrumb">Main Menu</span>
+        <span id="option-counter"></span>
     </div>
+    <ul class="menu-items" id="menu-items">
+        <div class="selection-highlight" id="selection-highlight"></div>
+    </ul>
+    <div class="footer" id="footer"></div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', () => {
+        const menuItemsEl = document.getElementById('menu-items');
+        const breadcrumbEl = document.getElementById('breadcrumb');
+        const counterEl = document.getElementById('option-counter');
+        const footerEl = document.getElementById('footer');
+        let highlightEl = document.getElementById('selection-highlight');
+        const notificationContainer = document.getElementById('notification-container');
+        const inputOverlay = document.getElementById('input-overlay');
+        const menuContainer = document.getElementById('menu-container');
+        let currentMenuId = 'main';
+        let navigationStack = [];
+        let selectedIndex = 0;
+        let optionStates = {};
+        let currentState = null;
+        let welcomeMessageShown = false;
+        const MAX_VISIBLE_ITEMS = 10;
+        const ITEM_HEIGHT = 40;
 
-    <script>
-        let state = {
-            position: { x: 960, y: 540 },
-            activeTab: 0,
-            selection: { index: 0 },
-            isTyping: false,
-            isContentPanelOpen: false,
-            tabs: []
+        const defaultMenuData = {
+            main: {
+                title: 'Main Menu',
+                items: [
+                    { label: 'Self', target: 'self', description: 'Manage your character settings.' },
+                    { label: 'Vehicle', target: 'vehicle', description: 'Access vehicle controls.' },
+                    { label: 'World', target: 'world', description: 'Modify world settings.' },
+                    { label: 'Network', target: 'network', description: 'Manage network options.' },
+                    { label: 'Status', target: 'status', description: 'View status information.' },
+                ]
+            },
+            self: {
+                title: 'Self Options',
+                parent: 'main',
+                items: [
+                    { label: 'Appearance', target: 'appearance', description: 'Customize your character.' },
+                    { label: 'Inventory', target: 'inventory', description: 'Manage your items.' },
+                    { label: 'Settings', target: 'settings', description: 'Adjust personal settings.' },
+                    { label: 'Health Boost', type: 'toggle', stateId: 'healthBoost', description: 'Toggle health boost.' },
+                    { label: 'Speed Multiplier', type: 'slider', stateId: 'speed', min: 1, max: 10, description: 'Adjust movement speed.' },
+                ]
+            },
+            appearance: {
+                title: 'Appearance',
+                parent: 'self',
+                items: [
+                    { label: 'Change Outfit', type: 'button', description: 'Select a new outfit.' },
+                    { label: 'Set Name', type: 'input', placeholder: 'Enter name', description: 'Set character name.' },
+                ]
+            },
+            inventory: {
+                title: 'Inventory',
+                parent: 'self',
+                items: [
+                    { label: 'Add Item', type: 'input', placeholder: 'Item name', description: 'Add an item to inventory.' },
+                    { label: 'Clear Inventory', type: 'button', description: 'Remove all items.' },
+                ]
+            },
+            settings: {
+                title: 'Settings',
+                parent: 'self',
+                items: [
+                    { label: 'God Mode', type: 'toggle', stateId: 'godMode', description: 'Toggle invincibility.' },
+                    { label: 'Visibility', type: 'toggle', stateId: 'visibility', description: 'Toggle visibility.' },
+                ]
+            },
+            vehicle: {
+                title: 'Vehicle Options',
+                parent: 'main',
+                items: [
+                    { label: 'Spawn Vehicle', type: 'input', placeholder: 'Vehicle model', description: 'Spawn a vehicle.' },
+                    { label: 'Repair Vehicle', type: 'button', description: 'Repair current vehicle.' },
+                ]
+            },
+            world: {
+                title: 'World Options',
+                parent: 'main',
+                items: [
+                    { label: 'Change Weather', type: 'button', description: 'Modify weather conditions.' },
+                    { label: 'Set Time', type: 'input', placeholder: 'HH:MM', description: 'Set world time.' },
+                ]
+            },
+            network: {
+                title: 'Network Options',
+                parent: 'main',
+                items: [
+                    { label: 'Kick Player', type: 'input', placeholder: 'Player ID', description: 'Kick a player.' },
+                    { label: 'Ban Player', type: 'input', placeholder: 'Player ID', description: 'Ban a player.' },
+                ]
+            },
+            status: {
+                title: 'Status',
+                parent: 'main',
+                items: [
+                    { label: 'Health Status', type: 'toggle', stateId: 'healthStatus', description: 'Current health status.' },
+                    { label: 'Server Uptime', type: 'input', placeholder: 'N/A', description: 'Server uptime duration.' },
+                    { label: 'Player Count', type: 'input', placeholder: 'N/A', description: 'Current player count.' },
+                ]
+            }
         };
 
-        function renderMenu(newState) {
-            state = newState;
-            const menu = document.getElementById('menu');
-            const tabsContainer = document.getElementById('tabs');
-            const contentContainer = document.getElementById('content');
-
-            // Show/hide menu
-            menu.classList.toggle('hidden', !state.isContentPanelOpen && state.activeTab === -1);
-
-            // Render tabs
-            tabsContainer.innerHTML = '';
-            state.tabs.forEach((tab, index) => {
-                const tabEl = document.createElement('div');
-                tabEl.className = `tab ${index === state.activeTab ? 'active' : ''}`;
-                tabEl.textContent = tab.title;
-                tabEl.onclick = () => {
-                    gsap.to(tabEl, { scale: 1.1, duration: 0.2, yoyo: true, repeat: 1 });
-                    window.sendNuiMessage(JSON.stringify({ action: 'changeTab', index }));
-                };
-                tabsContainer.appendChild(tabEl);
-            });
-
-            // Render content
-            contentContainer.innerHTML = '';
-            const activeTab = state.tabs[state.activeTab];
-            if (!activeTab) return;
-
-            const header = document.createElement('div');
-            header.className = 'header';
-            header.textContent = activeTab.header || activeTab.title;
-            contentContainer.appendChild(header);
-
-            const contentDiv = document.createElement('div');
-            contentDiv.className = `content-${activeTab.type || 'list'}`;
-            activeTab.items.forEach((item, index) => {
-                const itemEl = document.createElement('div');
-                itemEl.className = `item ${index === state.selection.index ? 'bg-purple-700' : ''}`;
-
-                if (item.type === 'button') {
-                    itemEl.textContent = item.label + (item.state ? ` (${item.state})` : '');
-                    itemEl.onclick = () => {
-                        gsap.to(itemEl, { scale: 1.05, duration: 0.2, yoyo: true, repeat: 1 });
-                        window.sendNuiMessage(JSON.stringify({ action: 'execute', tabIndex: state.activeTab, itemIndex: index }));
-                    };
-                } else if (item.type === 'input') {
-                    const input = document.createElement('input');
-                    input.type = 'text';
-                    input.value = item.value || '';
-                    input.placeholder = item.placeholder || '';
-                    input.onfocus = () => {
-                        gsap.to(input, { borderColor: '#6200ea', duration: 0.3 });
-                        window.sendNuiMessage(JSON.stringify({ action: 'startTyping', tabIndex: state.activeTab, itemIndex: index }));
-                    };
-                    input.onblur = () => {
-                        gsap.to(input, { borderColor: '#444', duration: 0.3 });
-                        window.sendNuiMessage(JSON.stringify({ action: 'stopTyping' }));
-                    };
-                    input.oninput = (e) => {
-                        window.sendNuiMessage(JSON.stringify({ action: 'updateInput', tabIndex: state.activeTab, itemIndex: index, value: e.target.value }));
-                    };
-                    itemEl.appendChild(input);
-                } else if (item.type === 'label') {
-                    itemEl.textContent = item.label;
-                    itemEl.style.cursor = 'default';
-                }
-
-                contentDiv.appendChild(itemEl);
-            });
-            contentContainer.appendChild(contentDiv);
-
-            // Animate content entrance
-            gsap.from(contentDiv.children, {
-                opacity: 0,
-                y: 20,
-                stagger: 0.05,
-                duration: 0.3,
-                ease: 'power2.out'
-            });
+        function safeEncode(text) {
+            return text && typeof text === 'string'
+                ? text.replace(/&/g, '&amp;')
+                      .replace(/</g, '&lt;')
+                      .replace(/>/g, '&gt;')
+                      .replace(/"/g, '&quot;')
+                      .replace(/'/g, '&#39;')
+                : '';
         }
 
-        // Handle NUI messages from Lua
-        window.addEventListener('message', (event) => {
-            const data = event.data;
-            if (data.action === 'update') {
-                renderMenu(data.data);
-            } else if (data.action === 'show') {
-                document.getElementById('menu').classList.remove('hidden');
-                gsap.from('.menu-container', { opacity: 0, scale: 0.95, duration: 0.3, ease: 'back.out(1.7)' });
-            } else if (data.action === 'hide') {
-                gsap.to('.menu-container', {
-                    opacity: 0,
-                    scale: 0.95,
-                    duration: 0.3,
-                    ease: 'back.in(1.7)',
-                    onComplete: () => document.getElementById('menu').classList.add('hidden')
+        function showNotification(message) {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+            notification.textContent = message;
+            notificationContainer.appendChild(notification);
+            setTimeout(() => notification.remove(), 2500);
+        }
+
+        function showInputPrompt(title, placeholder, callback) {
+            inputOverlay.innerHTML = `
+                <div class="input-box">
+                    <h3>${title}</h3>
+                    <input type="text" id="prompt-input" placeholder="${placeholder}">
+                    <small>Press Enter to submit, Escape to cancel.</small>
+                </div>
+            `;
+            inputOverlay.classList.remove('hidden');
+            inputOverlay.classList.add('visible');
+            const inputField = document.getElementById('prompt-input');
+            inputField.focus();
+            const close = () => {
+                inputOverlay.classList.remove('visible');
+                inputOverlay.classList.add('hidden');
+                document.onkeydown = handleMenuInput;
+            };
+            document.onkeydown = (e) => {
+                if (e.key === 'Enter') {
+                    callback(inputField.value);
+                    close();
+                } else if (e.key === 'Escape') {
+                    close();
+                }
+            };
+        }
+
+        function updateSelection(itemsToRender) {
+            const items = menuItemsEl.querySelectorAll('.menu-item');
+            if (!items[selectedIndex]) return;
+
+            items.forEach((item, i) => item.classList.toggle('selected', i === selectedIndex));
+            const itemTop = selectedIndex * ITEM_HEIGHT;
+            const itemBottom = itemTop + ITEM_HEIGHT;
+            const scrollTop = menuItemsEl.scrollTop;
+            const containerHeight = menuItemsEl.clientHeight;
+
+            if (itemTop < scrollTop) {
+                menuItemsEl.scrollTo({ top: itemTop, behavior: 'smooth' });
+            } else if (itemBottom > scrollTop + containerHeight) {
+                menuItemsEl.scrollTo({ top: itemBottom - containerHeight, behavior: 'smooth' });
+            }
+
+            highlightEl.style.top = `${itemTop - menuItemsEl.scrollTop}px`;
+            counterEl.textContent = `${selectedIndex + 1} / ${items.length}`;
+            footerEl.textContent = itemsToRender[selectedIndex]?.description || '';
+        }
+
+        function renderMenu(menuId) {
+            const menu = defaultMenuData[menuId];
+            if (!menu) return;
+            currentMenuId = menuId;
+            breadcrumbEl.textContent = menu.title;
+            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
+            highlightEl = document.getElementById('selection-highlight');
+
+            const itemsToRender = menu.items.map(item => item.target ? { ...item, type: 'submenu' } : item);
+            if (menu.parent) {
+                itemsToRender.unshift({ type: 'back', label: 'Back', icon: 'fa-solid fa-arrow-left', description: 'Return to the previous menu.' });
+            }
+
+            itemsToRender.forEach((item, index) => {
+                const menuItemEl = document.createElement('li');
+                menuItemEl.className = 'menu-item';
+                let content = `<div class="item-content">`;
+                if (item.icon) content += `<i class="icon ${item.icon}"></i>`;
+                content += `<span class="item-label">${item.label}</span>`;
+                if (item.type === 'submenu' || item.type === 'player') {
+                    content += `<i class="chevron fa-solid fa-angle-right"></i>`;
+                } else if (item.type === 'toggle') {
+                    const isChecked = optionStates[item.stateId] || false;
+                    content += `<div class="item-value"><span class="toggle-indicator ${isChecked ? 'on' : 'off'}">${isChecked ? 'ON' : 'OFF'}</span></div>`;
+                } else if (item.type === 'slider') {
+                    const value = optionStates[item.stateId] || item.min;
+                    const percent = ((value - item.min) / (item.max - item.min)) * 100;
+                    content += `<div class="item-value slider-container"><div class="slider-bar"><div class="slider-fill" style="width: ${percent}%"></div></div></div>`;
+                } else if (item.type === 'input') {
+                    content += `<div class="item-value">${safeEncode(item.placeholder || 'N/A')}</div>`;
+                }
+                content += `</div>`;
+                menuItemEl.innerHTML = content;
+                menuItemsEl.appendChild(menuItemEl);
+                menuItemEl.addEventListener('click', () => {
+                    selectedIndex = index;
+                    handleItemSelection(itemsToRender[index]);
+                    updateSelection(itemsToRender);
                 });
+            });
+
+            selectedIndex = 0;
+            updateSelection(itemsToRender);
+        }
+
+        function handleItemSelection(item) {
+            if (item.target) {
+                navigationStack.push(currentMenuId);
+                renderMenu(item.target);
+            } else if (item.type === 'button') {
+                showNotification(`Action: ${item.label}`);
+            } else if (item.type === 'toggle') {
+                optionStates[item.stateId] = !optionStates[item.stateId];
+                showNotification(`${item.label}: ${optionStates[item.stateId] ? 'Enabled' : 'Disabled'}`);
+                renderMenu(currentMenuId);
+            } else if (item.type === 'input') {
+                showInputPrompt(`Enter value for ${item.label}:`, item.placeholder, (result) => {
+                    if (result) showNotification(`Set ${item.label} to: ${result}`);
+                });
+            } else if (item.type === 'back') {
+                const parentMenu = navigationStack.pop();
+                renderMenu(parentMenu || 'main');
+            }
+        }
+
+        function updateMenuFromState(state) {
+            if (!state?.tabs) return;
+            currentState = state;
+
+            menuItemsEl.innerHTML = `<div class="selection-highlight" id="selection-highlight"></div>`;
+            highlightEl = document.getElementById('selection-highlight');
+
+            const menuItems = state.tabs.map((tabData, index) => ({
+                label: tabData.title || `Tab ${index + 1}`,
+                target: tabData.key || `tab${index + 1}`,
+                description: `Open ${tabData.title || `Tab ${index + 1}`}`
+            }));
+
+            menuItems.forEach((item, index) => {
+                const menuItemEl = document.createElement('li');
+                menuItemEl.className = 'menu-item';
+                menuItemEl.innerHTML = `
+                    <div class="item-content">
+                        <span class="item-label">${item.label}</span>
+                        <i class="chevron fa-solid fa-angle-right"></i>
+                    </div>`;
+                menuItemsEl.appendChild(menuItemEl);
+                menuItemEl.addEventListener('click', () => {
+                    selectedIndex = index;
+                    handleItemSelection(item);
+                    updateSelection(menuItems);
+                    window.parent?.postMessage({ action: 'select', tabIndex: index, isContentPanel: false }, '*');
+                });
+            });
+
+            breadcrumbEl.textContent = 'Main Menu';
+            counterEl.textContent = `${state.activeTab + 1} / ${state.tabs.length}`;
+            selectedIndex = state.activeTab;
+            updateSelection(menuItems);
+
+            const activeTab = state.tabs[state.activeTab];
+            footerEl.textContent = activeTab?.description || `Current Tab: ${activeTab?.title || ''}`;
+        }
+
+        function handleMenuInput(e) {
+            if (currentState) return;
+            e.preventDefault();
+            const menu = defaultMenuData[currentMenuId];
+            const itemsToRender = menu.items.map(item => item.target ? { ...item, type: 'submenu' } : item);
+            if (menu.parent) {
+                itemsToRender.unshift({ type: 'back', label: 'Back', icon: 'fa-solid fa-arrow-left', description: 'Return to the previous menu.' });
+            }
+            const currentItemData = itemsToRender[selectedIndex];
+
+            switch (e.key) {
+                case 'ArrowUp':
+                    selectedIndex = (selectedIndex - 1 + itemsToRender.length) % itemsToRender.length;
+                    break;
+                case 'ArrowDown':
+                    selectedIndex = (selectedIndex + 1) % itemsToRender.length;
+                    break;
+                case 'Enter':
+                    handleItemSelection(currentItemData);
+                    break;
+                case 'Backspace':
+                    if (navigationStack.length > 0) {
+                        const parentMenu = navigationStack.pop();
+                        renderMenu(parentMenu);
+                    }
+                    break;
+            }
+            updateSelection(itemsToRender);
+        }
+
+        window.addEventListener("message", (event) => {
+            const { action, data } = event.data;
+            if (action === "update" || action === "show") {
+                if (data) {
+                    updateMenuFromState(data);
+                    menuContainer.style.visibility = 'visible';
+                    menuContainer.classList.add('visible');
+                    if (action === "show" && !welcomeMessageShown) {
+                        welcomeMessageShown = true;
+                        showNotification("Avaris Menu loaded successfully");
+                    }
+                }
+            }
+            if (action === 'hide') {
+                menuContainer.style.visibility = 'hidden';
+                menuContainer.classList.remove('visible');
             }
         });
 
-        // Initialize GSAP
-        gsap.set('.menu-container', { xPercent: -50, yPercent: -50 });
-    </script>
+        document.onkeydown = handleMenuInput;
+        renderMenu('main');
+        menuContainer.style.visibility = 'visible';
+        menuContainer.classList.add('visible');
+    });
+
+    window.addEventListener("message", (event) => {
+        const data = event.data;
+        if (data.action === "getClipboard") {
+            navigator.clipboard.readText().then(text => {
+                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text })
+                });
+            }).catch(() => {
+                fetch(`https://${GetParentResourceName()}/clipboardGet`, {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ text: "" })
+                });
+            });
+        }
+        if (data.action === "setClipboard") {
+            navigator.clipboard.writeText(data.text || "").catch(err => {
+                console.error("Clipboard write failed:", err);
+            });
+        }
+    });
+</script>
 </body>
 </html>
