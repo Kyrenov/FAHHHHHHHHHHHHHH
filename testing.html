@@ -468,7 +468,7 @@
                 menuItemsEl.appendChild(menuItemEl);
                 menuItemEl.addEventListener('click', () => {
                     if (window.parent) {
-                        window.parent.postMessage({ action: 'select', tabIndex: item.tabIndex, isDropdown: false }, '*');
+                        window.parent.postMessage({ action: 'openDropdown', tabIndex: item.tabIndex }, '*'); // Trigger dropdown on click
                     }
                 });
             });
@@ -493,6 +493,12 @@
                 showNotification(data.title, data.message, data.duration);
             } else if (action === "hide") {
                 menuContainer.style.visibility = 'hidden';
+            } else if (action === "openDropdown") {
+                if (currentState) {
+                    currentState.dropdownOpen = true;
+                    currentState.dropdownSelection.index = 0;
+                    updateMenuFromState(currentState); // Force re-render with dropdown
+                }
             }
         });
 
