@@ -369,69 +369,43 @@
             main: {
                 title: 'Main Menu',
                 items: [
-                    { label: 'Self', target: 'self', description: 'Manage your character settings.' },
-                    { label: 'Vehicle', target: 'vehicle', description: 'Access vehicle controls.' },
-                    { label: 'World', target: 'world', description: 'Modify world settings.' },
-                    { label: 'Network', target: 'network', description: 'Manage network options.' },
+                    { label: 'Self', target: 'self', description: 'Manage personal options.' },
+                    { label: 'Players', target: 'players', description: 'View and manage players.' },
+                    { label: 'Resources', target: 'resources', description: 'Manage server resources.' },
+                    { label: 'Settings', target: 'settings', description: 'Adjust menu settings.' },
                 ]
             },
             self: {
                 title: 'Self Options',
                 parent: 'main',
                 items: [
-                    { label: 'Appearance', target: 'appearance', description: 'Customize your character.' },
-                    { label: 'Inventory', target: 'inventory', description: 'Manage your items.' },
-                    { label: 'Settings', target: 'settings', description: 'Adjust personal settings.' },
-                    { label: 'Health Boost', type: 'toggle', stateId: 'healthBoost', description: 'Toggle health boost.' },
-                    { label: 'Speed Multiplier', type: 'slider', stateId: 'speed', min: 1, max: 10, description: 'Adjust movement speed.' },
+                    { label: 'Revive', type: 'button', description: 'Revive your character.' },
+                    { label: 'Heal', type: 'button', description: 'Heal your character.' },
+                    { label: 'Invisible', type: 'toggle', stateId: 'invisible', description: 'Toggle invisibility.' },
                 ]
             },
-            appearance: {
-                title: 'Appearance',
-                parent: 'self',
+            players: {
+                title: 'Players',
+                parent: 'main',
                 items: [
-                    { label: 'Change Outfit', type: 'button', description: 'Select a new outfit.' },
-                    { label: 'Set Name', type: 'input', placeholder: 'Enter name', description: 'Set character name.' },
+                    { label: 'Kick Player', type: 'input', placeholder: 'Player ID', description: 'Kick a player by ID.' },
+                    { label: 'Spectate', type: 'input', placeholder: 'Player ID', description: 'Spectate a player.' },
                 ]
             },
-            inventory: {
-                title: 'Inventory',
-                parent: 'self',
+            resources: {
+                title: 'Resources',
+                parent: 'main',
                 items: [
-                    { label: 'Add Item', type: 'input', placeholder: 'Item name', description: 'Add an item to inventory.' },
-                    { label: 'Clear Inventory', type: 'button', description: 'Remove all items.' },
+                    { label: 'Search Resources', type: 'input', placeholder: 'Resource name', description: 'Search for server resources.' },
+                    { label: 'Restart Resource', type: 'input', placeholder: 'Resource name', description: 'Restart a resource.' },
                 ]
             },
             settings: {
                 title: 'Settings',
-                parent: 'self',
-                items: [
-                    { label: 'God Mode', type: 'toggle', stateId: 'godMode', description: 'Toggle invincibility.' },
-                    { label: 'Visibility', type: 'toggle', stateId: 'visibility', description: 'Toggle visibility.' },
-                ]
-            },
-            vehicle: {
-                title: 'Vehicle Options',
                 parent: 'main',
                 items: [
-                    { label: 'Spawn Vehicle', type: 'input', placeholder: 'Vehicle model', description: 'Spawn a vehicle.' },
-                    { label: 'Repair Vehicle', type: 'button', description: 'Repair current vehicle.' },
-                ]
-            },
-            world: {
-                title: 'World Options',
-                parent: 'main',
-                items: [
-                    { label: 'Change Weather', type: 'button', description: 'Modify weather conditions.' },
-                    { label: 'Set Time', type: 'input', placeholder: 'HH:MM', description: 'Set world time.' },
-                ]
-            },
-            network: {
-                title: 'Network Options',
-                parent: 'main',
-                items: [
-                    { label: 'Kick Player', type: 'input', placeholder: 'Player ID', description: 'Kick a player.' },
-                    { label: 'Ban Player', type: 'input', placeholder: 'Player ID', description: 'Ban a player.' },
+                    { label: 'Toggle Theme', type: 'button', description: 'Switch menu theme.' },
+                    { label: 'Reset Position', type: 'button', description: 'Reset menu position.' },
                 ]
             }
         };
@@ -765,4 +739,3 @@
 </script>
 </body>
 </html>
-
