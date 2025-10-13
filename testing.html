@@ -13,7 +13,7 @@
             --bg-color: rgba(10, 10, 10, 0.95);
             --primary-text: #ffffff;
             --secondary-text: #b0b0b0;
-            --accent-color: rgb(138, 43, 226); /* Updated to vibrant purple */
+            --accent-color: rgb(138, 43, 226);
             --highlight-bg: rgba(138, 43, 226, 0.3);
             --border-color: rgba(255, 255, 255, 0.15);
             --font: 'Inter', sans-serif;
@@ -111,7 +111,7 @@
         .item-value { color: var(--primary-text); font-weight: 500; }
         .dropdown {
             position: absolute;
-            top: 100%; /* Position below the menu-item */
+            top: 100%;
             width: 100%;
             background: rgba(20, 20, 20, 0.95);
             border: 1px solid var(--border-color);
@@ -121,10 +121,10 @@
             overflow-y: auto;
             scrollbar-width: none;
             -ms-overflow-style: none;
-            display: none; /* Hidden by default, shown when dropdownOpen */
+            display: none;
         }
         .dropdown.active {
-            display: block; /* Show when active */
+            display: block;
         }
         .dropdown::-webkit-scrollbar {
             display: none;
@@ -409,6 +409,7 @@
                             <input type="text" style="width: 100%; padding: 5px; background: rgba(0,0,0,0.5); border: 1px solid var(--border-color); color: var(--primary-text); border-radius: 3px;" value="${safeEncode(item.value || '')}" readonly>
                         </div>`;
                 } else if (item.type === 'toggle') {
+                    // Added NoClip toggle UI feature
                     element.className += item.value ? ' on' : '';
                     element.innerHTML = `
                         <span>${safeEncode(item.label || 'Unknown')}</span>
@@ -461,7 +462,7 @@
                 menuItemEl.innerHTML = content;
                 if (dropdownOpen && index === state.activeTab) {
                     const dropdownEl = document.createElement('div');
-                    dropdownEl.className = 'dropdown active'; // Ensure dropdown is shown when open
+                    dropdownEl.className = 'dropdown active';
                     populateDropdown(state.tabs[index], dropdownEl, state);
                     menuItemsEl.appendChild(dropdownEl);
                 }
@@ -486,6 +487,7 @@
                     menuContainer.style.visibility = 'visible';
                     if (action === "show" && !welcomeMessageShown) {
                         welcomeMessageShown = true;
+                        // Added custom notification feature
                         showNotification("Avaris Menu", "Loaded successfully", 3000);
                     }
                 }
