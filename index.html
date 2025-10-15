@@ -1,0 +1,1987 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lean Menu - Elite Edition</title> 
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;600;700;900&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
+    <link rel="stylesheet" href="style.css">
+
+</head>
+<body>
+    <div class="menu-wrapper">
+            <div class="external-scrollbar">
+                <!-- <div class="scroll-arrow scroll-arrow-up"></div> -->
+                <div class="custom-scrollbar">
+                    <div class="custom-scrollbar-thumb" id="customScrollbarThumb"></div>
+                    <div class="scrollbar-indicator" id="scrollbarIndicator"></div>
+                </div>
+                <!-- <div class="scroll-arrow scroll-arrow-down"></div> -->
+            </div>
+        
+        <div class="menu-container" id="mainMenu">
+            <div class="menu-header" id="menuHeader"></div>
+            
+            <!-- Tab Headers -->
+            <div class="tab-container" id="tabContainer" style="display: none;">
+                <div class="tab-headers" id="tabHeaders">
+                    <!-- Tab headers will be dynamically generated -->
+                </div>
+            </div>
+
+            <div class="menu-items" id="menuItemsContainer">
+                <div class="highlight-bar"></div> 
+            </div>
+        </div>
+        
+        <div class="menu-footer">
+            <span class="version">Version: Beta | build: 184</span>
+            <span class="counter" id="counter">1/9</span> 
+        </div>
+
+    </div>
+
+    <div class="notification-container" id="notificationContainer">
+    </div>
+
+    <div class="spectators-container" id="spectatorsContainer" style="display: none;">
+        <div class="spectators-header">
+            <div class="spectators-icon">
+                <i class="fa-solid fa-eye"></i>
+            </div>
+            <div class="spectators-title">Spectators List</div>
+        </div>
+        <div class="spectators-separator"></div>
+        <div class="spectators-list" id="spectatorsList">
+            </div>
+    </div>
+
+    <div class="tooltip-container" id="tooltipContainer" style="display: none;">
+        <div class="tooltip-content" id="tooltipContent">
+            </div>
+    </div>
+
+    <!-- Player Info Panel -->
+    <div class="player-info-panel" id="playerInfoPanel" style="display: none;">
+        <div class="player-panel">
+            <div class="player-header">
+                <div class="player-title" id="playerInfoName">Player Name</div>
+                <div class="divider"></div>
+            </div>
+            <div class="player-row">
+                <span class="player-label">Distance</span>
+                <span class="player-value" id="playerInfoDistance">0m</span>
+            </div>
+            <div class="player-row">
+                <span class="player-label">Local ID</span>
+                <span class="player-value" id="playerInfoId">0</span>
+            </div>
+            <div class="player-row">
+                <span class="player-label">Health</span>
+                <div class="bar-row">
+                    <span class="player-value" id="playerInfoHealth">200</span>
+                    <div class="bar-container" title="Health" style="position: relative;">
+                        <div class="bar-health" id="playerInfoHealthBar" style="height: 100%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="player-row">
+                <span class="player-label">Armor</span>
+                <div class="bar-row">
+                    <span class="player-value" id="playerInfoArmor">0</span>
+                    <div class="bar-container" title="Armor" style="position: relative;">
+                        <div class="bar-armor" id="playerInfoArmorBar" style="height: 0%;"></div>
+                    </div>
+                </div>
+            </div>
+            <div class="player-row">
+                <span class="player-label">Weapon</span>
+                <span class="player-value unarmed" id="playerInfoWeapon">Unarmed</span>
+            </div>
+            <div class="player-row">
+                <span class="player-label">Vehicle</span>
+                <span class="player-value" id="playerInfoVehicle">Outside</span>
+            </div>
+            <div class="player-row">
+                <span class="player-label">Alive</span>
+                <span class="player-value" id="playerInfoAlive">Alive</span>
+            </div>
+            <div class="player-row">
+                <span class="player-label">Speed</span>
+                <span class="player-value" id="playerInfoSpeed">0km/h</span>
+            </div>
+            <div class="player-row">
+                <span class="player-label">Friend</span>
+                <span class="player-value" id="playerInfoFriend">No</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="key-binding-overlay" id="keyBindingOverlay" style="display: none;">
+        <div class="keybind-container">
+            <div class="header">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon">
+                    <path d="M11.996 2.01c-5.522 0-9.998 4.477-9.998 9.998s4.476 9.998 9.998 9.998 9.998-4.477 9.998-9.998-4.476-9.998-9.998-9.998zm-4.321 15.657l-1.01-1.01 2.222-2.223 1.01 1.01-2.222 2.223zm6.666 0l-1.01-1.01 2.222-2.223 1.01 1.01-2.222 2.223zm-4.444-4.444l-1.01-1.01 2.222-2.223 1.01 1.01-2.222 2.223zm6.666 0l-1.01-1.01 2.222-2.223 1.01 1.01-2.222 2.223z"/>
+                </svg>
+                <span class="label">Select a keybind (Open key)</span>
+            </div>
+            <div class="input-field" id="keyBindingInput">
+                <span class="key-text" id="keyBindingText"></span>
+                <span class="cursor" id="cursor"></span>
+            </div>
+        </div>
+    </div>
+
+    <div class="weapon-input-overlay" id="weaponInputOverlay" style="display: none;">
+        <div class="keybind-container">
+            <div class="header">
+                <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" class="icon">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 15l-5-5 1.41-1.41L10 14.17l7.59-7.59L19 8l-9 9z"/>
+                </svg>
+                <span class="label">Write weapon Name</span>
+            </div>
+            <div class="input-field" id="weaponInputField">
+                <span class="key-text" id="weaponInputText"></span>
+                <span class="cursor" id="weaponCursor"></span>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const bannerImageUrl = 'default.png'; // Default Homer Atlas header image 
+
+        let currentIndex = 0; 
+        let currentMenuType = 'main';
+        let hasDetailedPlayerInfo = false; // Track if we have detailed player info loaded
+
+        const menuContainer = document.getElementById('mainMenu'); 
+        const menuItemsContainer = document.getElementById('menuItemsContainer'); 
+        let highlightBar = document.querySelector('.highlight-bar'); 
+        const counterElement = document.getElementById('counter'); 
+        const notificationContainer = document.getElementById('notificationContainer');
+
+        const menuData = {
+            main: {
+                title: 'HOME',
+                items: [
+                    { name: "Self", icon: '<i class="fa-solid fa-user"></i>', desc: "Player Options", action: "self", tooltip: "Access player-specific settings and controls" },
+                    { name: "Online", icon: '<i class="fa-solid fa-desktop"></i>', desc: "Online Features", action: "online", tooltip: "Manage online features and server interactions" },
+                    { name: "Combat/Weapons", icon: '<i class="fa-solid fa-crosshairs"></i>', desc: "Weapon System", action: "combat", tooltip: "Configure combat settings and weapon modifications" },
+                    { name: "Visual", icon: '<i class="fa-solid fa-eye"></i>', desc: "Visual Effects", action: "visual", tooltip: "Customize visual effects and graphics settings" },
+                    { name: "Vehicle", icon: '<i class="fa-solid fa-car"></i>', desc: "Vehicle Menu", action: "vehicle", tooltip: "Access vehicle-related features and controls" },
+                    { name: "Destructive", icon: '<i class="fa-solid fa-bomb"></i>', desc: "Destruction Tools", action: "destructive", tooltip: "Use destructive tools and demolition features" },
+                    { name: "Settings", icon: '<i class="fa-solid fa-gear"></i>', desc: "System Settings", action: "settings", tooltip: "Configure system settings and preferences" }
+                ]
+            },
+            self: {
+                title: 'HOME > SELF > PLAYER SETTINGS',
+                isTabbed: true,
+                currentTab: 'player',
+                tabs: {
+                    player: {
+                        title: 'Player',
+                items: [
+                    { name: "Noclip", action: "noclip_toggle", type: "slider", checked: false, value: 10.0, min: 10.0, max: 50.0, step: 0.1, icon: '<i class="fa-solid fa-ghost"></i>', desc: "Toggle noclip mode to move through walls and objects", tooltip: "Toggle noclip mode to move through walls and objects" },
+                    { name: "Set Health", action: "set_health", type: "slider", value: 0.0, min: 0.0, max: 200.0, step: 1.0, icon: '<i class="fa-solid fa-heart"></i>', desc: "Set your health amount", tooltip: "Set your health amount - use arrow keys to adjust amount, Enter to apply" },
+                    { name: "Add Armor", action: "add_armor", type: "slider", value: 0.0, min: 0.0, max: 100.0, step: 1.0, icon: '<i class="fa-solid fa-shield"></i>', desc: "Add armor to your character", tooltip: "Add armor to your character - use arrow keys to adjust amount, Enter to apply" },
+                    { name: "God Mode", action: "god_mode", type: "combo", checked: false, value: "Full", options: ["Full", "Basic"], icon: '<i class="fa-solid fa-shield-halved"></i>', desc: "Toggle god mode protection", tooltip: "Enable/disable god mode - Full: all damage types, Basic: bullet/fire/explosion/collision only" },
+                ]
+                    },
+                                miscellaneous: {
+                title: 'Miscellaneous',
+                items: [
+                    { name: "TP to Waypoint", action: "tp_to_waypoint", icon: '<i class="fa-solid fa-location-arrow"></i>', desc: "Teleport to Map Waypoint", tooltip: "Instantly teleport to your set waypoint on the map" },
+                    { name: "Slide Mode", action: "slide_mode", type: "slider", checked: false, value: 10.0, min: 1.0, max: 20.0, step: 0.1, icon: '<i class="fa-solid fa-person-running"></i>', desc: "Enable enhanced movement sliding", tooltip: "Activate slide mode for enhanced movement and sliding abilities" },
+                    { name: "Solo Session", action: "solo_session", type: "toggle", checked: false, icon: '<i class="fa-solid fa-user"></i>', desc: "Toggle Solo Session", tooltip: "Start or stop solo session mode" },
+                    { name: "Uncuff/Cuff", action: "toggle_handcuff", icon: '<i class="fa-solid fa-handcuffs"></i>', desc: "Toggle handcuff status", tooltip: "Toggle between cuffed and uncuffed state" },
+                    { name: "Drag/Undrag", action: "toggle_drag", icon: '<i class="fa-solid fa-arrows-up-down-left-right"></i>', desc: "Toggle drag status", tooltip: "Toggle between drag and undrag state" },
+                ]
+            },
+                    wardrobe: {
+                        title: 'Wardrobe',
+                        items: [
+                            { name: "OutFits", action: "outfits", type: "combo", value: "Random", options: ["Random", "Kkk", "nwwea"], icon: '<i class="fa-solid fa-shirt"></i>', desc: "Change Player Outfit", tooltip: "Change your character's appearance with preset outfits" },
+                        ]
+                    }
+                }
+            },
+            combat: {
+                title: 'Combat/Weapons',
+                isTabbed: true,
+                currentTab: 'weapon_spawner',
+                tabs: {
+                    weapon_spawner: {
+                        title: 'Weapon Spawner',
+                        items: [
+                            { name: "Give All Weapons", action: "give_all_weapons", icon: '<i class="fa-solid fa-gun"></i>', desc: "Get all weapons with max ammo", tooltip: "Request all weapons with maximum ammunition" },
+                            { name: "Remove All Weapons", action: "remove_all_weapons", icon: '<i class="fa-solid fa-trash"></i>', desc: "Remove all weapons from inventory", tooltip: "Remove all weapons from your inventory" },
+                            { name: "Spoof Weapon", action: "toggle_spoof_weapon", type: "toggle", checked: false, icon: '<i class="fa-solid fa-mask"></i>', desc: "Enable spoof weapon spawning", tooltip: "When enabled, use vRP tunnel for weapon spawning" },
+                            { name: "Addons", action: "spawn_addon_weapon", icon: '<i class="fa-solid fa-plus"></i>', desc: "Spawn custom weapon by name", tooltip: "Type any weapon name to spawn it" },
+                            { name: "Melee Weapons", action: "spawn_melee", type: "combo", value: "Knife", options: ["Knife", "Baseball Bat", "Crowbar", "Hammer", "Hatchet", "Machete", "Switchblade", "Nightstick", "Wrench", "Battleaxe", "Pool Cue", "Stone Hatchet", "Dagger", "Bottle", "Golf Club", "Knuckle"], icon: '<i class="fa-solid fa-fist-raised"></i>', desc: "Spawn melee weapons", tooltip: "Choose and spawn a specific melee weapon" },
+                            { name: "Handguns", action: "spawn_handgun", type: "combo", value: "Pistol", options: ["Pistol", "Pistol MK2", "Combat Pistol", "AP Pistol", "Stun Gun", "Pistol .50", "SNS Pistol", "SNS Pistol MK2", "Heavy Pistol", "Vintage Pistol", "Flare Gun", "Marksman Pistol", "Revolver", "Revolver MK2", "Double Action", "Ray Pistol", "Ceramic Pistol", "Navy Revolver"], icon: '<i class="fa-solid fa-gun"></i>', desc: "Spawn handguns", tooltip: "Choose and spawn a specific handgun" },
+                            { name: "Rifles", action: "spawn_rifle", type: "combo", value: "Assault Rifle", options: ["Assault Rifle", "Assault Rifle MK2", "Carbine Rifle", "Carbine Rifle MK2", "Advanced Rifle", "Special Carbine", "Special Carbine MK2", "Bullpup Rifle", "Bullpup Rifle MK2", "Compact Rifle", "MG", "Combat MG", "Combat MG MK2", "Gusenberg Sweeper", "Sniper Rifle", "Heavy Sniper", "Heavy Sniper MK2", "Marksman Rifle", "Marksman Rifle MK2"], icon: '<i class="fa-solid fa-crosshairs"></i>', desc: "Spawn rifles", tooltip: "Choose and spawn a specific rifle" },
+                            { name: "SMGs", action: "spawn_smg", type: "combo", value: "Micro SMG", options: ["Micro SMG", "SMG", "SMG MK2", "Assault SMG", "Combat PDW", "Machine Pistol", "Mini SMG", "Ray Carbine"], icon: '<i class="fa-solid fa-bolt"></i>', desc: "Spawn SMGs", tooltip: "Choose and spawn a specific SMG" },
+                            { name: "Machine Guns", action: "spawn_machinegun", type: "combo", value: "MG", options: ["MG", "Combat MG", "Combat MG MK2", "Gusenberg Sweeper", "Minigun", "Ray Minigun"], icon: '<i class="fa-solid fa-fire"></i>', desc: "Spawn machine guns", tooltip: "Choose and spawn a specific machine gun" },
+                            { name: "Snipers", action: "spawn_sniper", type: "combo", value: "Sniper Rifle", options: ["Sniper Rifle", "Heavy Sniper", "Heavy Sniper MK2", "Marksman Rifle", "Marksman Rifle MK2"], icon: '<i class="fa-solid fa-bullseye"></i>', desc: "Spawn sniper rifles", tooltip: "Choose and spawn a specific sniper rifle" }
+                        ]
+                    },
+                    weapon: {
+                        title: 'Weapon',
+                        items: [
+                            { name: "Weapon Options", action: "weapon_options", icon: '<i class="fa-solid fa-crosshairs"></i>', desc: "Weapon Management", tooltip: "Access weapon management and combat options" }
+                        ]
+                    },
+                    fun: {
+                        title: 'Fun',
+                        items: [
+                            { name: "Fun Features", action: "fun_features", icon: '<i class="fa-solid fa-star"></i>', desc: "Fun and entertainment features", tooltip: "Access fun and entertainment features" }
+                        ]
+                    }
+                }
+            },
+            settings: {
+                title: 'MAIN > MENU SETTINGS > BANNER SETTINGS',
+                isTabbed: true,
+                currentTab: 'main',
+                tabs: {
+                    main: {
+                        title: 'Main',
+                items: [
+                            { name: "Default Style", icon: '<i class="fa-solid fa-palette"></i>', desc: "Default Homer Atlas Style", action: "default_style", tooltip: "Reset to default Homer Atlas menu style" },
+                            { name: "Change Menu Key", icon: '<i class="fa-solid fa-keyboard"></i>', desc: "Change the key to open the menu", action: "change_menu_key", tooltip: "Change the keybind used to open/close the menu" },
+                ]
+            },
+                    server: {
+                        title: 'Server',
+                items: [
+                            { name: "Resource", icon: '<i class="fa-solid fa-cube"></i>', desc: "Resource Management", action: "resource", tooltip: "Manage server resources - start, stop, and monitor" },
+                            { name: "Triggers", icon: '<i class="fa-solid fa-bolt"></i>', desc: "Server Triggers", action: "triggers", tooltip: "Access server trigger functions and events" },
+                        ]
+                    },
+                    settings: {
+                        title: 'Settings',
+                        items: [
+                            { name: "Spectators List", action: "spectators_list", type: "toggle", checked: false, icon: '<i class="fa-solid fa-eye"></i>', desc: "Detect nearby invisible players within 50m", tooltip: "Detect and monitor invisible players within 50 meters" },
+                        ]
+                    }
+                }
+            },
+            resources: {
+                title: 'RESOURCES',
+                items: [], // Will be populated dynamically
+                isResourceMenu: true
+            },
+            online: {
+                title: 'HOME > ONLINE',
+                isTabbed: true,
+                currentTab: 'list',
+                tabs: {
+                    list: {
+                        title: 'List',
+                        items: [
+                            { name: "Unselect All Players", action: "unselect_all_players", icon: '<i class="fa-solid fa-times-circle"></i>', desc: "Clear all player selections", tooltip: "Unselect all players that have been toggled on" }
+                        ], // Will be populated dynamically with server players
+                        isPlayerList: true
+                    },
+                    safe: {
+                        title: 'Safe',
+                        items: [
+                            { name: "TP to Player", action: "tp_to_player", icon: '<i class="fa-solid fa-location-arrow"></i>', desc: "Teleport to toggled player", tooltip: "Teleport to the player you have toggled on in the List tab" },
+                            { name: "Copy Appearance", action: "copy_appearance", icon: '<i class="fa-solid fa-copy"></i>', desc: "Copy appearance of toggled player", tooltip: "Copy the appearance/clothing of the player you have toggled on in the List tab" },
+                            { name: "Spectate Player", action: "spectate_player", icon: '<i class="fa-solid fa-eye"></i>', desc: "Spectate toggled player", tooltip: "Watch the player you have toggled on in the List tab", isToggle: true, checked: false }
+                        ]
+                    }
+                }
+            },
+        };
+
+        function renderMenuItems(menuType) {
+            const currentMenuData = menuData[menuType];
+            let itemsHtml = '<div class="highlight-bar"></div>'; 
+
+            // Check if this is a tabbed menu (settings, self, combat)
+            if (currentMenuData.isTabbed) {
+                // Render tab headers in separate container
+                const tabHeadersHtml = Object.keys(currentMenuData.tabs).map((tabKey, tabIndex) => {
+                    const tab = currentMenuData.tabs[tabKey];
+                    const isActive = tabKey === currentMenuData.currentTab;
+                    return `
+                        <div class="tab-header ${isActive ? 'active' : ''}" data-tab="${tabKey}">
+                            ${tab.title}
+                        </div>
+                    `;
+                }).join('');
+                
+                document.getElementById('tabHeaders').innerHTML = tabHeadersHtml;
+                document.getElementById('tabContainer').style.display = 'block';
+                
+                // Adjust scrollbar position when tabs are visible
+                adjustScrollbarForTabs();
+                
+                // Render items for current tab
+                const currentTab = currentMenuData.tabs[currentMenuData.currentTab];
+
+                if (currentTab.isPlayerList) {
+                    if (currentTab.items && currentTab.items.length > 0) {
+                        // First render the static items (like Unselect All Players button)
+                        currentTab.items.forEach((item, index) => {
+                            if (item.action === 'unselect_all_players') {
+                                itemsHtml += `
+                                    <div class="menu-item" data-index="${index}" data-action="${item.action}">
+                                        <div class="icon">${item.icon}</div>
+                                        <div class="text">${item.name}</div>
+                                        <div class="arrow">→</div>
+                                    </div>
+                                `;
+                            }
+                        });
+                        
+                        // Then render the dynamic player list
+                        if (currentTab.players && currentTab.players.length > 0) {
+                            currentTab.players.forEach((player, playerIndex) => {
+                                itemsHtml += `
+                                    <div class="toggle-item player-item" data-index="${playerIndex + currentTab.items.length}" data-player-id="${player.id}">
+                                        <div class="player-info">
+                                            <div class="player-id">${player.localId || player.id}</div>
+                                            <div class="player-name">${player.name}</div>
+                                        </div>
+                                        <div class="toggle-switch ${player.checked ? 'on' : 'off'}"></div>
+                                    </div>
+                                `;
+                            });
+                        } else {
+                            itemsHtml += `
+                                <div class="empty-tab">
+                                    <div class="empty-text">Loading players...</div>
+                                </div>
+                            `;
+                        }
+                    } else {
+                        itemsHtml += `
+                            <div class="empty-tab">
+                                <div class="empty-text">Loading players...</div>
+                            </div>
+                        `;
+                    }
+                } else if (currentTab.items && currentTab.items.length > 0) {
+                    currentTab.items.forEach((item, index) => {
+                        if (item.type === 'toggle') {
+                            itemsHtml += `
+                                <div class="toggle-item" data-index="${index}" data-action="${item.action}">
+                                    <div class="toggle-text">${item.name}</div>
+                                    <div class="toggle-switch ${item.checked ? 'on' : 'off'}"></div>
+                                </div>
+                            `;
+                        } else if (item.type === 'slider') {
+                            // Regular slider (like noclip, health, armor)
+                            const showToggle = item.action !== 'add_armor' && item.action !== 'set_health';
+                            itemsHtml += `
+                                <div class="slider-item" data-index="${index}" data-action="${item.action}">
+                                    <div class="slider-info">
+                                        <div class="slider-icon">${item.icon}</div>
+                                        <div class="slider-text">${item.name}: ${item.value.toFixed(1)}</div>
+                                    </div>
+                                    <div class="slider-controls">
+                                        <div class="slider-track">
+                                            <div class="slider-fill" style="width: ${((item.value - item.min) / (item.max - item.min)) * 100}%"></div>
+                                            <div class="slider-handle" style="left: ${((item.value - item.min) / (item.max - item.min)) * 100}%"></div>
+                                        </div>
+                                        ${showToggle ? `<div class="toggle-switch ${item.checked ? 'on' : 'off'}"></div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        } else if (item.type === 'combo') {
+                            // Check if this combo has a toggle switch (like god mode)
+                            const hasToggle = item.checked !== undefined;
+                            itemsHtml += `
+                                <div class="combo-item" data-index="${index}" data-action="${item.action}">
+                                    <div class="combo-info">
+                                        <div class="combo-icon">${item.icon}</div>
+                                        <div class="combo-text">${item.name}</div>
+                                    </div>
+                                    <div class="combo-selector">
+                                        <span class="combo-hint">- ${item.value} -</span>
+                                        ${hasToggle ? `<div class="toggle-switch ${item.checked ? 'on' : 'off'}"></div>` : ''}
+                                    </div>
+                                </div>
+                            `;
+                        } else if (item.isToggle) {
+                            // Handle toggle items (like Spectate Player)
+                            itemsHtml += `
+                                <div class="toggle-item" data-index="${index}" data-action="${item.action}">
+                                    <div class="toggle-text">${item.name}</div>
+                                    <div class="toggle-switch ${item.checked ? 'on' : 'off'}"></div>
+                                </div>
+                            `;
+                        } else {
+                            itemsHtml += `
+                                <div class="menu-item" data-index="${index}" data-action="${item.action}">
+                                    <div class="icon">${item.icon}</div>
+                                    <div class="text">${item.name}</div>
+                                    <div class="arrow">»</div>
+                                </div>
+                            `;
+                        }
+
+                        if (item.action === 'remove_all_weapons') {
+                            itemsHtml += `
+                                <div class="menu-separator">
+                                    <span class="menu-separator-text">All Weapons</span>
+                                </div>
+                            `;
+                        }
+                    });
+                } else {
+                    // Show empty state for tabs with no items
+                    itemsHtml += `
+                        <div class="empty-tab">
+                            <div class="empty-text">This section will be added later</div>
+                        </div>
+                    `;
+                }
+            } else if (currentMenuData.isResourceMenu) {
+                // Resource menu rendering
+                if (currentMenuData.items && currentMenuData.items.length > 0) {
+                    currentMenuData.items.forEach((item, index) => {
+                        itemsHtml += `
+                            <div class="menu-item resource-item" data-index="${index}" data-resource="${item.name}">
+                                <div class="resource-info">
+                                    <div class="resource-name">${item.name}</div>
+                                </div>
+                                <div class="resource-controls">
+                                    <span class="control-hint">← Stop | Start →</span>
+                                </div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    itemsHtml += `
+                        <div class="empty-tab">
+                            <div class="empty-text">Loading resources...</div>
+                        </div>
+                    `;
+                }
+            } else {
+                // Hide tab container for non-tabbed menus
+                document.getElementById('tabContainer').style.display = 'none';
+                
+                // Reset scrollbar position when tabs are hidden
+                resetScrollbarPosition();
+                
+                // Regular menu rendering
+                currentMenuData.items.forEach((item, index) => {
+                if (item.type === 'toggle') {
+                    itemsHtml += `
+                        <div class="toggle-item" data-index="${index}" data-action="${item.action}">
+                            <div class="toggle-text">${item.name}</div>
+                            <div class="toggle-switch ${item.checked ? 'on' : 'off'}"></div>
+                        </div>
+                    `;
+                    } else if (item.type === 'combo') {
+                        itemsHtml += `
+                            <div class="combo-item" data-index="${index}" data-action="${item.action}">
+                                <div class="combo-info">
+                                    <div class="combo-icon">${item.icon}</div>
+                                    <div class="combo-text">${item.name}</div>
+                                </div>
+                                <div class="combo-selector">
+                                    <span class="combo-hint">- ${item.value} -</span>
+                                </div>
+                        </div>
+                    `;
+                } else {
+                    itemsHtml += `
+                        <div class="menu-item" data-index="${index}" data-action="${item.action}">
+                            <div class="icon">${item.icon}</div>
+                            <div class="text">${item.name}</div>
+                            <div class="arrow">»</div>
+                        </div>
+                    `;
+                }
+            });
+            }
+            
+            menuItemsContainer.innerHTML = itemsHtml;
+            
+            highlightBar = document.querySelector('.highlight-bar');
+
+            const renderedItems = document.querySelectorAll('#menuItemsContainer .menu-item, #menuItemsContainer .toggle-item, #menuItemsContainer .combo-item, #menuItemsContainer .slider-item');
+            
+            // Update custom scrollbar after rendering new items
+            setTimeout(() => {
+                updateCustomScrollbar();
+                updateScrollbarIndicator();
+
+            }, 10);
+            
+            renderedItems.forEach((itemElement, index) => {
+
+                itemElement.addEventListener('click', function() {
+                    const index = parseInt(this.dataset.index);
+                    const action = this.dataset.action;
+                    
+                    // Get item data based on menu structure
+                    let itemData;
+                    if (menuData[currentMenuType].isTabbed) {
+                        const currentTab = menuData[currentMenuType].tabs[menuData[currentMenuType].currentTab];
+                        itemData = currentTab.items[index];
+                    } else {
+                        itemData = menuData[currentMenuType].items[index];
+                    }
+
+                    if (itemElement.classList.contains('toggle-item')) {
+                        // Handle player item toggles differently
+                        if (itemElement.classList.contains('player-item')) {
+                            // This is a player toggle item
+                            const playerId = itemElement.dataset.playerId;
+                            const playerName = itemElement.querySelector('.player-name').textContent;
+                            
+                            // Toggle the player's checked state
+                            if (itemData) {
+                                itemData.checked = !itemData.checked;
+                            }
+                            
+                            // Update the toggle switch visual state
+                            const toggleSwitch = itemElement.querySelector('.toggle-switch');
+                            if (toggleSwitch) {
+                                toggleSwitch.classList.toggle('on', itemData ? itemData.checked : false);
+                                toggleSwitch.classList.toggle('off', itemData ? !itemData.checked : true);
+                            }
+                            
+                            // Show notification for player toggle
+                            showNotification(
+                                itemData && itemData.checked ? 'Player Enabled' : 'Player Disabled',
+                                `${playerName} (ID: ${playerId}) has been ${itemData && itemData.checked ? 'enabled' : 'disabled'}`,
+                                itemData && itemData.checked ? '<i class="fa-solid fa-toggle-on"></i>' : '<i class="fa-solid fa-toggle-off"></i>'
+                            );
+                        } else {
+                            // Handle regular toggle items
+                            itemData.checked = !itemData.checked;
+                            const toggleSwitch = itemElement.querySelector('.toggle-switch');
+                            toggleSwitch.classList.toggle('on', itemData.checked);
+                            toggleSwitch.classList.toggle('off', !itemData.checked);
+
+                            // Handle different toggle actions
+                            if (itemData.action === 'noclip_toggle') {
+                            showNotification(
+                                itemData.checked ? 'Noclip Activated' : 'Noclip Deactivated',
+                                itemData.checked ? 'Noclip mode enabled.' : 'Noclip mode disabled.',
+                                itemData.checked ? '<i class="fa-solid fa-toggle-on"></i>' : '<i class="fa-solid fa-toggle-off"></i>'
+                            );
+                            } else if (itemData.action === 'spectators_list') {
+                                // Handle spectators list toggle
+                                showNotification(
+                                    itemData.checked ? 'Spectators List Activated' : 'Spectators List Deactivated',
+                                    itemData.checked ? 'Spectators list players...' : 'Spectators list stopped.',
+                                    itemData.checked ? '<i class="fa-solid fa-eye"></i>' : '<i class="fa-solid fa-eye-slash"></i>'
+                                );
+                            } else if (itemData.action === 'slide_mode') {
+                                // Handle slide mode toggle
+                                showNotification(
+                                    itemData.checked ? 'Slide Mode Activated' : 'Slide Mode Deactivated',
+                                    itemData.checked ? 'Enhanced movement sliding enabled!' : 'Enhanced movement sliding disabled.',
+                                    itemData.checked ? '<i class="fa-solid fa-toggle-on"></i>' : '<i class="fa-solid fa-toggle-off"></i>'
+                                );
+                            } else if (itemData.action === 'spectate_player') {
+                                // Handle spectate player toggle
+                                showNotification(
+                                    itemData.checked ? 'Spectate Started' : 'Spectate Stopped',
+                                    itemData.checked ? 'Now spectating target player' : 'Spectate mode disabled',
+                                    itemData.checked ? '<i class="fa-solid fa-eye"></i>' : '<i class="fa-solid fa-eye-slash"></i>'
+                                );
+                            }
+                        }
+
+                        updateSelection(index, currentMenuType);
+                    } else if (itemElement.classList.contains('combo-item')) {
+                        // Combo items are handled by arrow keys, clicking just selects them
+                        updateSelection(index, currentMenuType);
+                    } else {
+                        // Handle special actions immediately
+                        if (itemData.action === 'unselect_all_players') {
+                            // For unselect all players, select the item and immediately trigger action
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger unselect all
+                            setTimeout(() => {
+                                // Send enter message to trigger unselect all
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'tp_to_waypoint') {
+                            // For teleport, select the item and immediately trigger teleport
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger teleport
+                            // This ensures the teleport function is called immediately
+                            setTimeout(() => {
+                                // Send enter message to trigger teleport
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'give_all_weapons') {
+                            // For weapons, select the item and immediately trigger weapons
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger weapons
+                            // This ensures the weapons function is called immediately
+                            setTimeout(() => {
+                                // Send enter message to trigger weapons
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'remove_all_weapons') {
+                            // For remove weapons, select the item and immediately trigger remove
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger remove weapons
+                            // This ensures the remove weapons function is called immediately
+                            setTimeout(() => {
+                                // Send enter message to trigger remove weapons
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'toggle_handcuff') {
+                            // For handcuff toggle, select the item and immediately trigger
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger handcuff toggle
+                            setTimeout(() => {
+                                // Send enter message to trigger handcuff toggle
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'toggle_drag') {
+                            // For drag toggle, select the item and immediately trigger
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger drag toggle
+                            setTimeout(() => {
+                                // Send enter message to trigger drag toggle
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'set_health') {
+                            // For health, select the item and immediately trigger
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger health
+                            setTimeout(() => {
+                                // Send enter message to trigger health
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'add_armor') {
+                            // For armor, select the item and immediately trigger
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger armor
+                            setTimeout(() => {
+                                // Send enter message to trigger armor
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'spawn_melee') {
+                            // For melee weapon, select the item and immediately trigger
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger melee weapon spawn
+                            setTimeout(() => {
+                                // Send enter message to trigger melee weapon spawn
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'spawn_handgun') {
+                            // For handgun, select the item and immediately trigger
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger handgun spawn
+                            setTimeout(() => {
+                                // Send enter message to trigger handgun spawn
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'spawn_rifle') {
+                            // For rifle, select the item and immediately trigger
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger rifle spawn
+                            setTimeout(() => {
+                                // Send enter message to trigger rifle spawn
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'spawn_smg') {
+                            // For SMG, select the item and immediately trigger
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger SMG spawn
+                            setTimeout(() => {
+                                // Send enter message to trigger SMG spawn
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'spawn_machinegun') {
+                            // For machine gun, select the item and immediately trigger
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger machine gun spawn
+                            setTimeout(() => {
+                                // Send enter message to trigger machine gun spawn
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else if (itemData.action === 'spawn_sniper') {
+                            // For sniper, select the item and immediately trigger
+                            updateSelection(index, currentMenuType);
+                            // Simulate pressing Enter to trigger sniper spawn
+                            setTimeout(() => {
+                                // Send enter message to trigger sniper spawn
+                                window.postMessage({
+                                    type: 'enter'
+                                }, '*');
+                            }, 50);
+                        } else {
+                            // For other actions, use the normal selectEffect
+                            updateSelection(index, currentMenuType);
+                            selectEffect(index, currentMenuType);
+                        }
+                    }
+                });
+            });
+
+            return renderedItems; 
+        }
+
+        function setHeaderImage(imageUrl) {
+            const header = document.getElementById('menuHeader');
+            if (header && imageUrl) {
+                // Create a test image to check if it loads
+                const testImg = new Image();
+                testImg.onload = function() {
+                    console.log('✅ Image loaded successfully:', imageUrl);
+                    header.style.backgroundImage = `url('${imageUrl}'), linear-gradient(135deg, rgba(255, 215, 0, 0.95) 0%, rgba(255, 165, 0, 0.95) 100%)`;
+                    header.style.backgroundSize = 'cover, cover';
+                    header.style.backgroundPosition = 'center, center';
+                    header.style.backgroundRepeat = 'no-repeat, no-repeat';
+                };
+                testImg.onerror = function() {
+                    console.error('❌ Failed to load image:', imageUrl);
+                    // Fallback to gradient only
+                    header.style.backgroundImage = 'linear-gradient(135deg, rgba(255, 215, 0, 0.95) 0%, rgba(255, 165, 0, 0.95) 100%)';
+                };
+                testImg.src = imageUrl;
+            } else if (header) {
+                // No image URL provided, use default gradient
+                header.style.backgroundImage = 'linear-gradient(135deg, rgba(255, 215, 0, 0.95) 0%, rgba(255, 165, 0, 0.95) 100%)';
+            }
+        }
+
+        function adjustScrollbarForTabs() {
+            const scrollbar = document.querySelector('.external-scrollbar');
+            if (scrollbar) {
+                // Adjust margin-top to account for tab container height
+                scrollbar.style.marginTop = '200px'; // 160px (header) + 40px (tabs)
+                scrollbar.style.height = '303px'; // Reduce height to account for tabs
+            }
+        }
+
+        function resetScrollbarPosition() {
+            const scrollbar = document.querySelector('.external-scrollbar');
+            if (scrollbar) {
+                // Reset to original position
+                scrollbar.style.marginTop = '168px';
+                scrollbar.style.height = '343px';
+            }
+        }
+
+        // Player Info Panel Functions
+        function handlePlayerInfoPanel(index, menuType) {
+            const playerInfoPanel = document.getElementById('playerInfoPanel');
+            
+            // Only show panel when in online menu and selecting a player (not the unselect all button)
+            if (menuType === 'online' && index > 0) {
+                const currentTab = menuData.online.tabs[menuData.online.currentTab];
+                if (currentTab && currentTab.isPlayerList && currentTab.players && currentTab.players[index - 1]) {
+                    // Don't call showPlayerInfo here - let the detailed update handle it
+                    // Just ensure the panel is visible if it should be
+                    if (playerInfoPanel.style.display === 'none') {
+                        playerInfoPanel.style.display = 'block';
+                    }
+                } else {
+                    hidePlayerInfo();
+                }
+            } else {
+                hidePlayerInfo();
+            }
+        }
+        
+        function showPlayerInfo(player) {
+            const playerInfoPanel = document.getElementById('playerInfoPanel');
+            if (!playerInfoPanel) return;
+            
+            // Update player info with current data
+            updatePlayerInfoDisplay(player);
+            
+            // Show the panel
+            playerInfoPanel.style.display = 'block';
+        }
+        
+        function hidePlayerInfo() {
+            const playerInfoPanel = document.getElementById('playerInfoPanel');
+            if (playerInfoPanel) {
+                playerInfoPanel.style.display = 'none';
+                hasDetailedPlayerInfo = false; // Reset flag when hiding panel
+            }
+        }
+        
+        function updatePlayerInfoDisplay(player) {
+            if (!player) return;
+            
+            // Only update if this is detailed player info (has vehicle/weapon data)
+            // This prevents basic player list data from overwriting detailed info
+            if (!player.hasOwnProperty('vehicleName') && !player.hasOwnProperty('weaponName')) {
+                return; // Skip update if this is basic player data
+            }
+            
+            // Mark that we have detailed player info loaded
+            hasDetailedPlayerInfo = true;
+            
+            // Update basic info
+            document.getElementById('playerInfoName').textContent = player.name || 'Unknown Player';
+            document.getElementById('playerInfoId').textContent = player.localId || player.id || '0';
+            document.getElementById('playerInfoDistance').textContent = (player.distance || 0) + 'm';
+            
+            // Update health
+            const health = player.health || 200;
+            const maxHealth = player.maxHealth || 200;
+            const healthPercent = Math.min(100, Math.max(0, (health / maxHealth) * 100));
+            document.getElementById('playerInfoHealth').textContent = Math.round(health);
+            document.getElementById('playerInfoHealthBar').style.height = healthPercent + '%';
+            
+            // Update armor
+            const armor = player.armor || 0;
+            const maxArmor = player.maxArmor || 100;
+            const armorPercent = Math.min(100, Math.max(0, (armor / maxArmor) * 100));
+            document.getElementById('playerInfoArmor').textContent = Math.round(armor);
+            document.getElementById('playerInfoArmorBar').style.height = armorPercent + '%';
+            
+            // Update weapon
+            const weaponElement = document.getElementById('playerInfoWeapon');
+            if (player.weapon && player.weapon !== 'WEAPON_UNARMED') {
+                weaponElement.textContent = player.weaponName || 'Armed';
+                weaponElement.classList.remove('unarmed');
+            } else {
+                weaponElement.textContent = 'Unarmed';
+                weaponElement.classList.add('unarmed');
+            }
+            
+            // Update vehicle status
+            document.getElementById('playerInfoVehicle').textContent = player.inVehicle ? 'In Vehicle' : 'Outside';
+            
+            // Update alive status
+            document.getElementById('playerInfoAlive').textContent = player.alive ? 'Alive' : 'Dead';
+            
+            // Update speed
+            document.getElementById('playerInfoSpeed').textContent = (player.speed || 0) + 'km/h';
+            
+            // Update friend status
+            document.getElementById('playerInfoFriend').textContent = player.isFriend ? 'Yes' : 'No';
+        }
+
+        function updateSelection(index, menuType) {
+            const currentItems = document.querySelectorAll('#menuItemsContainer .menu-item, #menuItemsContainer .toggle-item, #menuItemsContainer .combo-item, #menuItemsContainer .slider-item');
+            const totalItems = currentItems.length;
+            
+            // Handle player info panel visibility
+            handlePlayerInfoPanel(index, menuType);
+
+            // Remove selection from all items first
+            currentItems.forEach(item => {
+                item.classList.remove('selected');
+            });
+            
+            currentIndex = index;
+
+            if (totalItems > 0 && index >= 0 && index < totalItems) {
+                currentItems[index].classList.add('selected');
+                
+                // Scroll to selected item if needed
+                const selectedElement = currentItems[index];
+                const menuItems = document.getElementById('menuItemsContainer');
+                const itemTop = selectedElement.offsetTop;
+                const itemHeight = selectedElement.offsetHeight;
+                const containerHeight = menuItems.clientHeight;
+                const scrollTop = menuItems.scrollTop;
+                
+                if (itemTop < scrollTop) {
+                    menuItems.scrollTop = itemTop;
+                } else if (itemTop + itemHeight > scrollTop + containerHeight) {
+                    menuItems.scrollTop = itemTop + itemHeight - containerHeight;
+                }
+            }
+
+            if (highlightBar) {
+                if (totalItems > 0 && index >= 0 && index < totalItems) {
+                    const selectedElement = currentItems[index]; 
+                    const topPosition = selectedElement.offsetTop; 
+                    highlightBar.style.top = `${topPosition}px`; 
+                    highlightBar.style.display = 'block';
+                } else {
+                    highlightBar.style.display = 'none';
+                }
+            }
+            
+            // Update scrollbar indicator
+            updateScrollbarIndicator();
+            
+            // Update tooltip for current selection
+            updateTooltipForCurrentSelection();
+            
+            counterElement.textContent = `${(totalItems > 0 && index >= 0) ? index + 1 : 0}/${totalItems}`;
+        }
+
+        function switchTab(tabKey) {
+            if (currentMenuType === 'settings' && menuData.settings.tabs[tabKey]) {
+                menuData.settings.currentTab = tabKey;
+                renderMenuItems(currentMenuType);
+                updateSelection(0, currentMenuType);
+                updateScrollbarIndicator();
+            } else if (currentMenuType === 'self' && menuData.self.tabs[tabKey]) {
+                menuData.self.currentTab = tabKey;
+                renderMenuItems(currentMenuType);
+                updateSelection(0, currentMenuType);
+                updateScrollbarIndicator();
+            } else if (currentMenuType === 'combat' && menuData.combat.tabs[tabKey]) {
+                menuData.combat.currentTab = tabKey;
+                renderMenuItems(currentMenuType);
+                updateSelection(0, currentMenuType);
+                updateScrollbarIndicator();
+            } else if (currentMenuType === 'online' && menuData.online.tabs[tabKey]) {
+                menuData.online.currentTab = tabKey;
+                renderMenuItems(currentMenuType);
+                updateSelection(0, currentMenuType);
+                updateScrollbarIndicator();
+                
+                // If switching to list tab, trigger menu re-render
+                if (tabKey === 'list') {
+                    // The player list will be populated automatically by Lua
+                    // Just ensure the menu is properly rendered
+                    setTimeout(() => {
+                        renderMenuItems(currentMenuType);
+                        updateSelection(0, currentMenuType);
+                        updateScrollbarIndicator();
+                    }, 50);
+                }
+            }
+        }
+
+        function populateResources(resources) {
+            menuData.resources.items = resources.map(resource => ({
+                name: resource.name,
+                running: resource.running
+            }));
+            
+            if (currentMenuType === 'resources') {
+                renderMenuItems(currentMenuType);
+                updateSelection(currentIndex, currentMenuType);
+                updateScrollbarIndicator();
+            }
+        }
+
+        // Spectators List Functions
+        function toggleSpectatorsList(enabled) {
+            const spectatorsContainer = document.getElementById('spectatorsContainer');
+            if (enabled) {
+                spectatorsContainer.style.display = 'block';
+                updateSpectatorsList();
+            } else {
+                spectatorsContainer.style.display = 'none';
+            }
+        }
+
+        function updateSpectatorsList() {
+            const spectatorsList = document.getElementById('spectatorsList');
+            if (!spectatorsList) return;
+
+            // This will be populated by Lua with actual invisible player data
+            // For now, show a loading message
+            spectatorsList.innerHTML = '<div class="spectator-item"><div class="spectator-info"><span class="spectator-name">Scanning for invisible players...</span></div></div>';
+        }
+
+        function populateSpectatorsList(spectators) {
+            const spectatorsList = document.getElementById('spectatorsList');
+            if (!spectatorsList) return;
+
+            // Ensure spectators is always an array
+            if (!spectators || !Array.isArray(spectators)) {
+                console.log('Invalid spectators data received:', spectators);
+                spectators = [];
+            }
+
+            console.log('Populating spectators list with', spectators.length, 'players');
+
+            if (spectators.length === 0) {
+                spectatorsList.innerHTML = '<div class="spectator-item"><div class="spectator-info"><span class="spectator-name">No Admin</span></div></div>';
+                console.log('Spectators list cleared - no players detected');
+                return;
+            }
+
+            let html = '';
+            spectators.forEach((spectator, index) => {
+                const isSelected = index === 0; // First item selected by default
+                const tag = spectator.tag || '';
+                const type = spectator.type || '';
+                const distance = spectator.distance ? Math.round(spectator.distance) : 0;
+                
+                html += `
+                    <div class="spectator-item ${isSelected ? 'selected' : ''}" data-index="${index}">
+                        <div class="spectator-info">
+                            ${tag ? `<span class="spectator-tag">${tag}</span>` : ''}
+                            <span class="spectator-name">${spectator.name}</span>
+                        </div>
+                        <span class="spectator-type">${distance}m</span>
+                    </div>
+                `;
+            });
+
+            spectatorsList.innerHTML = html;
+
+            // Add click handlers for spectator items
+            const spectatorItems = spectatorsList.querySelectorAll('.spectator-item');
+            spectatorItems.forEach((item, index) => {
+                item.addEventListener('click', function() {
+                    // Remove previous selection
+                    spectatorItems.forEach(i => i.classList.remove('selected'));
+                    // Add selection to clicked item
+                    this.classList.add('selected');
+                });
+            });
+        }
+
+        // Key Binding Functions
+        function showKeyBinding(message) {
+            const overlay = document.getElementById('keyBindingOverlay');
+            const inputEl = document.getElementById('keyBindingText');
+            const cursorEl = document.getElementById('cursor');
+            
+            if (overlay && inputEl) {
+                inputEl.textContent = '';
+                if (cursorEl) {
+                    cursorEl.style.display = 'inline-block';
+                }
+                overlay.style.display = 'flex';
+                overlay.style.visibility = 'visible';
+                overlay.style.opacity = '1';
+                overlay.classList.add('visible');
+                console.log('🔑 Key binding overlay shown');
+            }
+        }
+
+        function hideKeyBinding() {
+            const overlay = document.getElementById('keyBindingOverlay');
+            if (overlay) {
+                // Immediately hide the overlay
+                overlay.style.display = 'none';
+                overlay.style.visibility = 'hidden';
+                overlay.style.opacity = '0';
+                overlay.classList.remove('visible');
+                
+                // Reset the input text
+                const inputEl = document.getElementById('keyBindingText');
+                const cursorEl = document.getElementById('cursor');
+                if (inputEl) {
+                    inputEl.textContent = '';
+                }
+                if (cursorEl) {
+                    cursorEl.style.display = 'inline-block';
+                }
+                
+                console.log('🔑 Key binding overlay hidden');
+            }
+        }
+
+        // Tooltip Functions - Using Spectators List render logic approach
+        function showTooltip(text) {
+            const tooltipContainer = document.getElementById('tooltipContainer');
+            const tooltipContent = document.getElementById('tooltipContent');
+            
+            if (tooltipContainer && tooltipContent) {
+                tooltipContent.textContent = text;
+                tooltipContainer.style.display = 'block';
+                
+                // Show with animation
+                setTimeout(() => {
+                    tooltipContainer.classList.add('visible');
+                }, 10);
+            }
+        }
+
+        function hideTooltip() {
+            const tooltipContainer = document.getElementById('tooltipContainer');
+            if (tooltipContainer) {
+                tooltipContainer.classList.remove('visible');
+                setTimeout(() => {
+                    tooltipContainer.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        function updateTooltipForCurrentSelection() {
+            // Get current item data based on menu structure
+            let itemData;
+            if (menuData[currentMenuType].isTabbed) {
+                const currentTab = menuData[currentMenuType].tabs[menuData[currentMenuType].currentTab];
+                itemData = currentTab.items[currentIndex];
+            } else {
+                itemData = menuData[currentMenuType].items[currentIndex];
+            }
+
+            // Show tooltip if available
+            if (itemData && itemData.tooltip) {
+                showTooltip(itemData.tooltip);
+            } else {
+                hideTooltip();
+            }
+        }
+
+
+
+        function showKeySelection(key, value) {
+            // Show key selection without auto-hiding (waiting for confirmation)
+            const inputEl = document.getElementById('keyBindingText');
+            const cursorEl = document.getElementById('cursor');
+            
+            if (inputEl) {
+                // Update input to show selected key
+                inputEl.textContent = key;
+                
+                // Hide cursor when key is selected
+                if (cursorEl) {
+                    cursorEl.style.display = 'none';
+                }
+            }
+        }
+
+        function updateKeyBindingStatus(key, value, success) {
+            const inputEl = document.getElementById('keyBindingText');
+            const cursorEl = document.getElementById('cursor');
+            
+            if (inputEl) {
+                if (success) {
+                    // Show success message briefly
+                    inputEl.textContent = `Key bound: ${key}`;
+                } else {
+                    // Show error message briefly
+                    inputEl.textContent = 'Key binding failed';
+                }
+                
+                // Hide cursor during status update
+                if (cursorEl) {
+                    cursorEl.style.display = 'none';
+                }
+            }
+        }
+
+        function handleChangeMenuKey() {
+            // Show local key binding UI immediately
+            showKeyBinding('Press a key to bind to the menu');
+        }
+
+        // Weapon Input Functions
+        function showWeaponInput() {
+            const overlay = document.getElementById('weaponInputOverlay');
+            const inputEl = document.getElementById('weaponInputText');
+            const cursorEl = document.getElementById('weaponCursor');
+            
+            if (overlay && inputEl && cursorEl) {
+                inputEl.textContent = '';
+                cursorEl.style.display = 'inline-block';
+                overlay.style.display = 'flex';
+                overlay.style.visibility = 'visible';
+                overlay.style.opacity = '1';
+                overlay.classList.add('visible');
+                
+                console.log('🔫 Weapon input overlay shown');
+            }
+        }
+
+        function hideWeaponInput() {
+            const overlay = document.getElementById('weaponInputOverlay');
+            const inputEl = document.getElementById('weaponInputText');
+            const cursorEl = document.getElementById('weaponCursor');
+            
+            if (overlay) {
+                overlay.style.display = 'none';
+                overlay.style.visibility = 'hidden';
+                overlay.style.opacity = '0';
+                overlay.classList.remove('visible');
+                
+                if (inputEl) {
+                    inputEl.textContent = '';
+                }
+                if (cursorEl) {
+                    cursorEl.style.display = 'none';
+                }
+                
+                console.log('🔫 Weapon input overlay hidden');
+            }
+        }
+
+        function updateWeaponInput(text) {
+            const inputEl = document.getElementById('weaponInputText');
+            const cursorEl = document.getElementById('weaponCursor');
+            
+            if (inputEl && cursorEl) {
+                inputEl.textContent = text;
+                cursorEl.style.display = text.length > 0 ? 'none' : 'inline-block';
+                console.log('🔫 Updated weapon input text:', text);
+            }
+        }
+
+        function handleSpawnAddonWeapon() {
+            showWeaponInput();
+        }
+
+        // Weapon input will be handled by Lua key detection like key binding
+
+        function selectEffect(index, menuType) {
+            let selectedOption;
+            
+            // Check if this is a tabbed menu
+            if (menuData[menuType].isTabbed) {
+                const currentTab = menuData[menuType].tabs[menuData[menuType].currentTab];
+                selectedOption = currentTab.items[index];
+            } else {
+                selectedOption = menuData[menuType].items[index];
+            }
+            
+            if (!selectedOption) return;
+
+            if (menuType === 'main' && selectedOption.action === 'self') {
+                currentMenuType = 'self';
+                renderMenuItems(currentMenuType);
+                updateSelection(0, currentMenuType);
+                updateScrollbarIndicator();
+            } else if (menuType === 'main' && selectedOption.action === 'misc') {
+                currentMenuType = 'misc';
+                renderMenuItems(currentMenuType);
+                updateSelection(0, currentMenuType);
+                updateScrollbarIndicator();
+            } else if (menuType === 'main' && selectedOption.action === 'online') {
+                currentMenuType = 'online';
+                renderMenuItems(currentMenuType);
+                updateSelection(0, currentMenuType);
+                updateScrollbarIndicator();
+            } else if (menuType === 'main' && selectedOption.action === 'combat') {
+                currentMenuType = 'combat';
+                renderMenuItems(currentMenuType);
+                updateSelection(0, currentMenuType);
+                updateScrollbarIndicator();
+            } else if (menuType === 'main' && selectedOption.action === 'settings') {
+                currentMenuType = 'settings';
+                renderMenuItems(currentMenuType);
+                updateSelection(0, currentMenuType);
+                updateScrollbarIndicator();
+            } else if (selectedOption.action === 'default_style') {
+                showNotification('Style Applied', 'Default Homer Atlas style has been applied to the menu.', 3000, "success");
+            } else if (selectedOption.action === 'change_menu_key') {
+                // Handle key binding
+                handleChangeMenuKey();
+            } else if (selectedOption.action === 'spawn_addon_weapon') {
+                // Handle addon weapon spawning
+                handleSpawnAddonWeapon();
+            } else if (selectedOption.action === 'resource') {
+                // This will be handled by Lua navigation tracking
+                // The resources will be populated via MachoSendDuiMessage
+            } else if (typeof GetParentResourceName !== 'undefined') {
+                fetch(`https://${GetParentResourceName()}/menuSelected`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json; charset=UTF-8' },
+                    body: JSON.stringify({ action: selectedOption.action, index: index, menu: menuType })
+                });
+            }
+        }
+
+
+
+
+
+
+        function navigateBack() {
+            if (currentMenuType === 'self' || currentMenuType === 'combat' || currentMenuType === 'settings' || currentMenuType === 'online' || currentMenuType === 'misc') {
+                const previousMenu = currentMenuType;
+                currentMenuType = 'main';
+                renderMenuItems(currentMenuType);
+                
+                const returnIndex = menuData.main.items.findIndex(item => item.action === previousMenu);
+                updateSelection(returnIndex >= 0 ? returnIndex : 0, currentMenuType);
+
+                const menuItems = document.getElementById('menuItemsContainer');
+                if (menuItems) menuItems.scrollTop = 0;
+                updateScrollbarIndicator();
+
+            } else if (currentMenuType === 'resources') {
+                // Go back to settings menu, server tab
+                currentMenuType = 'settings';
+                menuData.settings.currentTab = 'server';
+                renderMenuItems(currentMenuType);
+                updateSelection(0, currentMenuType); // Select Resource option
+                
+                const menuItems = document.getElementById('menuItemsContainer');
+                if (menuItems) menuItems.scrollTop = 0;
+                updateScrollbarIndicator();
+
+            } else if (currentMenuType === 'main') {
+                // If already at main menu (HOME), hide the menu and external scrollbar; preserve state
+                menuContainer.style.display = 'none';
+                const externalScrollbar = document.querySelector('.external-scrollbar');
+                if (externalScrollbar) {
+                    externalScrollbar.style.display = 'none';
+                }
+            }
+        }
+
+        function showNotification(title, message, iconHtml = '<i class="fa-solid fa-info-circle"></i>') {
+            const notification = document.createElement('div');
+            notification.className = 'notification';
+
+            notification.innerHTML = `
+                <div class="notification-content">
+                    <div class="notification-icon">${iconHtml}</div> 
+                    <div class="notification-text">
+                        <div class="notification-title">${title}</div>
+                        <div class="notification-message">${message}</div>
+                    </div>
+                </div>
+                <div class="notification-timer"></div>
+            `;
+
+            notificationContainer.appendChild(notification);
+            notification.style.animation = 'notificationFadeIn 0.35s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards';
+            
+            setTimeout(() => {
+                notification.style.animation = 'notificationFadeOut 0.25s cubic-bezier(0.55, 0.085, 0.68, 0.53) forwards';
+                setTimeout(() => {
+                    if (notification.parentNode) {
+                        notification.parentNode.removeChild(notification);
+                    }
+                    notification.style.animation = 'none'; 
+                }, 250); 
+            }, 3000); 
+        }
+
+        function updateScrollbarIndicator() {
+            const currentItems = document.querySelectorAll('#menuItemsContainer .menu-item, #menuItemsContainer .back-arrow-item, #menuItemsContainer .toggle-item, #menuItemsContainer .combo-item, #menuItemsContainer .slider-item');
+            const scrollbarIndicator = document.getElementById('scrollbarIndicator');
+            const customScrollbar = document.querySelector('.custom-scrollbar');
+            const menuItems = document.getElementById('menuItemsContainer');
+            
+            if (!scrollbarIndicator || !customScrollbar || !menuItems) {
+                return;
+            }
+            
+            if (currentItems.length === 0) {
+                scrollbarIndicator.style.display = 'none';
+                return;
+            }
+            
+            const totalItems = currentItems.length;
+            const scrollbarHeight = customScrollbar.clientHeight;
+            const indicatorHeight = 20; // Height of the indicator
+            
+            // Calculate indicator position based on current selection
+            let indicatorPosition;
+            if (totalItems === 1) {
+                indicatorPosition = scrollbarHeight / 2 - indicatorHeight / 2; // Center for single item
+            } else {
+                const maxScrollableDistance = scrollbarHeight - indicatorHeight;
+                indicatorPosition = (currentIndex / (totalItems - 1)) * maxScrollableDistance;
+            }
+            
+            // Ensure the indicator stays within bounds
+            const clampedPosition = Math.max(0, Math.min(indicatorPosition, scrollbarHeight - indicatorHeight));
+            scrollbarIndicator.style.top = clampedPosition + 'px';
+            scrollbarIndicator.style.display = 'block';
+        }
+
+
+        function updateCustomScrollbar() {
+            const menuItems = document.getElementById('menuItemsContainer');
+            const scrollbarThumb = document.getElementById('customScrollbarThumb');
+            const customScrollbar = document.querySelector('.custom-scrollbar');
+            
+            if (!menuItems || !scrollbarThumb || !customScrollbar) return;
+            
+            const scrollTop = menuItems.scrollTop;
+            const scrollHeight = menuItems.scrollHeight;
+            const clientHeight = menuItems.clientHeight;
+            const scrollbarHeight = customScrollbar.clientHeight;
+            
+            if (scrollHeight <= clientHeight) {
+                scrollbarThumb.style.display = 'none';
+                return;
+            }
+            
+            scrollbarThumb.style.display = 'block';
+            
+            const thumbHeight = Math.max(15, (clientHeight / scrollHeight) * scrollbarHeight * 0.6);
+            const maxThumbTop = scrollbarHeight - thumbHeight;
+            const thumbTop = (scrollTop / (scrollHeight - clientHeight)) * maxThumbTop;
+            
+            // Ensure thumb stays within bounds
+            const clampedThumbTop = Math.max(0, Math.min(thumbTop, maxThumbTop));
+            
+            scrollbarThumb.style.height = thumbHeight + 'px';
+            scrollbarThumb.style.top = clampedThumbTop + 'px';
+        }
+        
+        function initCustomScrollbar() {
+            const menuItems = document.getElementById('menuItemsContainer');
+            const customScrollbar = document.querySelector('.custom-scrollbar');
+            const scrollbarThumb = document.getElementById('customScrollbarThumb');
+            const externalScrollbar = document.querySelector('.external-scrollbar');
+            const scrollArrowUp = document.querySelector('.scroll-arrow-up');
+            const scrollArrowDown = document.querySelector('.scroll-arrow-down');
+            
+            if (!menuItems || !customScrollbar || !scrollbarThumb || !externalScrollbar) return;
+            
+            // Update scrollbar on scroll
+            menuItems.addEventListener('scroll', updateCustomScrollbar);
+            
+            // Handle scroll arrows
+            if (scrollArrowUp) {
+                scrollArrowUp.addEventListener('click', function() {
+                    menuItems.scrollTop -= 50;
+                    updateCustomScrollbar();
+                });
+            }
+            
+            if (scrollArrowDown) {
+                scrollArrowDown.addEventListener('click', function() {
+                    menuItems.scrollTop += 50;
+                    updateCustomScrollbar();
+                });
+            }
+            
+            // Handle scrollbar click
+            externalScrollbar.addEventListener('click', function(e) {
+                if (e.target === externalScrollbar || e.target === customScrollbar) {
+                    const rect = customScrollbar.getBoundingClientRect();
+                    const clickY = e.clientY - rect.top;
+                    const scrollRatio = clickY / rect.height;
+                    
+                    menuItems.scrollTop = scrollRatio * (menuItems.scrollHeight - menuItems.clientHeight);
+                }
+            });
+            
+            // Handle thumb drag
+            let isDragging = false;
+            let dragStartY = 0;
+            let scrollStartTop = 0;
+            
+            scrollbarThumb.addEventListener('mousedown', function(e) {
+                isDragging = true;
+                dragStartY = e.clientY;
+                scrollStartTop = menuItems.scrollTop;
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mousemove', function(e) {
+                if (!isDragging) return;
+                
+                const deltaY = e.clientY - dragStartY;
+                const scrollbarHeight = customScrollbar.clientHeight;
+                const scrollRatio = deltaY / scrollbarHeight;
+                
+                menuItems.scrollTop = scrollStartTop + scrollRatio * (menuItems.scrollHeight - menuItems.clientHeight);
+                e.preventDefault();
+            });
+            
+            document.addEventListener('mouseup', function() {
+                isDragging = false;
+            });
+            
+            // Initial update
+            updateCustomScrollbar();
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('🚀 DOM loaded, setting up menu...');
+            console.log('📸 Banner image URL:', bannerImageUrl);
+            
+            renderMenuItems('main');
+            updateSelection(0, 'main');
+            initCustomScrollbar();
+            updateScrollbarIndicator();
+            
+            // Add tab click handlers
+            document.addEventListener('click', function(e) {
+                if (e.target.classList.contains('tab-header')) {
+                    const tabId = e.target.getAttribute('data-tab');
+                    const currentMenu = currentMenuType;
+                    
+                    if (menuData[currentMenu] && menuData[currentMenu].isTabbed) {
+                        // Update current tab
+                        menuData[currentMenu].currentTab = tabId;
+                        
+                        // Re-render menu items
+                        renderMenuItems(currentMenu);
+                        updateSelection(0, currentMenu);
+                        updateScrollbarIndicator();
+                    }
+                }
+            });
+
+            
+            // Set header image immediately and with a fallback
+            setHeaderImage(bannerImageUrl);
+            
+            // Also try again after a short delay to ensure it loads
+            setTimeout(() => {
+                console.log('🔄 Retrying image load...');
+                setHeaderImage(bannerImageUrl);
+            }, 500);
+        });
+
+        window.addEventListener('message', function(event) {
+            let data = event.data;
+            try {
+                // Parse JSON if it's a string
+                if (typeof data === 'string') {
+                    data = JSON.parse(data);
+                }
+                if (data.type === 'updateSelection') {
+                    const currentItems = document.querySelectorAll('#menuItemsContainer .menu-item, #menuItemsContainer .back-arrow-item, #menuItemsContainer .toggle-item');
+                    const targetIndex = data.currentIndex !== undefined ? data.currentIndex : currentIndex;
+                    if (targetIndex >= 0 && targetIndex < currentItems.length) {
+                        updateSelection(targetIndex, currentMenuType);
+                    }
+                } else if (data.type === 'selectEffect') {
+                    selectEffect(currentIndex, currentMenuType);
+                } else if (data.type === 'moveUp') {
+                    const currentItems = document.querySelectorAll('#menuItemsContainer .menu-item, #menuItemsContainer .toggle-item, #menuItemsContainer .combo-item, #menuItemsContainer .slider-item');
+                    if (currentItems.length > 0) {
+                        currentIndex = (currentIndex - 1 + currentItems.length) % currentItems.length;
+                        updateSelection(currentIndex, currentMenuType);
+                        setTimeout(() => {
+                            updateCustomScrollbar();
+                            updateScrollbarIndicator();
+                        }, 50);
+                    }
+                } else if (data.type === 'moveDown') {
+                    const currentItems = document.querySelectorAll('#menuItemsContainer .menu-item, #menuItemsContainer .toggle-item, #menuItemsContainer .combo-item, #menuItemsContainer .slider-item');
+                    if (currentItems.length > 0) {
+                        currentIndex = (currentIndex + 1) % currentItems.length;
+                        updateSelection(currentIndex, currentMenuType);
+                        setTimeout(() => {
+                            updateCustomScrollbar();
+                            updateScrollbarIndicator();
+                        }, 50);
+                    }
+                } else if (data.type === 'enter') {
+                    let selectedItemData;
+                    if (menuData[currentMenuType].isTabbed) {
+                        const currentTab = menuData[currentMenuType].tabs[menuData[currentMenuType].currentTab];
+                        selectedItemData = currentTab.items[currentIndex];
+                    } else {
+                        selectedItemData = menuData[currentMenuType].items[currentIndex];
+                    }
+                    
+                    if (selectedItemData && selectedItemData.type === 'toggle') {
+                        const domElement = document.querySelector(`[data-index="${currentIndex}"][data-action="${selectedItemData.action}"]`);
+                        if (domElement) {
+                            domElement.click(); 
+                        }
+                    } else {
+                        selectEffect(currentIndex, currentMenuType); 
+                    }
+                } else if (data.type === 'showMenu') { 
+                    menuContainer.style.display = 'flex';
+                    menuContainer.style.opacity = '1';
+                    menuContainer.style.transform = 'none'; 
+                    const externalScrollbar = document.querySelector('.external-scrollbar');
+                    if (externalScrollbar) {
+                        externalScrollbar.style.display = 'flex';
+                    }
+                    
+                    // Show menu footer and tooltip when menu is opened
+                    const menuFooter = document.querySelector('.menu-footer');
+                    if (menuFooter) {
+                        menuFooter.style.display = 'flex';
+                    }
+                    
+                    const tooltipContainer = document.getElementById('tooltipContainer');
+                    if (tooltipContainer) {
+                        tooltipContainer.style.display = 'block';
+                    }
+                    
+                    renderMenuItems(currentMenuType);
+                    updateSelection(currentIndex, currentMenuType);
+                } else if (data.type === 'hideMenu') { 
+                    menuContainer.style.display = 'none';
+                    const externalScrollbar = document.querySelector('.external-scrollbar');
+                    if (externalScrollbar) {
+                        externalScrollbar.style.display = 'none';
+                    }
+                    
+                    // Hide menu footer and tooltip when menu is closed
+                    const menuFooter = document.querySelector('.menu-footer');
+                    if (menuFooter) {
+                        menuFooter.style.display = 'none';
+                    }
+                    
+                    const tooltipContainer = document.getElementById('tooltipContainer');
+                    if (tooltipContainer) {
+                        tooltipContainer.style.display = 'none';
+                    }
+                    
+                    // IMPORTANT: Keep spectators list visible when menu is hidden
+                    // The spectators list should remain visible even when menu is closed
+                    console.log('Menu hidden, but spectators list remains visible if enabled');
+                } else if (data.type === 'back') { 
+                    navigateBack();
+                } else if (data.type === 'teleportToWaypoint') {
+                    if (data.success) {
+                        showNotification('Teleport', 'Successfully teleported to waypoint!', '<i class="fa-solid fa-location-arrow"></i>');
+                    } else {
+                        showNotification('Teleport Failed', 'No waypoint set on map!', '<i class="fa-solid fa-exclamation-triangle"></i>');
+                    }
+                } else if (data.type === 'switchTab') {
+                    if ((currentMenuType === 'settings' || currentMenuType === 'self' || currentMenuType === 'combat' || currentMenuType === 'online') && data.tab) {
+                        switchTab(data.tab);
+                    }
+                } else if (data.type === 'enter') {
+                    // Update tooltip when entering submenus
+                    setTimeout(() => {
+                        updateTooltipForCurrentSelection();
+                    }, 100);
+                } else if (data.type === 'changeOutfit') {
+                    if (data.outfit && currentMenuType === 'self') {
+                        // Update outfit selection locally (just visual change)
+                        const outfitItem = menuData.self.tabs.wardrobe.items.find(item => item.action === 'outfits');
+                        if (outfitItem) {
+                            outfitItem.value = data.outfit;
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'changeGodMode') {
+                    if (data.mode && currentMenuType === 'self') {
+                        // Update god mode selection locally (just visual change)
+                        const godModeItem = menuData.self.tabs.player.items.find(item => item.action === 'god_mode');
+                        if (godModeItem) {
+                            godModeItem.value = data.mode;
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'changeMeleeWeapon') {
+                    if (data.weapon && currentMenuType === 'combat') {
+                        // Update melee weapon selection locally (just visual change)
+                        const meleeItem = menuData.combat.tabs.weapon_spawner.items.find(item => item.action === 'spawn_melee');
+                        if (meleeItem) {
+                            meleeItem.value = data.weapon;
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'changeHandgun') {
+                    if (data.weapon && currentMenuType === 'combat') {
+                        // Update handgun selection locally (just visual change)
+                        const handgunItem = menuData.combat.tabs.weapon_spawner.items.find(item => item.action === 'spawn_handgun');
+                        if (handgunItem) {
+                            handgunItem.value = data.weapon;
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'changeRifle') {
+                    if (data.weapon && currentMenuType === 'combat') {
+                        // Update rifle selection locally (just visual change)
+                        const rifleItem = menuData.combat.tabs.weapon_spawner.items.find(item => item.action === 'spawn_rifle');
+                        if (rifleItem) {
+                            rifleItem.value = data.weapon;
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'changeSMG') {
+                    if (data.weapon && currentMenuType === 'combat') {
+                        // Update SMG selection locally (just visual change)
+                        const smgItem = menuData.combat.tabs.weapon_spawner.items.find(item => item.action === 'spawn_smg');
+                        if (smgItem) {
+                            smgItem.value = data.weapon;
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'changeMachineGun') {
+                    if (data.weapon && currentMenuType === 'combat') {
+                        // Update machine gun selection locally (just visual change)
+                        const machineGunItem = menuData.combat.tabs.weapon_spawner.items.find(item => item.action === 'spawn_machinegun');
+                        if (machineGunItem) {
+                            machineGunItem.value = data.weapon;
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'changeSniper') {
+                    if (data.weapon && currentMenuType === 'combat') {
+                        // Update sniper selection locally (just visual change)
+                        const sniperItem = menuData.combat.tabs.weapon_spawner.items.find(item => item.action === 'spawn_sniper');
+                        if (sniperItem) {
+                            sniperItem.value = data.weapon;
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'applyOutfit') {
+                    if (data.outfit && currentMenuType === 'self') {
+                        // Apply outfit and show confirmation
+                        const outfitItem = menuData.self.tabs.wardrobe.items.find(item => item.action === 'outfits');
+                        if (outfitItem) {
+                            outfitItem.value = data.outfit;
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                            showNotification('Outfit Applied', `Successfully equipped: ${data.outfit}`, '<i class="fa-solid fa-check-circle"></i>');
+                        }
+                    }
+                } else if (data.type === 'spectatorsList') {
+                    console.log('Received spectatorsList message:', data);
+                    populateSpectatorsList(data.spectators || []);
+                } else if (data.type === 'toggleSpectatorsList') {
+                    toggleSpectatorsList(data.enabled);
+                    
+                    // Update the checkbox state in the menu data for settings tab
+                    if (currentMenuType === 'settings' && menuData.settings.tabs.settings) {
+                        const SpectatorslistItem = menuData.settings.tabs.settings.items.find(item => item.action === 'spectators_list');
+                        if (SpectatorslistItem) {
+                            SpectatorslistItem.checked = data.enabled;
+                            // Re-render the menu to show updated checkbox state
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'toggleSlideMode') {
+                    // Update the checkbox state in the menu data for slide mode
+                    if (currentMenuType === 'self' && menuData.self.tabs.miscellaneous) {
+                        const slideModeItem = menuData.self.tabs.miscellaneous.items.find(item => item.action === 'slide_mode');
+                        if (slideModeItem) {
+                            slideModeItem.checked = data.enabled;
+                            // Also update the speed if provided
+                            if (data.speed !== undefined) {
+                                slideModeItem.value = data.speed;
+                            }
+                            // Re-render the menu to show updated checkbox state
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'toggleNoclip') {
+                    // Update the checkbox state in the menu data for noclip
+                    if (currentMenuType === 'self' && menuData.self.tabs.player) {
+                        const noclipItem = menuData.self.tabs.player.items.find(item => item.action === 'noclip_toggle');
+                        if (noclipItem) {
+                            noclipItem.checked = data.enabled;
+                            // Also update the speed if provided
+                            if (data.speed !== undefined) {
+                                noclipItem.value = data.speed;
+                            }
+                            // Re-render the menu to show updated checkbox state
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'updateToggleState') {
+                    // Update toggle state for any toggle item
+                    if (data.action === 'solo_session' && currentMenuType === 'self' && menuData.self.tabs.miscellaneous) {
+                        const soloSessionItem = menuData.self.tabs.miscellaneous.items.find(item => item.action === 'solo_session');
+                        if (soloSessionItem) {
+                            soloSessionItem.checked = data.checked;
+                            // Re-render the menu to show updated checkbox state
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    } else if (data.action === 'spoof_weapon' && currentMenuType === 'combat' && menuData.combat.tabs.weapon_spawner) {
+                        const spoofWeaponItem = menuData.combat.tabs.weapon_spawner.items.find(item => item.action === 'toggle_spoof_weapon');
+                        if (spoofWeaponItem) {
+                            spoofWeaponItem.checked = data.checked;
+                            // Re-render the menu to show updated checkbox state
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    } else if (data.action === 'spectate_player' && currentMenuType === 'online' && menuData.online.tabs.safe) {
+                        const spectateItem = menuData.online.tabs.safe.items.find(item => item.action === 'spectate_player');
+                        if (spectateItem) {
+                            spectateItem.checked = data.checked;
+                            // Re-render the menu to show updated toggle state
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    } else if (data.action === 'god_mode' && currentMenuType === 'self' && menuData.self.tabs.player) {
+                        const godModeItem = menuData.self.tabs.player.items.find(item => item.action === 'god_mode');
+                        if (godModeItem) {
+                            godModeItem.checked = data.checked;
+                            // Re-render the menu to show updated checkbox state
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'updateSlideSpeed') {
+                    // Update the slide speed value in the menu data
+                    if (currentMenuType === 'self' && menuData.self.tabs.miscellaneous) {
+                        const slideModeItem = menuData.self.tabs.miscellaneous.items.find(item => item.action === 'slide_mode');
+                        if (slideModeItem) {
+                            slideModeItem.value = data.speed;
+                            // Re-render the menu to show updated speed
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'updateNoclipSpeed') {
+                    // Update the noclip speed value in the menu data
+                    if (currentMenuType === 'self' && menuData.self.tabs.player) {
+                        const noclipItem = menuData.self.tabs.player.items.find(item => item.action === 'noclip_toggle');
+                        if (noclipItem) {
+                            noclipItem.value = data.speed;
+                            // Re-render the menu to show updated speed
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'updateHealthAmount') {
+                    // Update the health amount value in the menu data
+                    if (currentMenuType === 'self' && menuData.self.tabs.player) {
+                        const healthItem = menuData.self.tabs.player.items.find(item => item.action === 'set_health');
+                        if (healthItem) {
+                            healthItem.value = data.amount;
+                            // Re-render the menu to show updated amount
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'updateArmorAmount') {
+                    // Update the armor amount value in the menu data
+                    if (currentMenuType === 'self' && menuData.self.tabs.player) {
+                        const armorItem = menuData.self.tabs.player.items.find(item => item.action === 'add_armor');
+                        if (armorItem) {
+                            armorItem.value = data.amount;
+                            // Re-render the menu to show updated amount
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                        }
+                    }
+                } else if (data.type === 'resourcesList') {
+                    if (data.resources) {
+                        populateResources(data.resources);
+                    }
+                } else if (data.type === 'navigateToResources') {
+                    if (data.resources) {
+                        // Navigate to resources menu and populate data
+                        currentMenuType = 'resources';
+                        populateResources(data.resources);
+                        renderMenuItems(currentMenuType);
+                        updateSelection(0, currentMenuType);
+                        updateScrollbarIndicator();
+                    }
+                } else if (data.type === 'resourceAction') {
+                    if (data.success) {
+                        const actionText = data.action === 'start' ? 'started' : 'stopped';
+                        showNotification('Resource ' + actionText.charAt(0).toUpperCase() + actionText.slice(1), 
+                                       `Resource "${data.resource}" has been ${actionText}.`, 
+                                       data.action === 'start' ? '<i class="fa-solid fa-play"></i>' : '<i class="fa-solid fa-stop"></i>');
+                        
+                        // Update resource status locally for immediate UI feedback
+                        if (currentMenuType === 'resources') {
+                            const resourceItem = menuData.resources.items.find(item => item.name === data.resource);
+                            if (resourceItem) {
+                                // Update the status immediately
+                                resourceItem.running = data.action === 'start';
+                                
+                                // Re-render the menu with updated status
+                                renderMenuItems(currentMenuType);
+                                updateSelection(currentIndex, currentMenuType);
+                                updateScrollbarIndicator();
+                            }
+                        }
+                    } else {
+                        showNotification('Resource Action Failed', 
+                                       `Failed to ${data.action} resource "${data.resource}".`, 
+                                       '<i class="fa-solid fa-exclamation-triangle"></i>');
+                    }
+                } else if (data.type === 'showKeyBinding') {
+                    showKeyBinding(data.message);
+                } else if (data.type === 'showWeaponInput') {
+                    showWeaponInput();
+                } else if (data.type === 'weaponInputUpdate') {
+                    updateWeaponInput(data.text);
+                    console.log('🔫 Received weapon input update:', data.text);
+                } else if (data.type === 'weaponInputComplete') {
+                    hideWeaponInput();
+                    if (data.success) {
+                        showNotification('Weapon Spawned', `Successfully spawned: ${data.weaponName}`, '<i class="fa-solid fa-gun"></i>');
+                    } else {
+                        showNotification('Weapon Spawn Failed', `Failed to spawn: ${data.weaponName}`, '<i class="fa-solid fa-exclamation-triangle"></i>');
+                    }
+                } else if (data.type === 'keySelected') {
+                    // Show key selection without auto-hiding (waiting for confirmation)
+                    showKeySelection(data.key, data.value);
+                } else if (data.type === 'keyBindingComplete') {
+                    if (data.success) {
+                        updateKeyBindingStatus(data.key, data.value, true);
+                        // Hide immediately after success
+                        setTimeout(() => {
+                            hideKeyBinding(); 
+                        }, 200); 
+                    } else {
+                        updateKeyBindingStatus(null, null, false);
+                        // Hide immediately after failure
+                        setTimeout(() => {
+                            hideKeyBinding(); 
+                        }, 500); 
+                    }
+                } else if (data.type === 'keySelectionReset') {
+                    // Reset key binding message to allow new key selection
+                    const inputEl = document.getElementById('keyBindingText');
+                    const cursorEl = document.getElementById('cursor');
+                    
+                    if (inputEl) {
+                        inputEl.textContent = '';
+                    }
+                    if (cursorEl) {
+                        cursorEl.style.display = 'inline-block';
+                    }
+                } else if (data.type === 'hideKeyBinding') {
+                    hideKeyBinding();
+                } else if (data.type === 'setHeaderImage') {
+                    setHeaderImage(data.imageUrl); 
+                } else if (data.type === 'populatePlayerList') {
+                    if (data.players && currentMenuType === 'online') {
+                        // Update the online menu data with player list
+                        if (menuData.online && menuData.online.tabs && menuData.online.tabs.list) {
+                            // Store players in a separate property, not overwriting the static items
+                            menuData.online.tabs.list.players = data.players;
+                            // Re-render the menu to show updated player list with toggle states
+                            renderMenuItems(currentMenuType);
+                            updateSelection(currentIndex, currentMenuType);
+                            updateScrollbarIndicator();
+                        }
+                    }
+                } else if (data.type === 'showCustomNotification') {
+                    showNotification(data.title || 'Notification', data.message || 'Custom message from server.', data.iconHtml);
+                } else if (data.type === 'updatePlayerInfo') {
+                    // Update player info panel with new data
+                    if (data.player && currentMenuType === 'online') {
+                        updatePlayerInfoDisplay(data.player);
+                    }
+                }
+            } catch (error) {
+                console.error('Error processing message from FiveM:', error);
+            }
+        });
+
+    </script>
+</body>
+</html>
